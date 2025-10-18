@@ -1,27 +1,45 @@
 import { useState, useEffect } from "react";
 import { Ticket, ExcelRecord } from "@/types/ticket";
+import { toast } from "sonner";
 
 const STORAGE_KEY = "noc_tickets";
-const EXCEL_DATA_KEY = "noc_excel_data";
 
 export function useTickets() {
+  // Clean up old Excel data from localStorage on first mount
+  useEffect(() => {
+    try {
+      localStorage.removeItem("noc_excel_data");
+    } catch (error) {
+      console.error("Error cleaning up old data:", error);
+    }
+  }, []);
+
   const [tickets, setTickets] = useState<Ticket[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.error("Error loading tickets from localStorage:", error);
+      return [];
+    }
   });
 
-  const [excelData, setExcelData] = useState<ExcelRecord[]>(() => {
-    const saved = localStorage.getItem(EXCEL_DATA_KEY);
-    return saved ? JSON.parse(saved) : [];
-  });
+  // Excel data is only stored in memory (session only)
+  // Users can re-import if needed after page refresh
+  const [excelData, setExcelData] = useState<ExcelRecord[]>([]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+    } catch (error) {
+      console.error("Error saving tickets to localStorage:", error);
+      if (error instanceof DOMException && error.name === "QuotaExceededError") {
+        toast.error(
+          "Storage penuh! Silakan export dan hapus tiket lama untuk membuat ruang."
+        );
+      }
+    }
   }, [tickets]);
-
-  useEffect(() => {
-    localStorage.setItem(EXCEL_DATA_KEY, JSON.stringify(excelData));
-  }, [excelData]);
 
   const addTicket = (ticket: Ticket) => {
     setTickets((prev) => [ticket, ...prev]);

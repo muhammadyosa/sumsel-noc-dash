@@ -254,7 +254,12 @@ export default function TicketManagement() {
       <Card className="shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Search & Filter</span>
+            <div>
+              <span>Search & Filter</span>
+              <p className="text-xs text-muted-foreground font-normal mt-1">
+                Data Excel disimpan sementara di memory. Import ulang setelah refresh halaman.
+              </p>
+            </div>
             <label>
               <input
                 type="file"
