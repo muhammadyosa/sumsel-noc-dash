@@ -1,7 +1,7 @@
 import { Activity, AlertTriangle, Zap, Server } from "lucide-react";
 import { MetricCard } from "@/components/MetricCard";
 import { useTickets } from "@/hooks/useTickets";
-import { FEEDER_CONSTRAINTS } from "@/types/ticket";
+import { FEEDER_CONSTRAINTS_SET } from "@/types/ticket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 
@@ -13,7 +13,7 @@ export default function Dashboard() {
     const ageMs = new Date().getTime() - new Date(t.createdISO).getTime();
     return ageMs > 24 * 60 * 60 * 1000 && t.status !== "Resolved";
   }).length;
-  const feederImpact = tickets.filter((t) => FEEDER_CONSTRAINTS.has(t.constraint)).length;
+  const feederImpact = tickets.filter((t) => FEEDER_CONSTRAINTS_SET.has(t.constraint)).length;
   const totalOLT = new Set(excelData.map((r) => r.hostname).filter(Boolean)).size || 0;
 
   const recentTickets = tickets.slice(0, 5);
@@ -85,6 +85,45 @@ export default function Dashboard() {
 
         <Card className="shadow-card">
           <CardHeader>
+            <CardTitle>Category Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {["RITEL", "FEEDER"].map((category) => {
+                const count = tickets.filter((t) => t.category === category).length;
+                const percentage = totalIncidents > 0 ? (count / totalIncidents) * 100 : 0;
+                return (
+                  <div key={category} className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            category === "FEEDER" ? "bg-warning" : "bg-primary"
+                          }`}
+                        />
+                        <span className="font-medium">{category}</span>
+                      </div>
+                      <span className="font-medium">
+                        {count} ({percentage.toFixed(0)}%)
+                      </span>
+                    </div>
+                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all ${
+                          category === "FEEDER" ? "bg-warning" : "bg-primary"
+                        }`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card md:col-span-2">
+          <CardHeader>
             <CardTitle>Recent Tickets</CardTitle>
           </CardHeader>
           <CardContent>
@@ -100,9 +139,20 @@ export default function Dashboard() {
                     className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{ticket.id}</p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-sm font-medium truncate">{ticket.id}</p>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full ${
+                            ticket.category === "FEEDER"
+                              ? "bg-warning/20 text-warning"
+                              : "bg-primary/20 text-primary"
+                          }`}
+                        >
+                          {ticket.category}
+                        </span>
+                      </div>
                       <p className="text-xs text-muted-foreground truncate">
-                        {ticket.customerName}
+                        {ticket.constraint} - {ticket.customerName}
                       </p>
                     </div>
                     <StatusBadge status={ticket.status} />

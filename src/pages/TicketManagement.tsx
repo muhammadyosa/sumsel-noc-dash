@@ -3,6 +3,7 @@ import { Download, Plus, Search, FileUp, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -26,9 +27,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { useTickets } from "@/hooks/useTickets";
-import { Ticket, CONSTRAINTS, ExcelRecord } from "@/types/ticket";
+import {
+  Ticket,
+  ALL_CONSTRAINTS,
+  FEEDER_CONSTRAINTS_SET,
+  generateTicketFormat,
+  ExcelRecord,
+} from "@/types/ticket";
 import { StatusBadge } from "@/components/StatusBadge";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
@@ -49,7 +55,7 @@ export default function TicketManagement() {
   const [formData, setFormData] = useState({
     serpo: "",
     constraint: "",
-    ticketResult: "",
+    portText: "", // For PORT DOWN constraint
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTicket, setEditingTicket] = useState<Ticket | null>(null);
@@ -112,6 +118,21 @@ export default function TicketManagement() {
     }
 
     const now = new Date();
+    
+    // Determine category based on constraint
+    const category = FEEDER_CONSTRAINTS_SET.has(formData.constraint) ? "FEEDER" : "RITEL";
+    
+    // Auto-generate ticket format
+    const ticketResult = generateTicketFormat(
+      formData.constraint,
+      String(selectedRecord.customer || ""),
+      formData.serpo.trim(),
+      String(selectedRecord.fat || ""),
+      String(selectedRecord.hostname || ""),
+      String(selectedRecord.sn || ""),
+      formData.portText || undefined
+    );
+    
     const ticket: Ticket = {
       id: `INC-${Date.now()}`,
       serviceId: String(selectedRecord.service || ""),
@@ -121,23 +142,24 @@ export default function TicketManagement() {
       fatId: String(selectedRecord.fat || ""),
       snOnt: String(selectedRecord.sn || ""),
       constraint: formData.constraint,
-      category: "RITEL",
-      ticketResult: formData.ticketResult || "",
+      category,
+      ticketResult,
       status: "On Progress",
       createdAt: now.toLocaleString("id-ID"),
       createdISO: now.toISOString(),
     };
 
     addTicket(ticket);
-    toast.success("Tiket berhasil dibuat");
+    toast.success(`Tiket ${category} berhasil dibuat`);
     setIsFormOpen(false);
-    setFormData({ serpo: "", constraint: "", ticketResult: "" });
+    setFormData({ serpo: "", constraint: "", portText: "" });
     setSelectedRecord(null);
   };
 
   const handleExportCSV = () => {
     const headers = [
       "Ticket ID",
+      "Category",
       "Service ID",
       "Customer Name",
       "Serpo",
@@ -145,12 +167,13 @@ export default function TicketManagement() {
       "ID FAT",
       "SN ONT",
       "Constraint",
-      "Category",
       "Status",
       "Created",
+      "Ticket Result",
     ];
     const rows = tickets.map((t) => [
       t.id,
+      t.category,
       t.serviceId,
       t.customerName,
       t.serpo,
@@ -158,9 +181,9 @@ export default function TicketManagement() {
       t.fatId,
       t.snOnt,
       t.constraint,
-      t.category,
       t.status,
       t.createdAt,
+      t.ticketResult,
     ]);
     const csv = [
       headers.join(","),
@@ -219,7 +242,18 @@ export default function TicketManagement() {
                       <SelectValue placeholder="Pilih constraint" />
                     </SelectTrigger>
                     <SelectContent>
-                      {CONSTRAINTS.map((c) => (
+                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                        RITEL
+                      </div>
+                      {ALL_CONSTRAINTS.filter(c => !FEEDER_CONSTRAINTS_SET.has(c)).map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-t mt-1">
+                        FEEDER (PROACTIVE NOC RETAIL)
+                      </div>
+                      {ALL_CONSTRAINTS.filter(c => FEEDER_CONSTRAINTS_SET.has(c)).map((c) => (
                         <SelectItem key={c} value={c}>
                           {c}
                         </SelectItem>
@@ -227,15 +261,38 @@ export default function TicketManagement() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label>Hasil Tiket (Optional)</Label>
-                  <Textarea
-                    value={formData.ticketResult}
-                    onChange={(e) => setFormData({ ...formData, ticketResult: e.target.value })}
-                    placeholder="Deskripsi hasil..."
-                    rows={4}
-                  />
-                </div>
+                
+                {/* Show PORT text input only for PORT DOWN constraint */}
+                {formData.constraint === "PORT DOWN" && (
+                  <div>
+                    <Label>Port Info (Optional)</Label>
+                    <Input
+                      value={formData.portText}
+                      onChange={(e) => setFormData({ ...formData, portText: e.target.value })}
+                      placeholder="Contoh: PORT-1/1/1"
+                    />
+                  </div>
+                )}
+                
+                {/* Preview ticket format */}
+                {formData.constraint && selectedRecord && formData.serpo && (
+                  <div className="p-3 bg-accent/50 rounded-lg space-y-1">
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      Preview Format Tiket:
+                    </p>
+                    <p className="text-sm font-mono">
+                      {generateTicketFormat(
+                        formData.constraint,
+                        String(selectedRecord.customer || ""),
+                        formData.serpo.trim(),
+                        String(selectedRecord.fat || ""),
+                        String(selectedRecord.hostname || ""),
+                        String(selectedRecord.sn || ""),
+                        formData.portText || undefined
+                      )}
+                    </p>
+                  </div>
+                )}
                 {selectedRecord && (
                   <div className="p-3 bg-secondary/50 rounded-lg space-y-1">
                     <p className="text-sm font-medium">Selected Record:</p>
@@ -282,27 +339,17 @@ export default function TicketManagement() {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-5">
             <div>
-              <Label>Customer Name</Label>
+              <Label>👨‍💼 Service ID</Label>
               <Input
-                placeholder="Search..."
-                value={searchFilters.customer}
-                onChange={(e) =>
-                  setSearchFilters({ ...searchFilters, customer: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label>Service ID</Label>
-              <Input
-                placeholder="Search..."
+                placeholder="Cari Service ID..."
                 value={searchFilters.service}
                 onChange={(e) => setSearchFilters({ ...searchFilters, service: e.target.value })}
               />
             </div>
             <div>
-              <Label>Hostname OLT</Label>
+              <Label>📍 Hostname OLT</Label>
               <Input
-                placeholder="Search..."
+                placeholder="Cari Hostname..."
                 value={searchFilters.hostname}
                 onChange={(e) =>
                   setSearchFilters({ ...searchFilters, hostname: e.target.value })
@@ -310,19 +357,29 @@ export default function TicketManagement() {
               />
             </div>
             <div>
-              <Label>ID FAT</Label>
+              <Label>🛠️ ID FAT</Label>
               <Input
-                placeholder="Search..."
+                placeholder="Cari ID FAT..."
                 value={searchFilters.fat}
                 onChange={(e) => setSearchFilters({ ...searchFilters, fat: e.target.value })}
               />
             </div>
             <div>
-              <Label>SN ONT</Label>
+              <Label>💻 SN ONT</Label>
               <Input
-                placeholder="Search..."
+                placeholder="Cari SN ONT..."
                 value={searchFilters.sn}
                 onChange={(e) => setSearchFilters({ ...searchFilters, sn: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Customer Name</Label>
+              <Input
+                placeholder="Cari Customer..."
+                value={searchFilters.customer}
+                onChange={(e) =>
+                  setSearchFilters({ ...searchFilters, customer: e.target.value })
+                }
               />
             </div>
           </div>
@@ -340,11 +397,11 @@ export default function TicketManagement() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Action</TableHead>
+                    <TableHead>👨‍💼 Service ID</TableHead>
+                    <TableHead>📍 Hostname OLT</TableHead>
+                    <TableHead>🛠️ ID FAT</TableHead>
+                    <TableHead>💻 SN ONT</TableHead>
                     <TableHead>Customer</TableHead>
-                    <TableHead>Service ID</TableHead>
-                    <TableHead>Hostname</TableHead>
-                    <TableHead>ID FAT</TableHead>
-                    <TableHead>SN ONT</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -362,11 +419,11 @@ export default function TicketManagement() {
                           Pilih
                         </Button>
                       </TableCell>
+                      <TableCell className="font-mono text-xs">{String(record.service || "")}</TableCell>
+                      <TableCell className="font-medium">{String(record.hostname || "")}</TableCell>
+                      <TableCell className="font-mono text-xs">{String(record.fat || "")}</TableCell>
+                      <TableCell className="font-mono text-xs">{String(record.sn || "")}</TableCell>
                       <TableCell>{String(record.customer || "")}</TableCell>
-                      <TableCell>{String(record.service || "")}</TableCell>
-                      <TableCell>{String(record.hostname || "")}</TableCell>
-                      <TableCell>{String(record.fat || "")}</TableCell>
-                      <TableCell>{String(record.sn || "")}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -386,10 +443,11 @@ export default function TicketManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Ticket ID</TableHead>
+                  <TableHead>Category</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Service ID</TableHead>
-                  <TableHead>Serpo</TableHead>
                   <TableHead>Constraint</TableHead>
+                  <TableHead>Serpo</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead>Action</TableHead>
@@ -398,7 +456,7 @@ export default function TicketManagement() {
               <TableBody>
                 {tickets.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="text-center text-muted-foreground">
                       Belum ada tiket
                     </TableCell>
                   </TableRow>
@@ -406,42 +464,121 @@ export default function TicketManagement() {
                   tickets.map((ticket) => (
                     <TableRow key={ticket.id}>
                       <TableCell className="font-medium">{ticket.id}</TableCell>
+                      <TableCell>
+                        <Badge
+                          className={
+                            ticket.category === "FEEDER"
+                              ? "bg-warning text-warning-foreground"
+                              : "bg-primary text-primary-foreground"
+                          }
+                        >
+                          {ticket.category}
+                        </Badge>
+                      </TableCell>
                       <TableCell>{ticket.customerName}</TableCell>
-                      <TableCell>{ticket.serviceId}</TableCell>
-                      <TableCell>{ticket.serpo}</TableCell>
-                      <TableCell>{ticket.constraint}</TableCell>
+                      <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
+                      <TableCell className="text-xs">{ticket.constraint}</TableCell>
+                      <TableCell className="text-xs">{ticket.serpo}</TableCell>
                       <TableCell>
                         <StatusBadge status={ticket.status} />
                       </TableCell>
-                      <TableCell className="text-sm">{ticket.createdAt}</TableCell>
+                      <TableCell className="text-xs">{ticket.createdAt}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Select
-                            value={ticket.status}
-                            onValueChange={(value: any) =>
-                              updateTicket(ticket.id, { status: value })
-                            }
-                          >
-                            <SelectTrigger className="h-8 w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="On Progress">On Progress</SelectItem>
-                              <SelectItem value="Critical">Critical</SelectItem>
-                              <SelectItem value="Resolved">Resolved</SelectItem>
-                              <SelectItem value="Pending">Pending</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              deleteTicket(ticket.id);
-                              toast.success("Tiket dihapus");
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button size="sm" variant="outline">
+                                Detail
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>Detail Tiket {ticket.id}</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3 text-sm">
+                                  <div>
+                                    <span className="text-muted-foreground">Category:</span>
+                                    <p className="font-medium">{ticket.category}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Status:</span>
+                                    <div className="mt-1">
+                                      <StatusBadge status={ticket.status} />
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Constraint:</span>
+                                    <p className="font-medium">{ticket.constraint}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Serpo/Tim:</span>
+                                    <p className="font-medium">{ticket.serpo}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Customer:</span>
+                                    <p className="font-medium">{ticket.customerName}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Service ID:</span>
+                                    <p className="font-mono text-xs">{ticket.serviceId}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Hostname OLT:</span>
+                                    <p className="font-medium">{ticket.hostname}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">ID FAT:</span>
+                                    <p className="font-mono text-xs">{ticket.fatId}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">SN ONT:</span>
+                                    <p className="font-mono text-xs">{ticket.snOnt}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">Created:</span>
+                                    <p className="text-xs">{ticket.createdAt}</p>
+                                  </div>
+                                </div>
+                                <div className="pt-3 border-t">
+                                  <span className="text-muted-foreground text-sm">Format Tiket:</span>
+                                  <div className="mt-2 p-3 bg-muted/50 rounded-lg">
+                                    <p className="font-mono text-sm whitespace-pre-wrap break-all">
+                                      {ticket.ticketResult}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex gap-2 pt-3">
+                                  <Select
+                                    value={ticket.status}
+                                    onValueChange={(value: any) =>
+                                      updateTicket(ticket.id, { status: value })
+                                    }
+                                  >
+                                    <SelectTrigger className="flex-1">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="On Progress">On Progress</SelectItem>
+                                      <SelectItem value="Critical">Critical</SelectItem>
+                                      <SelectItem value="Resolved">Resolved</SelectItem>
+                                      <SelectItem value="Pending">Pending</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button
+                                    variant="destructive"
+                                    onClick={() => {
+                                      deleteTicket(ticket.id);
+                                      toast.success("Tiket dihapus");
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Hapus
+                                  </Button>
+                                </div>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </TableCell>
                     </TableRow>
