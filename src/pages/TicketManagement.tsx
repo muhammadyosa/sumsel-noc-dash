@@ -81,17 +81,19 @@ export default function TicketManagement() {
   };
 
   const filteredData = excelData.filter((r) => {
+    // Convert all fields to string to handle numeric values from Excel
+    const customer = String(r.customer || "").toLowerCase();
+    const service = String(r.service || "").toLowerCase();
+    const hostname = String(r.hostname || "").toLowerCase();
+    const fat = String(r.fat || "").toLowerCase();
+    const sn = String(r.sn || "").toLowerCase();
+
     return (
-      (!searchFilters.customer ||
-        (r.customer || "").toLowerCase().includes(searchFilters.customer.toLowerCase())) &&
-      (!searchFilters.service ||
-        (r.service || "").toLowerCase().includes(searchFilters.service.toLowerCase())) &&
-      (!searchFilters.hostname ||
-        (r.hostname || "").toLowerCase().includes(searchFilters.hostname.toLowerCase())) &&
-      (!searchFilters.fat ||
-        (r.fat || "").toLowerCase().includes(searchFilters.fat.toLowerCase())) &&
-      (!searchFilters.sn ||
-        (r.sn || "").toLowerCase().includes(searchFilters.sn.toLowerCase()))
+      (!searchFilters.customer || customer.includes(searchFilters.customer.toLowerCase())) &&
+      (!searchFilters.service || service.includes(searchFilters.service.toLowerCase())) &&
+      (!searchFilters.hostname || hostname.includes(searchFilters.hostname.toLowerCase())) &&
+      (!searchFilters.fat || fat.includes(searchFilters.fat.toLowerCase())) &&
+      (!searchFilters.sn || sn.includes(searchFilters.sn.toLowerCase()))
     );
   });
 
@@ -112,12 +114,12 @@ export default function TicketManagement() {
     const now = new Date();
     const ticket: Ticket = {
       id: `INC-${Date.now()}`,
-      serviceId: selectedRecord.service || "",
-      customerName: selectedRecord.customer || "",
+      serviceId: String(selectedRecord.service || ""),
+      customerName: String(selectedRecord.customer || ""),
       serpo: formData.serpo.trim(),
-      hostname: selectedRecord.hostname || "",
-      fatId: selectedRecord.fat || "",
-      snOnt: selectedRecord.sn || "",
+      hostname: String(selectedRecord.hostname || ""),
+      fatId: String(selectedRecord.fat || ""),
+      snOnt: String(selectedRecord.sn || ""),
       constraint: formData.constraint,
       category: "RITEL",
       ticketResult: formData.ticketResult || "",
@@ -238,7 +240,8 @@ export default function TicketManagement() {
                   <div className="p-3 bg-secondary/50 rounded-lg space-y-1">
                     <p className="text-sm font-medium">Selected Record:</p>
                     <p className="text-xs text-muted-foreground">
-                      Customer: {selectedRecord.customer} | Service: {selectedRecord.service}
+                      Customer: {String(selectedRecord.customer || "")} | Service:{" "}
+                      {String(selectedRecord.service || "")}
                     </p>
                   </div>
                 )}
@@ -359,11 +362,11 @@ export default function TicketManagement() {
                           Pilih
                         </Button>
                       </TableCell>
-                      <TableCell>{record.customer}</TableCell>
-                      <TableCell>{record.service}</TableCell>
-                      <TableCell>{record.hostname}</TableCell>
-                      <TableCell>{record.fat}</TableCell>
-                      <TableCell>{record.sn}</TableCell>
+                      <TableCell>{String(record.customer || "")}</TableCell>
+                      <TableCell>{String(record.service || "")}</TableCell>
+                      <TableCell>{String(record.hostname || "")}</TableCell>
+                      <TableCell>{String(record.fat || "")}</TableCell>
+                      <TableCell>{String(record.sn || "")}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
