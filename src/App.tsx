@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { Zap } from "lucide-react";
 import Dashboard from "./pages/Dashboard";
 import TicketManagement from "./pages/TicketManagement";
 import Teams from "./pages/Teams";
@@ -25,8 +26,12 @@ const App = () => (
               <AppSidebar />
               <div className="flex-1 flex flex-col">
                 <header className="sticky top-0 z-10 h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                  <div className="flex h-14 items-center px-4">
+                  <div className="flex h-14 items-center px-4 gap-3">
                     <SidebarTrigger />
+                    <div className="flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-lg">NOC RITEL</span>
+                    </div>
                   </div>
                 </header>
                 <main className="flex-1 p-6">

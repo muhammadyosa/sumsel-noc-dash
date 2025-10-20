@@ -5,15 +5,6 @@ import { toast } from "sonner";
 const STORAGE_KEY = "noc_tickets";
 
 export function useTickets() {
-  // Clean up old Excel data from localStorage on first mount
-  useEffect(() => {
-    try {
-      localStorage.removeItem("noc_excel_data");
-    } catch (error) {
-      console.error("Error cleaning up old data:", error);
-    }
-  }, []);
-
   const [tickets, setTickets] = useState<Ticket[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -24,9 +15,16 @@ export function useTickets() {
     }
   });
 
-  // Excel data is only stored in memory (session only)
-  // Users can re-import if needed after page refresh
-  const [excelData, setExcelData] = useState<ExcelRecord[]>([]);
+  // Excel data persists in localStorage for the session
+  const [excelData, setExcelData] = useState<ExcelRecord[]>(() => {
+    try {
+      const saved = localStorage.getItem("noc_excel_data");
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.error("Error loading Excel data from localStorage:", error);
+      return [];
+    }
+  });
 
   useEffect(() => {
     try {
@@ -57,6 +55,14 @@ export function useTickets() {
 
   const importExcelData = (data: ExcelRecord[]) => {
     setExcelData(data);
+    try {
+      localStorage.setItem("noc_excel_data", JSON.stringify(data));
+    } catch (error) {
+      console.error("Error saving Excel data to localStorage:", error);
+      if (error instanceof DOMException && error.name === "QuotaExceededError") {
+        toast.error("Storage penuh! Excel data tidak dapat disimpan.");
+      }
+    }
   };
 
   return {

@@ -53,6 +53,7 @@ export default function TicketManagement() {
 
   const [selectedRecord, setSelectedRecord] = useState<ExcelRecord | null>(null);
   const [formData, setFormData] = useState({
+    ticketId: "",
     serpo: "",
     constraint: "",
     portText: "", // For PORT DOWN constraint
@@ -104,6 +105,10 @@ export default function TicketManagement() {
   });
 
   const handleSubmitTicket = () => {
+    if (!formData.ticketId.trim()) {
+      toast.error("Ticket ID wajib diisi");
+      return;
+    }
     if (!formData.constraint) {
       toast.error("Constraint wajib dipilih");
       return;
@@ -134,7 +139,7 @@ export default function TicketManagement() {
     );
     
     const ticket: Ticket = {
-      id: `INC-${Date.now()}`,
+      id: formData.ticketId.trim(),
       serviceId: String(selectedRecord.service || ""),
       customerName: String(selectedRecord.customer || ""),
       serpo: formData.serpo.trim(),
@@ -152,7 +157,7 @@ export default function TicketManagement() {
     addTicket(ticket);
     toast.success(`Tiket ${category} berhasil dibuat`);
     setIsFormOpen(false);
-    setFormData({ serpo: "", constraint: "", portText: "" });
+    setFormData({ ticketId: "", serpo: "", constraint: "", portText: "" });
     setSelectedRecord(null);
   };
 
@@ -224,6 +229,14 @@ export default function TicketManagement() {
                 <DialogTitle>Buat Tiket Baru</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
+                <div>
+                  <Label>Ticket ID</Label>
+                  <Input
+                    value={formData.ticketId}
+                    onChange={(e) => setFormData({ ...formData, ticketId: e.target.value })}
+                    placeholder="Masukkan Ticket ID (contoh: INC12345678)"
+                  />
+                </div>
                 <div>
                   <Label>Serpo / Tim</Label>
                   <Input
@@ -317,7 +330,7 @@ export default function TicketManagement() {
             <div>
               <span>Search & Filter</span>
               <p className="text-xs text-muted-foreground font-normal mt-1">
-                Data Excel disimpan sementara di memory. Import ulang setelah refresh halaman.
+                Data Excel tersimpan di browser. Tidak perlu upload ulang saat pindah menu.
               </p>
             </div>
             <label>
