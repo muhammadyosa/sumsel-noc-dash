@@ -579,9 +579,10 @@ export default function TicketManagement() {
                                 <div className="flex gap-2 pt-3">
                                   <Select
                                     value={ticket.status}
-                                    onValueChange={(value: any) =>
-                                      updateTicket(ticket.id, { status: value })
-                                    }
+                                    onValueChange={(value: any) => {
+                                      updateTicket(ticket.id, { status: value });
+                                      toast.success(`Status tiket ${ticket.id} berhasil diubah menjadi ${value}`);
+                                    }}
                                   >
                                     <SelectTrigger className="flex-1">
                                       <SelectValue />
