@@ -10,6 +10,8 @@ import { Zap } from "lucide-react";
 import Dashboard from "./pages/Dashboard";
 import TicketManagement from "./pages/TicketManagement";
 import Teams from "./pages/Teams";
+import OLTList from "./pages/OLTList";
+import Report from "./pages/Report";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +41,8 @@ const App = () => (
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/tickets" element={<TicketManagement />} />
                     <Route path="/teams" element={<Teams />} />
+                    <Route path="/olt" element={<OLTList />} />
+                    <Route path="/report" element={<Report />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>
