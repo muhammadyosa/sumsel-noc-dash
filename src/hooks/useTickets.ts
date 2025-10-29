@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Ticket, ExcelRecord } from "@/types/ticket";
 import { toast } from "sonner";
+import { loadExcelData, saveExcelData } from "@/lib/indexedDB";
 
 const STORAGE_KEY = "noc_tickets";
 
@@ -15,16 +16,22 @@ export function useTickets() {
     }
   });
 
-  // Excel data persists in localStorage for the session
-  const [excelData, setExcelData] = useState<ExcelRecord[]>(() => {
-    try {
-      const saved = localStorage.getItem("noc_excel_data");
-      return saved ? JSON.parse(saved) : [];
-    } catch (error) {
-      console.error("Error loading Excel data from localStorage:", error);
-      return [];
-    }
-  });
+  // Excel data persists in IndexedDB
+  const [excelData, setExcelData] = useState<ExcelRecord[]>([]);
+  const [isLoadingExcel, setIsLoadingExcel] = useState(true);
+
+  // Load Excel data from IndexedDB on mount
+  useEffect(() => {
+    loadExcelData()
+      .then((data) => {
+        setExcelData(data);
+        setIsLoadingExcel(false);
+      })
+      .catch((error) => {
+        console.error("Error loading Excel data from IndexedDB:", error);
+        setIsLoadingExcel(false);
+      });
+  }, []);
 
   useEffect(() => {
     try {
@@ -53,21 +60,21 @@ export function useTickets() {
     setTickets((prev) => prev.filter((ticket) => ticket.id !== id));
   };
 
-  const importExcelData = (data: ExcelRecord[]) => {
-    setExcelData(data);
+  const importExcelData = async (data: ExcelRecord[]) => {
     try {
-      localStorage.setItem("noc_excel_data", JSON.stringify(data));
+      await saveExcelData(data);
+      setExcelData(data);
+      toast.success("Data Excel berhasil disimpan secara permanen!");
     } catch (error) {
-      console.error("Error saving Excel data to localStorage:", error);
-      if (error instanceof DOMException && error.name === "QuotaExceededError") {
-        toast.error("Storage penuh! Excel data tidak dapat disimpan.");
-      }
+      console.error("Error saving Excel data to IndexedDB:", error);
+      toast.error("Gagal menyimpan data Excel.");
     }
   };
 
   return {
     tickets,
     excelData,
+    isLoadingExcel,
     addTicket,
     updateTicket,
     deleteTicket,

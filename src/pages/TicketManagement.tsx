@@ -40,7 +40,7 @@ import { toast } from "sonner";
 import * as XLSX from "xlsx";
 
 export default function TicketManagement() {
-  const { tickets, excelData, addTicket, updateTicket, deleteTicket, importExcelData } =
+  const { tickets, excelData, isLoadingExcel, addTicket, updateTicket, deleteTicket, importExcelData } =
     useTickets();
 
   const [searchFilters, setSearchFilters] = useState({
@@ -330,7 +330,13 @@ export default function TicketManagement() {
             <div>
               <span>Search & Filter</span>
               <p className="text-xs text-muted-foreground font-normal mt-1">
-                Data Excel tersimpan di browser. Tidak perlu upload ulang saat pindah menu.
+                {isLoadingExcel ? (
+                  "Memuat data Excel..."
+                ) : excelData.length > 0 ? (
+                  `✓ ${excelData.length} data tersimpan secara permanen - tidak perlu upload ulang!`
+                ) : (
+                  "Upload Excel sekali, data tersimpan permanen di aplikasi"
+                )}
               </p>
             </div>
             <label>
@@ -339,11 +345,12 @@ export default function TicketManagement() {
                 accept=".xlsx,.xls"
                 onChange={handleImportExcel}
                 className="hidden"
+                disabled={isLoadingExcel}
               />
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm" asChild disabled={isLoadingExcel}>
                 <span>
                   <FileUp className="h-4 w-4 mr-2" />
-                  Import Excel
+                  {isLoadingExcel ? "Loading..." : "Import Excel"}
                 </span>
               </Button>
             </label>
@@ -399,7 +406,15 @@ export default function TicketManagement() {
         </CardContent>
       </Card>
 
-      {filteredData.length > 0 && (
+      {isLoadingExcel ? (
+        <Card className="shadow-card">
+          <CardContent className="py-8">
+            <div className="text-center text-muted-foreground">
+              <p>Memuat data Excel...</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : filteredData.length > 0 && (
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle>Preview Data ({filteredData.length} records)</CardTitle>
