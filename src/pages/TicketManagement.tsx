@@ -508,25 +508,7 @@ export default function TicketManagement() {
                       <TableCell className="text-xs">{ticket.constraint}</TableCell>
                       <TableCell className="text-xs">{ticket.serpo}</TableCell>
                       <TableCell>
-                        <Select
-                          value={ticket.status}
-                          onValueChange={(value: any) => {
-                            updateTicket(ticket.id, { status: value });
-                            toast.success(`Status tiket ${ticket.id} diubah menjadi ${value}`);
-                          }}
-                        >
-                          <SelectTrigger className="w-[140px]">
-                            <SelectValue>
-                              <StatusBadge status={ticket.status} />
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="On Progress">On Progress</SelectItem>
-                            <SelectItem value="Critical">Critical</SelectItem>
-                            <SelectItem value="Resolved">Resolved</SelectItem>
-                            <SelectItem value="Pending">Pending</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <StatusBadge status={ticket.status} />
                       </TableCell>
                       <TableCell className="text-xs">{ticket.createdAt}</TableCell>
                       <TableCell>
