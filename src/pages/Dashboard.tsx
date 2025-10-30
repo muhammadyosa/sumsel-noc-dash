@@ -11,7 +11,10 @@ interface ShiftReport {
   date: string;
   shift: string;
   officer: string;
-  summary: string;
+  oltDown?: string;
+  portDown?: string;
+  fatLoss?: string;
+  summary?: string;
   issues: string;
   notes: string;
   createdAt: string;
@@ -150,57 +153,86 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 {shiftReports.slice(-3).reverse().map((report) => (
                   <div
                     key={report.id}
-                    className="p-4 rounded-lg bg-card border border-primary/10 shadow-sm hover:shadow-md transition-shadow"
+                    className="p-4 rounded-lg bg-card border border-primary/10 shadow-sm hover:shadow-md transition-all hover:border-primary/30"
                   >
-                    <div className="flex flex-wrap items-center gap-4 mb-3 pb-3 border-b border-border/50">
+                    <div className="space-y-3 mb-4 pb-3 border-b border-border/50">
                       <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-primary" />
-                        <span className="font-semibold">{new Date(report.date).toLocaleDateString("id-ID", { 
-                          weekday: 'long', 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-primary" />
-                        <span className="font-medium capitalize px-2 py-1 bg-primary/10 rounded-md">
-                          Shift {report.shift}
+                        <Calendar className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="font-semibold text-xs md:text-sm">
+                          {new Date(report.date).toLocaleDateString("id-ID", { 
+                            weekday: 'short', 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <User className="h-4 w-4 text-primary" />
-                        <span className="font-medium">{report.officer}</span>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Clock className="h-4 w-4 text-primary flex-shrink-0" />
+                          <span className="font-medium capitalize px-2 py-1 bg-primary/10 rounded-md text-xs">
+                            Shift {report.shift}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <User className="h-4 w-4 text-primary flex-shrink-0" />
+                          <span className="font-medium text-xs truncate max-w-[120px]">{report.officer}</span>
+                        </div>
                       </div>
                     </div>
 
                     <div className="space-y-3">
                       <div>
-                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                        <h4 className="text-xs font-bold text-primary uppercase tracking-wide mb-2 flex items-center gap-1">
+                          <span className="h-4 w-1 bg-primary rounded-full" />
                           Ringkasan Shift
                         </h4>
-                        <p className="text-sm leading-relaxed">{report.summary}</p>
+                        <div className="space-y-2 pl-2">
+                          {report.oltDown && (
+                            <div className="bg-destructive/5 p-2 rounded border-l-2 border-destructive">
+                              <div className="text-xs font-semibold text-destructive mb-1">📡 LAPORAN OLT DOWN</div>
+                              <p className="text-xs leading-relaxed text-foreground/80">{report.oltDown}</p>
+                            </div>
+                          )}
+                          {report.portDown && (
+                            <div className="bg-warning/5 p-2 rounded border-l-2 border-warning">
+                              <div className="text-xs font-semibold text-warning mb-1">🔌 LAPORAN PORT DOWN</div>
+                              <p className="text-xs leading-relaxed text-foreground/80">{report.portDown}</p>
+                            </div>
+                          )}
+                          {report.fatLoss && (
+                            <div className="bg-primary/5 p-2 rounded border-l-2 border-primary">
+                              <div className="text-xs font-semibold text-primary mb-1">📊 LAPORAN FAT LOSS SBS</div>
+                              <p className="text-xs leading-relaxed text-foreground/80">{report.fatLoss}</p>
+                            </div>
+                          )}
+                          {report.summary && !report.oltDown && !report.portDown && !report.fatLoss && (
+                            <div className="bg-muted/50 p-2 rounded">
+                              <p className="text-xs leading-relaxed">{report.summary}</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       {report.issues && (
                         <div>
                           <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
-                            Kendala/Masalah
+                            ⚠️ Kendala/Masalah
                           </h4>
-                          <p className="text-sm leading-relaxed text-destructive/90">{report.issues}</p>
+                          <p className="text-xs leading-relaxed text-destructive/90 bg-destructive/5 p-2 rounded">{report.issues}</p>
                         </div>
                       )}
 
                       {report.notes && (
                         <div>
                           <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
-                            Catatan
+                            📝 Catatan
                           </h4>
-                          <p className="text-sm leading-relaxed text-muted-foreground">{report.notes}</p>
+                          <p className="text-xs leading-relaxed text-muted-foreground bg-muted/30 p-2 rounded">{report.notes}</p>
                         </div>
                       )}
                     </div>

@@ -248,28 +248,27 @@ const OLTList = () => {
             />
           </div>
 
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>No</TableHead>
+                  <TableHead className="w-16">No</TableHead>
                   <TableHead>Nama Provinsi</TableHead>
                   <TableHead>ID FAT</TableHead>
                   <TableHead>Hostname OLT</TableHead>
                   <TableHead>Tikor OLT</TableHead>
-                  <TableHead>Tanggal Import</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
                       Memuat data OLT...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
                       {oltData.length === 0
                         ? "Belum ada data OLT. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
@@ -278,14 +277,11 @@ const OLTList = () => {
                 ) : (
                   filteredData.map((olt, index) => (
                     <TableRow key={olt.id}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{olt.provinsi}</TableCell>
+                      <TableCell className="font-medium">{index + 1}</TableCell>
+                      <TableCell className="font-medium">{olt.provinsi}</TableCell>
                       <TableCell>{olt.fatId}</TableCell>
-                      <TableCell>{olt.hostname}</TableCell>
+                      <TableCell className="font-mono text-xs">{olt.hostname}</TableCell>
                       <TableCell>{olt.tikor}</TableCell>
-                      <TableCell>
-                        {new Date(olt.createdAt).toLocaleString("id-ID")}
-                      </TableCell>
                     </TableRow>
                   ))
                 )}

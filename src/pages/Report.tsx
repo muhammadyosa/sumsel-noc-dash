@@ -26,7 +26,9 @@ const Report = () => {
     date: new Date().toISOString().split("T")[0],
     shift: "pagi",
     officer: "",
-    summary: "",
+    oltDown: "",
+    portDown: "",
+    fatLoss: "",
     issues: "",
     notes: "",
   });
@@ -39,10 +41,10 @@ const Report = () => {
   });
 
   const handleShiftReportSubmit = () => {
-    if (!shiftReport.officer || !shiftReport.summary) {
+    if (!shiftReport.officer || (!shiftReport.oltDown && !shiftReport.portDown && !shiftReport.fatLoss)) {
       toast({
         title: "Data tidak lengkap",
-        description: "Mohon lengkapi petugas dan ringkasan shift.",
+        description: "Mohon lengkapi petugas dan minimal satu ringkasan shift.",
         variant: "destructive",
       });
       return;
@@ -67,7 +69,9 @@ const Report = () => {
       date: new Date().toISOString().split("T")[0],
       shift: "pagi",
       officer: "",
-      summary: "",
+      oltDown: "",
+      portDown: "",
+      fatLoss: "",
       issues: "",
       notes: "",
     });
@@ -125,10 +129,18 @@ Tanggal: ${r.date}
 Shift: ${r.shift.toUpperCase()}
 Petugas: ${r.officer}
 
-RINGKASAN:
-${r.summary}
+RINGKASAN SHIFT:
 
-KENDALA:
+LAPORAN OLT DOWN:
+${r.oltDown || "-"}
+
+LAPORAN PORT DOWN:
+${r.portDown || "-"}
+
+LAPORAN FAT LOSS SBS:
+${r.fatLoss || "-"}
+
+KENDALA/MASALAH:
 ${r.issues || "-"}
 
 CATATAN:
@@ -220,17 +232,60 @@ Dibuat: ${new Date(r.createdAt).toLocaleString("id-ID")}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="summary">Ringkasan Shift</Label>
-                <Textarea
-                  id="summary"
-                  placeholder="Ringkasan aktivitas selama shift..."
-                  rows={4}
-                  value={shiftReport.summary}
-                  onChange={(e) =>
-                    setShiftReport({ ...shiftReport, summary: e.target.value })
-                  }
-                />
+              <div className="space-y-4">
+                <div className="border-l-4 border-primary pl-4">
+                  <h3 className="font-semibold mb-3 text-primary">Ringkasan Shift</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="oltDown" className="flex items-center gap-2">
+                        <span className="text-xs bg-destructive/10 text-destructive px-2 py-0.5 rounded">OLT DOWN</span>
+                        Laporan OLT Down
+                      </Label>
+                      <Textarea
+                        id="oltDown"
+                        placeholder="Laporan OLT yang mengalami down..."
+                        rows={3}
+                        value={shiftReport.oltDown}
+                        onChange={(e) =>
+                          setShiftReport({ ...shiftReport, oltDown: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="portDown" className="flex items-center gap-2">
+                        <span className="text-xs bg-warning/10 text-warning px-2 py-0.5 rounded">PORT DOWN</span>
+                        Laporan Port Down
+                      </Label>
+                      <Textarea
+                        id="portDown"
+                        placeholder="Laporan port yang mengalami down..."
+                        rows={3}
+                        value={shiftReport.portDown}
+                        onChange={(e) =>
+                          setShiftReport({ ...shiftReport, portDown: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="fatLoss" className="flex items-center gap-2">
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">FAT LOSS</span>
+                        Laporan FAT Loss SBS
+                      </Label>
+                      <Textarea
+                        id="fatLoss"
+                        placeholder="Laporan FAT loss SBS..."
+                        rows={3}
+                        value={shiftReport.fatLoss}
+                        onChange={(e) =>
+                          setShiftReport({ ...shiftReport, fatLoss: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
