@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Upload, Download, Trash2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -24,7 +25,12 @@ import { loadOLTData, saveOLTData, clearOLTData } from "@/lib/indexedDB";
 
 const OLTList = () => {
   const [oltData, setOltData] = useState<OLT[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchFilters, setSearchFilters] = useState({
+    provinsi: "",
+    fatId: "",
+    hostname: "",
+    tikor: "",
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   // Load OLT data from IndexedDB on mount
@@ -180,13 +186,19 @@ const OLTList = () => {
     }
   };
 
-  const filteredData = oltData.filter(
-    (olt) =>
-      olt.provinsi.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      olt.fatId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      olt.hostname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      olt.tikor.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = oltData.filter((olt) => {
+    const provinsi = String(olt.provinsi || "").toLowerCase();
+    const fatId = String(olt.fatId || "").toLowerCase();
+    const hostname = String(olt.hostname || "").toLowerCase();
+    const tikor = String(olt.tikor || "").toLowerCase();
+
+    return (
+      (!searchFilters.provinsi || provinsi.includes(searchFilters.provinsi.toLowerCase())) &&
+      (!searchFilters.fatId || fatId.includes(searchFilters.fatId.toLowerCase())) &&
+      (!searchFilters.hostname || hostname.includes(searchFilters.hostname.toLowerCase())) &&
+      (!searchFilters.tikor || tikor.includes(searchFilters.tikor.toLowerCase()))
+    );
+  });
 
   return (
     <div className="space-y-6">
@@ -199,56 +211,103 @@ const OLTList = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Data OLT</CardTitle>
+          <CardTitle className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <span>Data OLT</span>
+              <p className="text-xs text-muted-foreground font-normal mt-1">
+                {isLoading ? (
+                  "Memuat data OLT..."
+                ) : oltData.length > 0 ? (
+                  `✓ ${oltData.length} data tersimpan secara permanen - tidak perlu upload ulang!`
+                ) : (
+                  "Upload Excel/CSV sekali, data tersimpan permanen di aplikasi"
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="default" size="sm">
+                <label className="cursor-pointer">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import Excel/CSV
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleFileUpload}
+                  />
+                </label>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+                disabled={filteredData.length === 0}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export Excel
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleClearData}
+                disabled={oltData.length === 0}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Hapus Semua Data
+              </Button>
+            </div>
+          </CardTitle>
           <CardDescription>
             Upload file Excel/CSV dengan kolom: Nama Provinsi, ID FAT, Hostname OLT, Tikor OLT
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="default" size="sm">
-              <label className="cursor-pointer">
-                <Upload className="mr-2 h-4 w-4" />
-                Import Excel/CSV
-                <input
-                  type="file"
-                  className="hidden"
-                  accept=".xlsx,.xls,.csv"
-                  onChange={handleFileUpload}
+          <div className="space-y-2">
+            <p className="text-sm font-medium flex items-center gap-2">
+              <Search className="h-4 w-4" />
+              Search & Filter
+            </p>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div>
+                <Label>📜 Nama Provinsi</Label>
+                <Input
+                  placeholder="Cari Provinsi..."
+                  value={searchFilters.provinsi}
+                  onChange={(e) =>
+                    setSearchFilters({ ...searchFilters, provinsi: e.target.value })
+                  }
                 />
-              </label>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExport}
-              disabled={filteredData.length === 0}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Export Excel
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleClearData}
-              disabled={oltData.length === 0}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Hapus Semua Data
-            </Button>
+              </div>
+              <div>
+                <Label>🛠️ ID FAT</Label>
+                <Input
+                  placeholder="Cari ID FAT..."
+                  value={searchFilters.fatId}
+                  onChange={(e) => setSearchFilters({ ...searchFilters, fatId: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>📍 Hostname OLT</Label>
+                <Input
+                  placeholder="Cari Hostname..."
+                  value={searchFilters.hostname}
+                  onChange={(e) =>
+                    setSearchFilters({ ...searchFilters, hostname: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <Label>🛰️ Tikor OLT</Label>
+                <Input
+                  placeholder="Cari Tikor..."
+                  value={searchFilters.tikor}
+                  onChange={(e) => setSearchFilters({ ...searchFilters, tikor: e.target.value })}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Cari berdasarkan provinsi, FAT ID, hostname, atau tikor..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-md"
-            />
-          </div>
-
-          <div className="rounded-md border overflow-x-auto">
+          <div className="rounded-md border overflow-auto max-h-96">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -274,12 +333,12 @@ const OLTList = () => {
                         : "Tidak ada data yang sesuai dengan pencarian."}
                     </TableCell>
                   </TableRow>
-                ) : (
-                  filteredData.map((olt, index) => (
+                 ) : (
+                  filteredData.slice(0, 100).map((olt, index) => (
                     <TableRow key={olt.id}>
                       <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell className="font-medium">{olt.provinsi}</TableCell>
-                      <TableCell>{olt.fatId}</TableCell>
+                      <TableCell className="font-mono text-xs">{olt.fatId}</TableCell>
                       <TableCell className="font-mono text-xs">{olt.hostname}</TableCell>
                       <TableCell>{olt.tikor}</TableCell>
                     </TableRow>
@@ -290,7 +349,11 @@ const OLTList = () => {
           </div>
 
           <div className="text-sm text-muted-foreground">
-            Total: {filteredData.length} dari {oltData.length} data OLT
+            {filteredData.length > 100 ? (
+              <>Menampilkan 100 dari {filteredData.length} hasil pencarian (Total: {oltData.length} data OLT)</>
+            ) : (
+              <>Total: {filteredData.length} dari {oltData.length} data OLT</>
+            )}
           </div>
         </CardContent>
       </Card>
