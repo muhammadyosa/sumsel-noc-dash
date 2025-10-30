@@ -1,12 +1,31 @@
-import { Activity, AlertTriangle, Zap, Server } from "lucide-react";
+import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User } from "lucide-react";
 import { MetricCard } from "@/components/MetricCard";
 import { useTickets } from "@/hooks/useTickets";
 import { FEEDER_CONSTRAINTS_SET } from "@/types/ticket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
+import { useState, useEffect } from "react";
+
+interface ShiftReport {
+  id: string;
+  date: string;
+  shift: string;
+  officer: string;
+  summary: string;
+  issues: string;
+  notes: string;
+  createdAt: string;
+}
 
 export default function Dashboard() {
   const { tickets, excelData } = useTickets();
+  const [shiftReports, setShiftReports] = useState<ShiftReport[]>([]);
+
+  // Load shift reports from localStorage
+  useEffect(() => {
+    const reports = JSON.parse(localStorage.getItem("shiftReports") || "[]");
+    setShiftReports(reports);
+  }, []);
 
   const totalIncidents = tickets.length;
   const overSLA = tickets.filter((t) => {
@@ -121,6 +140,76 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {shiftReports.length > 0 && (
+          <Card className="shadow-card md:col-span-2 bg-gradient-to-br from-primary/5 via-background to-accent/5 border-primary/20">
+            <CardHeader className="border-b border-primary/10">
+              <CardTitle className="flex items-center gap-2">
+                <div className="h-8 w-1 bg-primary rounded-full" />
+                Laporan Shift Terbaru
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                {shiftReports.slice(-3).reverse().map((report) => (
+                  <div
+                    key={report.id}
+                    className="p-4 rounded-lg bg-card border border-primary/10 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex flex-wrap items-center gap-4 mb-3 pb-3 border-b border-border/50">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-primary" />
+                        <span className="font-semibold">{new Date(report.date).toLocaleDateString("id-ID", { 
+                          weekday: 'long', 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="h-4 w-4 text-primary" />
+                        <span className="font-medium capitalize px-2 py-1 bg-primary/10 rounded-md">
+                          Shift {report.shift}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <User className="h-4 w-4 text-primary" />
+                        <span className="font-medium">{report.officer}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                          Ringkasan Shift
+                        </h4>
+                        <p className="text-sm leading-relaxed">{report.summary}</p>
+                      </div>
+
+                      {report.issues && (
+                        <div>
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                            Kendala/Masalah
+                          </h4>
+                          <p className="text-sm leading-relaxed text-destructive/90">{report.issues}</p>
+                        </div>
+                      )}
+
+                      {report.notes && (
+                        <div>
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                            Catatan
+                          </h4>
+                          <p className="text-sm leading-relaxed text-muted-foreground">{report.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="shadow-card md:col-span-2">
           <CardHeader>

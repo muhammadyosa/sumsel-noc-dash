@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Upload, Download, Trash2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,13 +20,25 @@ import {
 import { toast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
 import { OLT, OLTExcelRecord } from "@/types/olt";
+import { loadOLTData, saveOLTData, clearOLTData } from "@/lib/indexedDB";
 
 const OLTList = () => {
-  const [oltData, setOltData] = useState<OLT[]>(() => {
-    const saved = localStorage.getItem("oltData");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [oltData, setOltData] = useState<OLT[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load OLT data from IndexedDB on mount
+  useEffect(() => {
+    loadOLTData()
+      .then((data) => {
+        setOltData(data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error loading OLT data:", error);
+        setIsLoading(false);
+      });
+  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,11 +107,15 @@ const OLTList = () => {
 
         const newData = [...oltData, ...processedData];
         setOltData(newData);
-        localStorage.setItem("oltData", JSON.stringify(newData));
+        
+        // Save to IndexedDB
+        saveOLTData(newData).catch((error) => {
+          console.error("Error saving OLT data:", error);
+        });
 
         toast({
           title: "Import berhasil",
-          description: `${processedData.length} data OLT berhasil diimport.`,
+          description: `${processedData.length} data OLT berhasil diimport dan disimpan secara permanen.`,
         });
       } catch (error) {
         console.error("Error processing file:", error);
@@ -144,14 +160,23 @@ const OLTList = () => {
     });
   };
 
-  const handleClearData = () => {
+  const handleClearData = async () => {
     if (window.confirm("Apakah Anda yakin ingin menghapus semua data OLT?")) {
-      setOltData([]);
-      localStorage.removeItem("oltData");
-      toast({
-        title: "Data dihapus",
-        description: "Semua data OLT berhasil dihapus.",
-      });
+      try {
+        await clearOLTData();
+        setOltData([]);
+        toast({
+          title: "Data dihapus",
+          description: "Semua data OLT berhasil dihapus.",
+        });
+      } catch (error) {
+        console.error("Error clearing OLT data:", error);
+        toast({
+          title: "Gagal menghapus",
+          description: "Terjadi kesalahan saat menghapus data.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -236,7 +261,13 @@ const OLTList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredData.length === 0 ? (
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      Memuat data OLT...
+                    </TableCell>
+                  </TableRow>
+                ) : filteredData.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center text-muted-foreground">
                       {oltData.length === 0
