@@ -472,7 +472,7 @@ export default function TicketManagement() {
                 <TableRow>
                   <TableHead>Ticket ID</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Customer</TableHead>
+                  <TableHead>Customer/Type</TableHead>
                   <TableHead>Service ID</TableHead>
                   <TableHead>Constraint</TableHead>
                   <TableHead>Serpo</TableHead>
@@ -503,7 +503,9 @@ export default function TicketManagement() {
                           {ticket.category}
                         </Badge>
                       </TableCell>
-                      <TableCell>{ticket.customerName}</TableCell>
+                      <TableCell>
+                        {ticket.category === "FEEDER" ? ticket.constraint : ticket.customerName}
+                      </TableCell>
                       <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
                       <TableCell className="text-xs">{ticket.constraint}</TableCell>
                       <TableCell className="text-xs">{ticket.serpo}</TableCell>

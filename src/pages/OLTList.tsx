@@ -29,7 +29,6 @@ const OLTList = () => {
     provinsi: "",
     fatId: "",
     hostname: "",
-    tikor: "",
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -190,13 +189,11 @@ const OLTList = () => {
     const provinsi = String(olt.provinsi || "").toLowerCase();
     const fatId = String(olt.fatId || "").toLowerCase();
     const hostname = String(olt.hostname || "").toLowerCase();
-    const tikor = String(olt.tikor || "").toLowerCase();
 
     return (
       (!searchFilters.provinsi || provinsi.includes(searchFilters.provinsi.toLowerCase())) &&
       (!searchFilters.fatId || fatId.includes(searchFilters.fatId.toLowerCase())) &&
-      (!searchFilters.hostname || hostname.includes(searchFilters.hostname.toLowerCase())) &&
-      (!searchFilters.tikor || tikor.includes(searchFilters.tikor.toLowerCase()))
+      (!searchFilters.hostname || hostname.includes(searchFilters.hostname.toLowerCase()))
     );
   });
 
@@ -267,7 +264,7 @@ const OLTList = () => {
               <Search className="h-4 w-4" />
               Search & Filter
             </p>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-3">
               <div>
                 <Label>📜 Nama Provinsi</Label>
                 <Input
@@ -294,14 +291,6 @@ const OLTList = () => {
                   onChange={(e) =>
                     setSearchFilters({ ...searchFilters, hostname: e.target.value })
                   }
-                />
-              </div>
-              <div>
-                <Label>🛰️ Tikor OLT</Label>
-                <Input
-                  placeholder="Cari Tikor..."
-                  value={searchFilters.tikor}
-                  onChange={(e) => setSearchFilters({ ...searchFilters, tikor: e.target.value })}
                 />
               </div>
             </div>
