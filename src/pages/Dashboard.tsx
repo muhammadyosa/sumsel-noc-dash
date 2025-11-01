@@ -241,53 +241,58 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-3">
-                      <div>
-                        <h4 className="text-xs font-bold text-primary uppercase tracking-wide mb-2 flex items-center gap-1">
-                          <span className="h-4 w-1 bg-primary rounded-full" />
-                          Ringkasan Shift
-                        </h4>
-                        <div className="space-y-2 pl-2">
-                          {report.oltDown && (
-                            <div className="bg-destructive/5 p-2 rounded border-l-2 border-destructive">
-                              <div className="text-xs font-semibold text-destructive mb-1">📡 LAPORAN OLT DOWN</div>
-                              <p className="text-xs leading-relaxed text-foreground/80">{report.oltDown}</p>
-                            </div>
-                          )}
-                          {report.portDown && (
-                            <div className="bg-warning/5 p-2 rounded border-l-2 border-warning">
-                              <div className="text-xs font-semibold text-warning mb-1">🔌 LAPORAN PORT DOWN</div>
-                              <p className="text-xs leading-relaxed text-foreground/80">{report.portDown}</p>
-                            </div>
-                          )}
-                          {report.fatLoss && (
-                            <div className="bg-primary/5 p-2 rounded border-l-2 border-primary">
-                              <div className="text-xs font-semibold text-primary mb-1">📊 LAPORAN FAT LOSS SBS</div>
-                              <p className="text-xs leading-relaxed text-foreground/80">{report.fatLoss}</p>
-                            </div>
-                          )}
-                          {report.summary && !report.oltDown && !report.portDown && !report.fatLoss && (
-                            <div className="bg-muted/50 p-2 rounded">
-                              <p className="text-xs leading-relaxed">{report.summary}</p>
-                            </div>
-                          )}
+                      {report.oltDown && (
+                        <div className="bg-destructive/5 p-3 rounded-lg border border-destructive/20">
+                          <div className="text-xs font-bold text-destructive mb-2 flex items-center gap-1">
+                            📡 LAPORAN OLT DOWN
+                          </div>
+                          <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans text-foreground/90">
+                            {report.oltDown}
+                          </pre>
                         </div>
-                      </div>
+                      )}
+                      
+                      {report.portDown && (
+                        <div className="bg-warning/5 p-3 rounded-lg border border-warning/20">
+                          <div className="text-xs font-bold text-warning mb-2 flex items-center gap-1">
+                            🔌 LAPORAN PORT DOWN
+                          </div>
+                          <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans text-foreground/90">
+                            {report.portDown}
+                          </pre>
+                        </div>
+                      )}
+                      
+                      {report.fatLoss && (
+                        <div className="bg-primary/5 p-3 rounded-lg border border-primary/20">
+                          <div className="text-xs font-bold text-primary mb-2 flex items-center gap-1">
+                            📊 LAPORAN FAT LOSS SBS
+                          </div>
+                          <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans text-foreground/90">
+                            {report.fatLoss}
+                          </pre>
+                        </div>
+                      )}
 
                       {report.issues && (
-                        <div>
-                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                        <div className="bg-muted/50 p-3 rounded-lg border border-border/50">
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                             ⚠️ Kendala/Masalah
-                          </h4>
-                          <p className="text-xs leading-relaxed text-destructive/90 bg-destructive/5 p-2 rounded">{report.issues}</p>
+                          </div>
+                          <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans text-foreground/80">
+                            {report.issues}
+                          </pre>
                         </div>
                       )}
 
                       {report.notes && (
-                        <div>
-                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                        <div className="bg-muted/30 p-3 rounded-lg border border-border/40">
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                             📝 Catatan
-                          </h4>
-                          <p className="text-xs leading-relaxed text-muted-foreground bg-muted/30 p-2 rounded">{report.notes}</p>
+                          </div>
+                          <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans text-muted-foreground">
+                            {report.notes}
+                          </pre>
                         </div>
                       )}
                     </div>
