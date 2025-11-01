@@ -504,7 +504,12 @@ export default function TicketManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {ticket.category === "FEEDER" ? ticket.constraint : ticket.customerName}
+                        {ticket.category === "FEEDER" ? (
+                          ticket.constraint === "OLT DOWN" ? ticket.hostname :
+                          ticket.constraint === "PORT DOWN" ? (ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT INFO") :
+                          ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? ticket.fatId :
+                          ticket.constraint
+                        ) : ticket.customerName}
                       </TableCell>
                       <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
                       <TableCell className="text-xs">{ticket.constraint}</TableCell>

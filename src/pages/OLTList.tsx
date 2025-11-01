@@ -85,6 +85,8 @@ const OLTList = () => {
             const tikor = 
               row.tikor || 
               row.Tikor || 
+              row["tikor fat"] || 
+              row["Tikor FAT"] ||
               row["tikor olt"] || 
               row["Tikor OLT"] || "";
 
@@ -304,7 +306,7 @@ const OLTList = () => {
                   <TableHead>Nama Provinsi</TableHead>
                   <TableHead>ID FAT</TableHead>
                   <TableHead>Hostname OLT</TableHead>
-                  <TableHead>Tikor OLT</TableHead>
+                  <TableHead>Tikor FAT</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

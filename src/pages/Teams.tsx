@@ -69,6 +69,11 @@ export default function Teams() {
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
                   {team}
+                  {stats.pending > 0 && (
+                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30 ml-auto">
+                      {stats.pending} Pending
+                    </Badge>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -82,7 +87,7 @@ export default function Teams() {
                     <span className="font-medium text-success">{stats.resolved}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-warning">In Progress:</span>
+                    <span className="text-warning">In Progress/Pending:</span>
                     <span className="font-medium text-warning">{stats.pending}</span>
                   </div>
                   <div className="flex justify-between text-sm">
@@ -146,9 +151,12 @@ export default function Teams() {
                                     <div>
                                       <span className="text-muted-foreground">Customer/Type:</span>
                                       <p className="font-medium">
-                                        {ticket.category === "FEEDER" 
-                                          ? ticket.constraint 
-                                          : ticket.customerName}
+                                        {ticket.category === "FEEDER" ? (
+                                          ticket.constraint === "OLT DOWN" ? ticket.hostname :
+                                          ticket.constraint === "PORT DOWN" ? (ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT INFO") :
+                                          ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? ticket.fatId :
+                                          ticket.constraint
+                                        ) : ticket.customerName}
                                       </p>
                                     </div>
                                     <div>

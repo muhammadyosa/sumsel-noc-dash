@@ -82,21 +82,47 @@ export default function Dashboard() {
             <CardTitle>Status Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-4">
               {["On Progress", "Critical", "Resolved", "Pending"].map((status) => {
                 const count = tickets.filter((t) => t.status === status).length;
                 const percentage = totalIncidents > 0 ? (count / totalIncidents) * 100 : 0;
+                const getStatusColor = (s: string) => {
+                  switch (s) {
+                    case "On Progress": return "bg-blue-500";
+                    case "Critical": return "bg-destructive";
+                    case "Resolved": return "bg-success";
+                    case "Pending": return "bg-warning";
+                    default: return "bg-primary";
+                  }
+                };
+                const getStatusIcon = (s: string) => {
+                  switch (s) {
+                    case "On Progress": return "⚙️";
+                    case "Critical": return "🚨";
+                    case "Resolved": return "✅";
+                    case "Pending": return "⏳";
+                    default: return "📊";
+                  }
+                };
                 return (
-                  <div key={status} className="space-y-1">
-                    <div className="flex items-center justify-between text-sm">
-                      <StatusBadge status={status as any} />
-                      <span className="font-medium">{count} tickets</span>
-                    </div>
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary transition-all"
-                        style={{ width: `${percentage}%` }}
-                      />
+                  <div key={status} className="relative group">
+                    <div className="p-4 rounded-lg border bg-card hover:shadow-lg transition-all hover:scale-105">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl">{getStatusIcon(status)}</span>
+                          <StatusBadge status={status as any} />
+                        </div>
+                      </div>
+                      <div className="text-3xl font-bold mb-1">{count}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {percentage.toFixed(1)}% of total
+                      </div>
+                      <div className="mt-3 h-1.5 bg-secondary rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${getStatusColor(status)} transition-all duration-500`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                 );
@@ -110,32 +136,61 @@ export default function Dashboard() {
             <CardTitle>Category Distribution</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {["RITEL", "FEEDER"].map((category) => {
                 const count = tickets.filter((t) => t.category === category).length;
                 const percentage = totalIncidents > 0 ? (count / totalIncidents) * 100 : 0;
+                const circumference = 2 * Math.PI * 45;
+                const strokeDashoffset = circumference - (percentage / 100) * circumference;
+                
                 return (
-                  <div key={category} className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-3 h-3 rounded-full ${
-                            category === "FEEDER" ? "bg-warning" : "bg-primary"
-                          }`}
-                        />
-                        <span className="font-medium">{category}</span>
+                  <div key={category} className="relative">
+                    <div className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:shadow-lg transition-all">
+                      <div className="relative w-24 h-24 flex-shrink-0">
+                        <svg className="w-24 h-24 transform -rotate-90">
+                          <circle
+                            cx="48"
+                            cy="48"
+                            r="45"
+                            stroke="currentColor"
+                            strokeWidth="8"
+                            fill="none"
+                            className="text-secondary"
+                          />
+                          <circle
+                            cx="48"
+                            cy="48"
+                            r="45"
+                            stroke="currentColor"
+                            strokeWidth="8"
+                            fill="none"
+                            className={category === "FEEDER" ? "text-warning" : "text-primary"}
+                            strokeDasharray={circumference}
+                            strokeDashoffset={strokeDashoffset}
+                            strokeLinecap="round"
+                            style={{ transition: "stroke-dashoffset 1s ease" }}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold">{percentage.toFixed(0)}%</div>
+                          </div>
+                        </div>
                       </div>
-                      <span className="font-medium">
-                        {count} ({percentage.toFixed(0)}%)
-                      </span>
-                    </div>
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all ${
-                          category === "FEEDER" ? "bg-warning" : "bg-primary"
-                        }`}
-                        style={{ width: `${percentage}%` }}
-                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div
+                            className={`w-3 h-3 rounded-full ${
+                              category === "FEEDER" ? "bg-warning" : "bg-primary"
+                            }`}
+                          />
+                          <span className="text-lg font-semibold">{category}</span>
+                        </div>
+                        <div className="text-3xl font-bold mb-1">{count}</div>
+                        <div className="text-sm text-muted-foreground">
+                          tickets in this category
+                        </div>
+                      </div>
                     </div>
                   </div>
                 );
