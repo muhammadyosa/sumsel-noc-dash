@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useState, useEffect } from "react";
+import { OLT } from "@/types/olt";
+import { loadOLTData } from "@/lib/indexedDB";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface ShiftReport {
   id: string;
@@ -27,11 +30,17 @@ export default function Dashboard() {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [oltData, setOltData] = useState<OLT[]>([]);
 
   // Load shift reports from localStorage
   useEffect(() => {
     const reports = JSON.parse(localStorage.getItem("shiftReports") || "[]");
     setShiftReports(reports);
+  }, []);
+
+  // Load OLT data
+  useEffect(() => {
+    loadOLTData().then(setOltData).catch(console.error);
   }, []);
 
   const totalIncidents = tickets.length;
@@ -363,7 +372,8 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>
-                {selectedStatus || selectedCategory || selectedMetric ? "Filtered Tickets" : "Recent Tickets"}
+                {selectedMetric === "olt" ? "List OLT" : 
+                 selectedStatus || selectedCategory || selectedMetric ? "Detail Tiket" : "Recent Tickets"}
               </span>
               {(selectedStatus || selectedCategory || selectedMetric) && (
                 <Button
@@ -381,44 +391,139 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {(selectedStatus || selectedCategory || selectedMetric ? filteredTickets : recentTickets).length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  {selectedStatus || selectedCategory || selectedMetric ? "Tidak ada tiket yang sesuai filter" : "Belum ada tiket"}
-                </p>
-              ) : (
-                (selectedStatus || selectedCategory || selectedMetric ? filteredTickets : recentTickets).map((ticket) => (
-                  <div
-                    key={ticket.id}
-                    className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-medium truncate">{ticket.id}</p>
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full ${
-                            ticket.category === "FEEDER"
-                              ? "bg-warning/20 text-warning"
-                              : "bg-primary/20 text-primary"
-                          }`}
-                        >
-                          {ticket.category}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {ticket.category === "FEEDER" ? (
-                          ticket.constraint === "OLT DOWN" ? ticket.hostname :
-                          ticket.constraint === "PORT DOWN" ? `${ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT"} - ${ticket.hostname}` :
-                          ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? `${ticket.fatId} - ${ticket.hostname}` :
-                          ticket.constraint
-                        ) : ticket.customerName}
-                      </p>
-                    </div>
-                    <StatusBadge status={ticket.status} />
+            {selectedMetric === "olt" ? (
+              // Display OLT List when Total OLT is selected
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">No</TableHead>
+                      <TableHead>Provinsi</TableHead>
+                      <TableHead>ID FAT</TableHead>
+                      <TableHead>Hostname OLT</TableHead>
+                      <TableHead>Tikor FAT</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {oltData.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
+                          Belum ada data OLT
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      oltData.slice(0, 50).map((olt, index) => (
+                        <TableRow key={olt.id}>
+                          <TableCell className="font-medium">{index + 1}</TableCell>
+                          <TableCell>{olt.provinsi}</TableCell>
+                          <TableCell className="font-mono text-xs">{olt.fatId}</TableCell>
+                          <TableCell className="font-mono text-xs">{olt.hostname}</TableCell>
+                          <TableCell>{olt.tikor}</TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+                {oltData.length > 50 && (
+                  <div className="p-3 text-sm text-muted-foreground text-center border-t">
+                    Menampilkan 50 dari {oltData.length} OLT. Lihat semua di halaman List OLT.
                   </div>
-                ))
-              )}
-            </div>
+                )}
+              </div>
+            ) : (
+              // Display Detailed Tickets
+              <div className="space-y-3">
+                {(selectedStatus || selectedCategory || selectedMetric ? filteredTickets : recentTickets).length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    {selectedStatus || selectedCategory || selectedMetric ? "Tidak ada tiket yang sesuai filter" : "Belum ada tiket"}
+                  </p>
+                ) : (
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-12">No</TableHead>
+                          <TableHead>Tiket ID</TableHead>
+                          <TableHead>Service ID</TableHead>
+                          <TableHead>Customer / Info</TableHead>
+                          <TableHead>SERPO</TableHead>
+                          <TableHead>Hostname</TableHead>
+                          <TableHead>FAT ID</TableHead>
+                          <TableHead>SN ONT</TableHead>
+                          <TableHead>Constraint</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Created</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {(selectedStatus || selectedCategory || selectedMetric ? filteredTickets : recentTickets).map((ticket, index) => (
+                          <TableRow key={ticket.id}>
+                            <TableCell className="font-medium">{index + 1}</TableCell>
+                            <TableCell className="font-mono text-xs">{ticket.id}</TableCell>
+                            <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
+                            <TableCell>
+                              {ticket.category === "FEEDER" ? (
+                                <div className="text-xs">
+                                  {ticket.constraint === "OLT DOWN" && (
+                                    <span className="font-medium">{ticket.hostname}</span>
+                                  )}
+                                  {ticket.constraint === "PORT DOWN" && (
+                                    <>
+                                      <div className="font-medium">{ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT"}</div>
+                                      <div className="text-muted-foreground">{ticket.hostname}</div>
+                                    </>
+                                  )}
+                                  {(ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX") && (
+                                    <>
+                                      <div className="font-medium">{ticket.fatId}</div>
+                                      <div className="text-muted-foreground">{ticket.hostname}</div>
+                                    </>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-xs">{ticket.customerName}</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-xs">{ticket.serpo}</TableCell>
+                            <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
+                            <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
+                            <TableCell className="font-mono text-xs">{ticket.snOnt}</TableCell>
+                            <TableCell>
+                              <span className="text-xs px-2 py-1 rounded-md bg-muted">
+                                {ticket.constraint}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                  ticket.category === "FEEDER"
+                                    ? "bg-warning/20 text-warning"
+                                    : "bg-primary/20 text-primary"
+                                }`}
+                              >
+                                {ticket.category}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <StatusBadge status={ticket.status} />
+                            </TableCell>
+                            <TableCell className="text-xs whitespace-nowrap">
+                              {new Date(ticket.createdISO).toLocaleString("id-ID", {
+                                day: "2-digit",
+                                month: "short",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
