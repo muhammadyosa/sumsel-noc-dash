@@ -3,6 +3,7 @@ import { MetricCard } from "@/components/MetricCard";
 import { useTickets } from "@/hooks/useTickets";
 import { FEEDER_CONSTRAINTS_SET } from "@/types/ticket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useState, useEffect } from "react";
 
@@ -23,6 +24,8 @@ interface ShiftReport {
 export default function Dashboard() {
   const { tickets, excelData } = useTickets();
   const [shiftReports, setShiftReports] = useState<ShiftReport[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Load shift reports from localStorage
   useEffect(() => {
@@ -39,6 +42,12 @@ export default function Dashboard() {
   const totalOLT = new Set(excelData.map((r) => r.hostname).filter(Boolean)).size || 0;
 
   const recentTickets = tickets.slice(0, 5);
+  
+  const filteredTickets = tickets.filter((ticket) => {
+    if (selectedStatus && ticket.status !== selectedStatus) return false;
+    if (selectedCategory && ticket.category !== selectedCategory) return false;
+    return true;
+  });
 
   return (
     <div className="space-y-6">
@@ -106,7 +115,12 @@ export default function Dashboard() {
                 };
                 return (
                   <div key={status} className="relative group">
-                    <div className="p-4 rounded-lg border bg-card hover:shadow-lg transition-all hover:scale-105">
+                    <button
+                      onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
+                      className={`w-full p-4 rounded-lg border bg-card hover:shadow-lg transition-all hover:scale-105 text-left ${
+                        selectedStatus === status ? "ring-2 ring-primary" : ""
+                      }`}
+                    >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className="text-2xl">{getStatusIcon(status)}</span>
@@ -123,7 +137,7 @@ export default function Dashboard() {
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                    </div>
+                    </button>
                   </div>
                 );
               })}
@@ -145,7 +159,12 @@ export default function Dashboard() {
                 
                 return (
                   <div key={category} className="relative">
-                    <div className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:shadow-lg transition-all">
+                    <button
+                      onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
+                      className={`w-full flex items-center gap-4 p-4 rounded-lg border bg-card hover:shadow-lg transition-all text-left ${
+                        selectedCategory === category ? "ring-2 ring-primary" : ""
+                      }`}
+                    >
                       <div className="relative w-24 h-24 flex-shrink-0">
                         <svg className="w-24 h-24 transform -rotate-90">
                           <circle
@@ -191,7 +210,7 @@ export default function Dashboard() {
                           tickets in this category
                         </div>
                       </div>
-                    </div>
+                    </button>
                   </div>
                 );
               })}
@@ -305,16 +324,32 @@ export default function Dashboard() {
 
         <Card className="shadow-card md:col-span-2">
           <CardHeader>
-            <CardTitle>Recent Tickets</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>
+                {selectedStatus || selectedCategory ? "Filtered Tickets" : "Recent Tickets"}
+              </span>
+              {(selectedStatus || selectedCategory) && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedStatus(null);
+                    setSelectedCategory(null);
+                  }}
+                >
+                  Clear Filter
+                </Button>
+              )}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentTickets.length === 0 ? (
+              {(selectedStatus || selectedCategory ? filteredTickets : recentTickets).length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  Belum ada tiket
+                  {selectedStatus || selectedCategory ? "Tidak ada tiket yang sesuai filter" : "Belum ada tiket"}
                 </p>
               ) : (
-                recentTickets.map((ticket) => (
+                (selectedStatus || selectedCategory ? filteredTickets : recentTickets).map((ticket) => (
                   <div
                     key={ticket.id}
                     className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg"
@@ -333,7 +368,12 @@ export default function Dashboard() {
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground truncate">
-                        {ticket.constraint} - {ticket.customerName}
+                        {ticket.category === "FEEDER" ? (
+                          ticket.constraint === "OLT DOWN" ? ticket.hostname :
+                          ticket.constraint === "PORT DOWN" ? `${ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT"} - ${ticket.hostname}` :
+                          ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? ticket.fatId :
+                          ticket.constraint
+                        ) : ticket.customerName}
                       </p>
                     </div>
                     <StatusBadge status={ticket.status} />
