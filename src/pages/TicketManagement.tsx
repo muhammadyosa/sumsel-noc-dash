@@ -512,7 +512,12 @@ export default function TicketManagement() {
                               <div className="text-muted-foreground">{ticket.hostname}</div>
                             </div>
                           ) :
-                          ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? ticket.fatId :
+                          ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? (
+                            <div className="text-xs">
+                              <div className="font-medium">{ticket.fatId}</div>
+                              <div className="text-muted-foreground">{ticket.hostname}</div>
+                            </div>
+                          ) :
                           ticket.constraint
                         ) : ticket.customerName}
                       </TableCell>

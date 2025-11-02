@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [shiftReports, setShiftReports] = useState<ShiftReport[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
 
   // Load shift reports from localStorage
   useEffect(() => {
@@ -46,6 +47,22 @@ export default function Dashboard() {
   const filteredTickets = tickets.filter((ticket) => {
     if (selectedStatus && ticket.status !== selectedStatus) return false;
     if (selectedCategory && ticket.category !== selectedCategory) return false;
+    
+    // Metric-based filters
+    if (selectedMetric === "overSLA") {
+      const ageMs = new Date().getTime() - new Date(ticket.createdISO).getTime();
+      return ageMs > 24 * 60 * 60 * 1000 && ticket.status !== "Resolved";
+    }
+    if (selectedMetric === "feeder") {
+      return FEEDER_CONSTRAINTS_SET.has(ticket.constraint);
+    }
+    if (selectedMetric === "total") {
+      return true; // Show all tickets
+    }
+    if (selectedMetric === "olt") {
+      return ticket.constraint === "OLT DOWN";
+    }
+    
     return true;
   });
 
@@ -59,30 +76,50 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          title="Total Incident"
-          value={totalIncidents}
-          icon={Activity}
-          variant="default"
-        />
-        <MetricCard
-          title="Over SLA (>24h)"
-          value={overSLA}
-          icon={AlertTriangle}
-          variant="destructive"
-        />
-        <MetricCard
-          title="Impact Feeder"
-          value={feederImpact}
-          icon={Zap}
-          variant="warning"
-        />
-        <MetricCard
-          title="Total OLT"
-          value={totalOLT}
-          icon={Server}
-          variant="success"
-        />
+        <div 
+          onClick={() => setSelectedMetric(selectedMetric === "total" ? null : "total")}
+          className={`cursor-pointer transition-all ${selectedMetric === "total" ? "ring-2 ring-primary" : ""}`}
+        >
+          <MetricCard
+            title="Total Incident"
+            value={totalIncidents}
+            icon={Activity}
+            variant="default"
+          />
+        </div>
+        <div 
+          onClick={() => setSelectedMetric(selectedMetric === "overSLA" ? null : "overSLA")}
+          className={`cursor-pointer transition-all ${selectedMetric === "overSLA" ? "ring-2 ring-destructive" : ""}`}
+        >
+          <MetricCard
+            title="Over SLA (>24h)"
+            value={overSLA}
+            icon={AlertTriangle}
+            variant="destructive"
+          />
+        </div>
+        <div 
+          onClick={() => setSelectedMetric(selectedMetric === "feeder" ? null : "feeder")}
+          className={`cursor-pointer transition-all ${selectedMetric === "feeder" ? "ring-2 ring-warning" : ""}`}
+        >
+          <MetricCard
+            title="Impact Feeder"
+            value={feederImpact}
+            icon={Zap}
+            variant="warning"
+          />
+        </div>
+        <div 
+          onClick={() => setSelectedMetric(selectedMetric === "olt" ? null : "olt")}
+          className={`cursor-pointer transition-all ${selectedMetric === "olt" ? "ring-2 ring-success" : ""}`}
+        >
+          <MetricCard
+            title="Total OLT"
+            value={totalOLT}
+            icon={Server}
+            variant="success"
+          />
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -326,15 +363,16 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>
-                {selectedStatus || selectedCategory ? "Filtered Tickets" : "Recent Tickets"}
+                {selectedStatus || selectedCategory || selectedMetric ? "Filtered Tickets" : "Recent Tickets"}
               </span>
-              {(selectedStatus || selectedCategory) && (
+              {(selectedStatus || selectedCategory || selectedMetric) && (
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => {
                     setSelectedStatus(null);
                     setSelectedCategory(null);
+                    setSelectedMetric(null);
                   }}
                 >
                   Clear Filter
@@ -344,12 +382,12 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {(selectedStatus || selectedCategory ? filteredTickets : recentTickets).length === 0 ? (
+              {(selectedStatus || selectedCategory || selectedMetric ? filteredTickets : recentTickets).length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  {selectedStatus || selectedCategory ? "Tidak ada tiket yang sesuai filter" : "Belum ada tiket"}
+                  {selectedStatus || selectedCategory || selectedMetric ? "Tidak ada tiket yang sesuai filter" : "Belum ada tiket"}
                 </p>
               ) : (
-                (selectedStatus || selectedCategory ? filteredTickets : recentTickets).map((ticket) => (
+                (selectedStatus || selectedCategory || selectedMetric ? filteredTickets : recentTickets).map((ticket) => (
                   <div
                     key={ticket.id}
                     className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg"
@@ -371,7 +409,7 @@ export default function Dashboard() {
                         {ticket.category === "FEEDER" ? (
                           ticket.constraint === "OLT DOWN" ? ticket.hostname :
                           ticket.constraint === "PORT DOWN" ? `${ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT"} - ${ticket.hostname}` :
-                          ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? ticket.fatId :
+                          ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? `${ticket.fatId} - ${ticket.hostname}` :
                           ticket.constraint
                         ) : ticket.customerName}
                       </p>
