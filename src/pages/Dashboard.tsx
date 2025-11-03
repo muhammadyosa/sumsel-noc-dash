@@ -1,5 +1,4 @@
-import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User, X, ExternalLink } from "lucide-react";
-import { MetricCard } from "@/components/MetricCard";
+import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User, ExternalLink, TrendingUp, BarChart3 } from "lucide-react";
 import { useTickets } from "@/hooks/useTickets";
 import { FEEDER_CONSTRAINTS_SET, Ticket } from "@/types/ticket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,8 @@ import { OLT } from "@/types/olt";
 import { loadOLTData } from "@/lib/indexedDB";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { motion } from "framer-motion";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 interface ShiftReport {
   id: string;
@@ -79,235 +80,291 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard Overview</h1>
-        <p className="text-muted-foreground">
-          Monitoring incident NOC RITEL SBU SUMBAGSEL
-        </p>
-      </div>
+    <div className="min-h-screen space-y-8 p-6">
+      {/* Header Section */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative"
+      >
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg">
+            <BarChart3 className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Dashboard Overview
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Monitoring incident NOC RITEL SBU SUMBAGSEL
+            </p>
+          </div>
+        </div>
+      </motion.div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div 
-          onClick={() => setSelectedMetric(selectedMetric === "total" ? null : "total")}
-          className={`cursor-pointer transition-all ${selectedMetric === "total" ? "ring-2 ring-primary" : ""}`}
-        >
-          <MetricCard
-            title="Total Incident"
-            value={totalIncidents}
-            icon={Activity}
-            variant="default"
-          />
-        </div>
-        <div 
-          onClick={() => setSelectedMetric(selectedMetric === "overSLA" ? null : "overSLA")}
-          className={`cursor-pointer transition-all ${selectedMetric === "overSLA" ? "ring-2 ring-destructive" : ""}`}
-        >
-          <MetricCard
-            title="Over SLA (>24h)"
-            value={overSLA}
-            icon={AlertTriangle}
-            variant="destructive"
-          />
-        </div>
-        <div 
-          onClick={() => setSelectedMetric(selectedMetric === "feeder" ? null : "feeder")}
-          className={`cursor-pointer transition-all ${selectedMetric === "feeder" ? "ring-2 ring-warning" : ""}`}
-        >
-          <MetricCard
-            title="Impact Feeder"
-            value={feederImpact}
-            icon={Zap}
-            variant="warning"
-          />
-        </div>
-        <div 
-          onClick={() => setSelectedMetric(selectedMetric === "olt" ? null : "olt")}
-          className={`cursor-pointer transition-all ${selectedMetric === "olt" ? "ring-2 ring-success" : ""}`}
-        >
-          <MetricCard
-            title="Total OLT"
-            value={totalOLT}
-            icon={Server}
-            variant="success"
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="shadow-elevated overflow-hidden border-2">
-          <CardHeader className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border-b">
-            <CardTitle className="flex items-center gap-2">
-              <div className="h-6 w-1 bg-primary rounded-full" />
-              Status Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {["On Progress", "Critical", "Resolved", "Pending"].map((status) => {
-                const count = tickets.filter((t) => t.status === status).length;
-                const percentage = totalIncidents > 0 ? (count / totalIncidents) * 100 : 0;
-                
-                const getStatusGradient = (s: string) => {
-                  switch (s) {
-                    case "On Progress": return "from-blue-500 to-blue-600";
-                    case "Critical": return "from-red-500 to-red-600";
-                    case "Resolved": return "from-green-500 to-green-600";
-                    case "Pending": return "from-amber-500 to-amber-600";
-                    default: return "from-primary to-accent";
-                  }
-                };
-                
-                const getStatusIcon = (s: string) => {
-                  switch (s) {
-                    case "On Progress": return "⚙️";
-                    case "Critical": return "🚨";
-                    case "Resolved": return "✅";
-                    case "Pending": return "⏳";
-                    default: return "📊";
-                  }
-                };
-                
-                return (
-                  <button
-                    key={status}
-                    onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
-                    className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-2xl group ${
-                      selectedStatus === status 
-                        ? "ring-4 ring-primary ring-offset-2 shadow-2xl scale-105" 
-                        : "hover:border-primary/50"
-                    }`}
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${getStatusGradient(status)} opacity-10 group-hover:opacity-20 transition-opacity`} />
-                    
-                    <div className="relative p-5 text-left">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-3xl drop-shadow-lg">{getStatusIcon(status)}</span>
-                        <StatusBadge status={status as any} />
-                      </div>
-                      
-                      <div className="text-4xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
-                        {count}
-                      </div>
-                      
-                      <div className="text-xs text-muted-foreground font-medium mb-3">
-                        {percentage.toFixed(1)}% dari total
-                      </div>
-                      
-                      <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
-                        <div
-                          className={`absolute inset-y-0 left-0 bg-gradient-to-r ${getStatusGradient(status)} rounded-full transition-all duration-1000 ease-out shadow-lg`}
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
+      {/* KPI Cards Section */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {[
+          { 
+            title: "Total Incident", 
+            value: totalIncidents, 
+            icon: Activity, 
+            metric: "total",
+            gradient: "from-blue-500 to-blue-700",
+            glowColor: "shadow-blue-500/50"
+          },
+          { 
+            title: "Over SLA (>24h)", 
+            value: overSLA, 
+            icon: AlertTriangle, 
+            metric: "overSLA",
+            gradient: "from-red-500 to-red-700",
+            glowColor: "shadow-red-500/50"
+          },
+          { 
+            title: "Impact Feeder", 
+            value: feederImpact, 
+            icon: Zap, 
+            metric: "feeder",
+            gradient: "from-amber-500 to-orange-600",
+            glowColor: "shadow-amber-500/50"
+          },
+          { 
+            title: "Total OLT", 
+            value: totalOLT, 
+            icon: Server, 
+            metric: "olt",
+            gradient: "from-green-500 to-emerald-700",
+            glowColor: "shadow-green-500/50"
+          }
+        ].map((card, index) => (
+          <motion.div
+            key={card.metric}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            onClick={() => setSelectedMetric(selectedMetric === card.metric ? null : card.metric)}
+            className={`
+              relative cursor-pointer group
+              rounded-2xl border-2 overflow-hidden
+              transition-all duration-300
+              hover:scale-105 hover:shadow-2xl ${card.glowColor}
+              ${selectedMetric === card.metric ? `ring-4 ring-primary shadow-2xl ${card.glowColor}` : "hover:border-primary/50"}
+            `}
+          >
+            {/* Background Gradient */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
+            
+            {/* Content */}
+            <div className="relative p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className={`p-3 rounded-xl bg-gradient-to-br ${card.gradient} shadow-lg`}>
+                  <card.icon className="h-6 w-6 text-white" />
+                </div>
+                <TrendingUp className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+              
+              <div>
+                <p className="text-sm text-muted-foreground font-medium mb-1">{card.title}</p>
+                <p className="text-4xl font-bold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                  {card.value}
+                </p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </motion.div>
+        ))}
+      </div>
 
-        <Card className="shadow-elevated overflow-hidden border-2">
-          <CardHeader className="bg-gradient-to-r from-accent/10 via-primary/5 to-accent/10 border-b">
-            <CardTitle className="flex items-center gap-2">
-              <div className="h-6 w-1 bg-accent rounded-full" />
-              Category Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {["RITEL", "FEEDER"].map((category) => {
-                const count = tickets.filter((t) => t.category === category).length;
-                const percentage = totalIncidents > 0 ? (count / totalIncidents) * 100 : 0;
-                const circumference = 2 * Math.PI * 60;
-                const strokeDashoffset = circumference - (percentage / 100) * circumference;
-                
-                const categoryGradient = category === "FEEDER" 
-                  ? "from-amber-500 to-orange-600" 
-                  : "from-blue-500 to-indigo-600";
-                
-                const categoryColor = category === "FEEDER" 
-                  ? "text-warning" 
-                  : "text-primary";
-                
-                return (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
-                    className={`relative overflow-hidden rounded-xl border-2 p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl group ${
-                      selectedCategory === category 
-                        ? "ring-4 ring-accent ring-offset-2 shadow-2xl scale-105" 
-                        : "hover:border-accent/50"
-                    }`}
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${categoryGradient} opacity-5 group-hover:opacity-10 transition-opacity`} />
-                    
-                    <div className="relative flex items-center gap-6">
-                      <div className="relative flex-shrink-0">
-                        <svg className="w-32 h-32 transform -rotate-90 drop-shadow-lg">
-                          {/* Background circle */}
-                          <circle
-                            cx="64"
-                            cy="64"
-                            r="60"
-                            stroke="currentColor"
-                            strokeWidth="10"
-                            fill="none"
-                            className="text-secondary/50"
-                          />
-                          {/* Animated progress circle */}
-                          <circle
-                            cx="64"
-                            cy="64"
-                            r="60"
-                            stroke="url(#gradient-${category})"
-                            strokeWidth="10"
-                            fill="none"
-                            strokeDasharray={circumference}
-                            strokeDashoffset={strokeDashoffset}
-                            strokeLinecap="round"
-                            className="transition-all duration-1000 ease-out drop-shadow-lg"
-                          />
-                          <defs>
-                            <linearGradient id={`gradient-${category}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" className={categoryColor} stopOpacity="1" />
-                              <stop offset="100%" className={categoryColor} stopOpacity="0.6" />
-                            </linearGradient>
-                          </defs>
-                        </svg>
-                        
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <div className="text-3xl font-bold">{percentage.toFixed(0)}%</div>
-                          </div>
-                        </div>
-                      </div>
+      {/* Charts Section */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Status Distribution */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <Card className="shadow-2xl overflow-hidden border-2 backdrop-blur-lg bg-card/70">
+            <CardHeader className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border-b">
+              <CardTitle className="flex items-center gap-2">
+                <div className="h-6 w-1 bg-primary rounded-full" />
+                Status Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { status: "On Progress", icon: "⚙️", gradient: "from-blue-500 to-blue-600" },
+                  { status: "Critical", icon: "🚨", gradient: "from-red-500 to-red-600" },
+                  { status: "Resolved", icon: "✅", gradient: "from-green-500 to-green-600" },
+                  { status: "Pending", icon: "⏳", gradient: "from-amber-500 to-amber-600" }
+                ].map((item, index) => {
+                  const count = tickets.filter((t) => t.status === item.status).length;
+                  const percentage = totalIncidents > 0 ? (count / totalIncidents) * 100 : 0;
+                  
+                  return (
+                    <motion.button
+                      key={item.status}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+                      onClick={() => setSelectedStatus(selectedStatus === item.status ? null : item.status)}
+                      className={`
+                        relative overflow-hidden rounded-xl border-2 
+                        transition-all duration-300 hover:scale-105 hover:shadow-2xl
+                        backdrop-blur-lg bg-card/50 group
+                        ${selectedStatus === item.status 
+                          ? "ring-4 ring-primary ring-offset-2 shadow-2xl scale-105" 
+                          : "hover:border-primary/50"}
+                      `}
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
                       
-                      <div className="flex-1 text-left">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${categoryGradient} shadow-lg`} />
-                          <span className="text-xl font-bold">{category}</span>
+                      <div className="relative p-5 text-left">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-3xl drop-shadow-lg">{item.icon}</span>
+                          <StatusBadge status={item.status as any} />
                         </div>
                         
-                        <div className="text-4xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                        <div className="text-3xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
                           {count}
                         </div>
                         
-                        <div className="text-sm text-muted-foreground font-medium">
-                          tiket dalam kategori ini
+                        <div className="text-xs text-muted-foreground font-medium mb-3">
+                          {percentage.toFixed(1)}% dari total
+                        </div>
+                        
+                        {/* Progress Bar */}
+                        <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${percentage}%` }}
+                            transition={{ duration: 1, delay: 0.6 + index * 0.1, ease: "easeOut" }}
+                            className={`absolute inset-y-0 left-0 bg-gradient-to-r ${item.gradient} rounded-full shadow-lg`}
+                          />
                         </div>
                       </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        {shiftReports.length > 0 && (
-          <Card className="shadow-card md:col-span-2 bg-gradient-to-br from-primary/5 via-background to-accent/5 border-primary/20">
+        {/* Category Distribution with Pie Chart */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        >
+          <Card className="shadow-2xl overflow-hidden border-2 backdrop-blur-lg bg-card/70">
+            <CardHeader className="bg-gradient-to-r from-accent/10 via-primary/5 to-accent/10 border-b">
+              <CardTitle className="flex items-center gap-2">
+                <div className="h-6 w-1 bg-accent rounded-full" />
+                Category Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {(() => {
+                const ritelCount = tickets.filter((t) => t.category === "RITEL").length;
+                const feederCount = tickets.filter((t) => t.category === "FEEDER").length;
+                const ritelPercentage = totalIncidents > 0 ? (ritelCount / totalIncidents) * 100 : 0;
+                const feederPercentage = totalIncidents > 0 ? (feederCount / totalIncidents) * 100 : 0;
+                
+                const pieData = [
+                  { name: "RITEL", value: ritelCount, color: "hsl(217, 91%, 60%)" },
+                  { name: "FEEDER", value: feederCount, color: "hsl(38, 92%, 50%)" }
+                ];
+
+                return (
+                  <div className="space-y-6">
+                    {/* Pie Chart */}
+                    {totalIncidents > 0 ? (
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.6, delay: 0.7 }}
+                        className="h-64"
+                      >
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={pieData}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {pieData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </motion.div>
+                    ) : (
+                      <div className="h-64 flex items-center justify-center text-muted-foreground">
+                        Tidak ada data tiket
+                      </div>
+                    )}
+                    
+                    {/* Category Cards */}
+                    <div className="grid grid-cols-2 gap-4">
+                      {[
+                        { category: "RITEL", count: ritelCount, percentage: ritelPercentage, gradient: "from-blue-500 to-indigo-600", icon: "🔵" },
+                        { category: "FEEDER", count: feederCount, percentage: feederPercentage, gradient: "from-amber-500 to-orange-600", icon: "🟠" }
+                      ].map((item, index) => (
+                        <motion.button
+                          key={item.category}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.8 + index * 0.1 }}
+                          onClick={() => setSelectedCategory(selectedCategory === item.category ? null : item.category)}
+                          className={`
+                            relative overflow-hidden rounded-xl border-2 p-4
+                            transition-all duration-300 hover:scale-105 hover:shadow-2xl
+                            backdrop-blur-lg bg-card/50 group
+                            ${selectedCategory === item.category 
+                              ? "ring-4 ring-accent ring-offset-2 shadow-2xl scale-105" 
+                              : "hover:border-accent/50"}
+                          `}
+                        >
+                          <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                          
+                          <div className="relative text-center">
+                            <div className="text-2xl mb-2">{item.icon}</div>
+                            <div className="text-lg font-bold mb-1">{item.category}</div>
+                            <div className="text-3xl font-bold mb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                              {item.count}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {item.percentage.toFixed(0)}% dari total
+                            </div>
+                          </div>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Shift Reports Section */}
+      {shiftReports.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <Card className="shadow-2xl border-2 bg-gradient-to-br from-primary/5 via-background to-accent/5 border-primary/20">
             <CardHeader className="border-b border-primary/10">
               <CardTitle className="flex items-center gap-2">
                 <div className="h-8 w-1 bg-primary rounded-full" />
@@ -382,20 +439,20 @@ export default function Dashboard() {
                       )}
 
                       {report.issues && (
-                        <div className="bg-muted/50 p-3 rounded-lg border border-border/50">
-                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                            ⚠️ Kendala/Masalah
+                        <div className="bg-accent/5 p-3 rounded-lg border border-accent/20">
+                          <div className="text-xs font-bold text-accent mb-2 flex items-center gap-1">
+                            ⚠️ PERMASALAHAN
                           </div>
-                          <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans text-foreground/80">
+                          <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans text-foreground/90">
                             {report.issues}
                           </pre>
                         </div>
                       )}
 
                       {report.notes && (
-                        <div className="bg-muted/30 p-3 rounded-lg border border-border/40">
-                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                            📝 Catatan
+                        <div className="bg-muted/30 p-3 rounded-lg border border-border/50">
+                          <div className="text-xs font-bold text-muted-foreground mb-2 flex items-center gap-1">
+                            📝 CATATAN
                           </div>
                           <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans text-muted-foreground">
                             {report.notes}
@@ -408,9 +465,16 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-        )}
+        </motion.div>
+      )}
 
-        <Card className="shadow-card md:col-span-2">
+      {/* Tickets/OLT List Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.7 }}
+      >
+        <Card className="shadow-2xl border-2">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>
@@ -506,43 +570,21 @@ export default function Dashboard() {
                             onClick={() => setSelectedTicket(ticket)}
                           >
                             <TableCell className="font-medium">{index + 1}</TableCell>
-                            <TableCell className="font-mono text-xs">{ticket.id}</TableCell>
+                            <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
-                            <TableCell>
-                              {ticket.category === "FEEDER" ? (
-                                <div className="text-xs">
-                                  {ticket.constraint === "OLT DOWN" && (
-                                    <span className="font-medium">{ticket.hostname}</span>
-                                  )}
-                                  {ticket.constraint === "PORT DOWN" && (
-                                    <>
-                                      <div className="font-medium">{ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT"}</div>
-                                      <div className="text-muted-foreground">{ticket.hostname}</div>
-                                    </>
-                                  )}
-                                  {(ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX") && (
-                                    <>
-                                      <div className="font-medium">{ticket.fatId}</div>
-                                      <div className="text-muted-foreground">{ticket.hostname}</div>
-                                    </>
-                                  )}
-                                </div>
-                              ) : (
-                                <span className="text-xs">{ticket.customerName}</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-xs">{ticket.serpo}</TableCell>
+                            <TableCell className="max-w-[200px] truncate">{ticket.customerName || ticket.info || "-"}</TableCell>
+                            <TableCell className="font-medium text-xs">{ticket.serpo}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.snOnt}</TableCell>
                             <TableCell>
-                              <span className="text-xs px-2 py-1 rounded-md bg-muted">
+                              <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
                                 {ticket.constraint}
                               </span>
                             </TableCell>
                             <TableCell>
                               <span
-                                className={`text-xs px-2 py-1 rounded-full ${
+                                className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
                                   ticket.category === "FEEDER"
                                     ? "bg-warning/20 text-warning"
                                     : "bg-primary/20 text-primary"
@@ -572,7 +614,7 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
       {/* Ticket Detail Dialog */}
       <Dialog open={!!selectedTicket} onOpenChange={() => setSelectedTicket(null)}>
@@ -604,75 +646,77 @@ export default function Dashboard() {
                 <StatusBadge status={selectedTicket.status} />
               </div>
 
-              {/* Main Information */}
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Service ID</label>
-                    <p className="text-lg font-mono mt-1">{selectedTicket.serviceId}</p>
-                  </div>
-                  
-                  <div>
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Category</label>
-                    <div className="mt-1">
-                      <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                        selectedTicket.category === "FEEDER"
-                          ? "bg-warning/20 text-warning"
-                          : "bg-primary/20 text-primary"
-                      }`}>
-                        {selectedTicket.category}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Constraint</label>
-                    <p className="text-lg font-medium mt-1 px-3 py-2 bg-muted rounded-md inline-block">
-                      {selectedTicket.constraint}
-                    </p>
-                  </div>
+              {/* Category & Constraint */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-muted/30 rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">Category</p>
+                  <span
+                    className={`inline-block text-sm px-3 py-1 rounded-full font-semibold ${
+                      selectedTicket.category === "FEEDER"
+                        ? "bg-warning/20 text-warning"
+                        : "bg-primary/20 text-primary"
+                    }`}
+                  >
+                    {selectedTicket.category}
+                  </span>
                 </div>
+                <div className="p-4 bg-muted/30 rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">Constraint</p>
+                  <span className="text-sm font-semibold text-accent">
+                    {selectedTicket.constraint}
+                  </span>
+                </div>
+              </div>
 
-                <div className="space-y-4">
+              {/* Customer Information */}
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <h4 className="font-semibold mb-3 text-primary">Customer Information</h4>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">SERPO</label>
-                    <p className="text-lg mt-1">{selectedTicket.serpo}</p>
+                    <p className="text-xs text-muted-foreground mb-1">Service ID</p>
+                    <p className="text-sm font-mono">{selectedTicket.serviceId}</p>
                   </div>
-
-                  {selectedTicket.category === "RITEL" && (
-                    <div>
-                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Customer Name</label>
-                      <p className="text-lg mt-1">{selectedTicket.customerName}</p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Customer Name</p>
+                    <p className="text-sm">{selectedTicket.customerName || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Info</p>
+                    <p className="text-sm">{selectedTicket.info || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">SERPO</p>
+                    <p className="text-sm font-semibold">{selectedTicket.serpo}</p>
+                  </div>
                 </div>
               </div>
 
               {/* Technical Details */}
-              <div className="p-4 bg-muted/50 rounded-lg border">
-                <h4 className="font-semibold mb-3 flex items-center gap-2">
-                  <Server className="h-4 w-4" />
-                  Technical Information
-                </h4>
-                <div className="grid grid-cols-3 gap-4">
+              <div className="p-4 bg-accent/5 rounded-lg border border-accent/20">
+                <h4 className="font-semibold mb-3 text-accent">Technical Details</h4>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground">Hostname OLT</label>
-                    <p className="text-sm font-mono mt-1">{selectedTicket.hostname}</p>
+                    <p className="text-xs text-muted-foreground mb-1">Hostname</p>
+                    <p className="text-sm font-mono">{selectedTicket.hostname}</p>
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground">FAT ID</label>
-                    <p className="text-sm font-mono mt-1">{selectedTicket.fatId}</p>
+                    <p className="text-xs text-muted-foreground mb-1">FAT ID</p>
+                    <p className="text-sm font-mono">{selectedTicket.fatId}</p>
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground">SN ONT</label>
-                    <p className="text-sm font-mono mt-1">{selectedTicket.snOnt}</p>
+                    <p className="text-xs text-muted-foreground mb-1">Port/Slot</p>
+                    <p className="text-sm font-mono">{selectedTicket.port}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">SN ONT</p>
+                    <p className="text-sm font-mono">{selectedTicket.snOnt}</p>
                   </div>
                 </div>
               </div>
 
               {/* Ticket Result */}
-              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                <h4 className="font-semibold mb-2 text-primary">Ticket Result</h4>
+              <div className="p-4 bg-success/5 rounded-lg border border-success/20">
+                <h4 className="font-semibold mb-2 text-success">Ticket Result</h4>
                 <pre className="text-sm whitespace-pre-wrap font-mono bg-background p-3 rounded border">
                   {selectedTicket.ticketResult}
                 </pre>
@@ -684,7 +728,6 @@ export default function Dashboard() {
                   Tutup
                 </Button>
                 <Button onClick={() => {
-                  // Navigate to ticket management
                   window.location.href = '/ticket-management';
                 }}>
                   <ExternalLink className="h-4 w-4 mr-2" />
