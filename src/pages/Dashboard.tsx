@@ -1,7 +1,7 @@
-import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User } from "lucide-react";
+import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User, X, ExternalLink } from "lucide-react";
 import { MetricCard } from "@/components/MetricCard";
 import { useTickets } from "@/hooks/useTickets";
-import { FEEDER_CONSTRAINTS_SET } from "@/types/ticket";
+import { FEEDER_CONSTRAINTS_SET, Ticket } from "@/types/ticket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { OLT } from "@/types/olt";
 import { loadOLTData } from "@/lib/indexedDB";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ShiftReport {
   id: string;
@@ -31,6 +32,7 @@ export default function Dashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [oltData, setOltData] = useState<OLT[]>([]);
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
 
   // Load shift reports from localStorage
   useEffect(() => {
@@ -49,7 +51,8 @@ export default function Dashboard() {
     return ageMs > 24 * 60 * 60 * 1000 && t.status !== "Resolved";
   }).length;
   const feederImpact = tickets.filter((t) => FEEDER_CONSTRAINTS_SET.has(t.constraint)).length;
-  const totalOLT = new Set(excelData.map((r) => r.hostname).filter(Boolean)).size || 0;
+  // Count unique OLT hostnames only
+  const totalOLT = new Set(oltData.map((olt) => olt.hostname).filter(Boolean)).size || 0;
 
   const recentTickets = tickets.slice(0, 5);
   
@@ -132,24 +135,29 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle>Status Distribution</CardTitle>
+        <Card className="shadow-elevated overflow-hidden border-2">
+          <CardHeader className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border-b">
+            <CardTitle className="flex items-center gap-2">
+              <div className="h-6 w-1 bg-primary rounded-full" />
+              Status Distribution
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {["On Progress", "Critical", "Resolved", "Pending"].map((status) => {
                 const count = tickets.filter((t) => t.status === status).length;
                 const percentage = totalIncidents > 0 ? (count / totalIncidents) * 100 : 0;
-                const getStatusColor = (s: string) => {
+                
+                const getStatusGradient = (s: string) => {
                   switch (s) {
-                    case "On Progress": return "bg-blue-500";
-                    case "Critical": return "bg-destructive";
-                    case "Resolved": return "bg-success";
-                    case "Pending": return "bg-warning";
-                    default: return "bg-primary";
+                    case "On Progress": return "from-blue-500 to-blue-600";
+                    case "Critical": return "from-red-500 to-red-600";
+                    case "Resolved": return "from-green-500 to-green-600";
+                    case "Pending": return "from-amber-500 to-amber-600";
+                    default: return "from-primary to-accent";
                   }
                 };
+                
                 const getStatusIcon = (s: string) => {
                   switch (s) {
                     case "On Progress": return "⚙️";
@@ -159,105 +167,139 @@ export default function Dashboard() {
                     default: return "📊";
                   }
                 };
+                
                 return (
-                  <div key={status} className="relative group">
-                    <button
-                      onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
-                      className={`w-full p-4 rounded-lg border bg-card hover:shadow-lg transition-all hover:scale-105 text-left ${
-                        selectedStatus === status ? "ring-2 ring-primary" : ""
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl">{getStatusIcon(status)}</span>
-                          <StatusBadge status={status as any} />
-                        </div>
+                  <button
+                    key={status}
+                    onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
+                    className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-2xl group ${
+                      selectedStatus === status 
+                        ? "ring-4 ring-primary ring-offset-2 shadow-2xl scale-105" 
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${getStatusGradient(status)} opacity-10 group-hover:opacity-20 transition-opacity`} />
+                    
+                    <div className="relative p-5 text-left">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-3xl drop-shadow-lg">{getStatusIcon(status)}</span>
+                        <StatusBadge status={status as any} />
                       </div>
-                      <div className="text-3xl font-bold mb-1">{count}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {percentage.toFixed(1)}% of total
+                      
+                      <div className="text-4xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                        {count}
                       </div>
-                      <div className="mt-3 h-1.5 bg-secondary rounded-full overflow-hidden">
+                      
+                      <div className="text-xs text-muted-foreground font-medium mb-3">
+                        {percentage.toFixed(1)}% dari total
+                      </div>
+                      
+                      <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
                         <div
-                          className={`h-full ${getStatusColor(status)} transition-all duration-500`}
+                          className={`absolute inset-y-0 left-0 bg-gradient-to-r ${getStatusGradient(status)} rounded-full transition-all duration-1000 ease-out shadow-lg`}
                           style={{ width: `${percentage}%` }}
                         />
                       </div>
-                    </button>
-                  </div>
+                    </div>
+                  </button>
                 );
               })}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle>Category Distribution</CardTitle>
+        <Card className="shadow-elevated overflow-hidden border-2">
+          <CardHeader className="bg-gradient-to-r from-accent/10 via-primary/5 to-accent/10 border-b">
+            <CardTitle className="flex items-center gap-2">
+              <div className="h-6 w-1 bg-accent rounded-full" />
+              Category Distribution
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {["RITEL", "FEEDER"].map((category) => {
                 const count = tickets.filter((t) => t.category === category).length;
                 const percentage = totalIncidents > 0 ? (count / totalIncidents) * 100 : 0;
-                const circumference = 2 * Math.PI * 45;
+                const circumference = 2 * Math.PI * 60;
                 const strokeDashoffset = circumference - (percentage / 100) * circumference;
                 
+                const categoryGradient = category === "FEEDER" 
+                  ? "from-amber-500 to-orange-600" 
+                  : "from-blue-500 to-indigo-600";
+                
+                const categoryColor = category === "FEEDER" 
+                  ? "text-warning" 
+                  : "text-primary";
+                
                 return (
-                  <div key={category} className="relative">
-                    <button
-                      onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
-                      className={`w-full flex items-center gap-4 p-4 rounded-lg border bg-card hover:shadow-lg transition-all text-left ${
-                        selectedCategory === category ? "ring-2 ring-primary" : ""
-                      }`}
-                    >
-                      <div className="relative w-24 h-24 flex-shrink-0">
-                        <svg className="w-24 h-24 transform -rotate-90">
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
+                    className={`relative overflow-hidden rounded-xl border-2 p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl group ${
+                      selectedCategory === category 
+                        ? "ring-4 ring-accent ring-offset-2 shadow-2xl scale-105" 
+                        : "hover:border-accent/50"
+                    }`}
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${categoryGradient} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                    
+                    <div className="relative flex items-center gap-6">
+                      <div className="relative flex-shrink-0">
+                        <svg className="w-32 h-32 transform -rotate-90 drop-shadow-lg">
+                          {/* Background circle */}
                           <circle
-                            cx="48"
-                            cy="48"
-                            r="45"
+                            cx="64"
+                            cy="64"
+                            r="60"
                             stroke="currentColor"
-                            strokeWidth="8"
+                            strokeWidth="10"
                             fill="none"
-                            className="text-secondary"
+                            className="text-secondary/50"
                           />
+                          {/* Animated progress circle */}
                           <circle
-                            cx="48"
-                            cy="48"
-                            r="45"
-                            stroke="currentColor"
-                            strokeWidth="8"
+                            cx="64"
+                            cy="64"
+                            r="60"
+                            stroke="url(#gradient-${category})"
+                            strokeWidth="10"
                             fill="none"
-                            className={category === "FEEDER" ? "text-warning" : "text-primary"}
                             strokeDasharray={circumference}
                             strokeDashoffset={strokeDashoffset}
                             strokeLinecap="round"
-                            style={{ transition: "stroke-dashoffset 1s ease" }}
+                            className="transition-all duration-1000 ease-out drop-shadow-lg"
                           />
+                          <defs>
+                            <linearGradient id={`gradient-${category}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" className={categoryColor} stopOpacity="1" />
+                              <stop offset="100%" className={categoryColor} stopOpacity="0.6" />
+                            </linearGradient>
+                          </defs>
                         </svg>
+                        
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-center">
-                            <div className="text-2xl font-bold">{percentage.toFixed(0)}%</div>
+                            <div className="text-3xl font-bold">{percentage.toFixed(0)}%</div>
                           </div>
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div
-                            className={`w-3 h-3 rounded-full ${
-                              category === "FEEDER" ? "bg-warning" : "bg-primary"
-                            }`}
-                          />
-                          <span className="text-lg font-semibold">{category}</span>
+                      
+                      <div className="flex-1 text-left">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${categoryGradient} shadow-lg`} />
+                          <span className="text-xl font-bold">{category}</span>
                         </div>
-                        <div className="text-3xl font-bold mb-1">{count}</div>
-                        <div className="text-sm text-muted-foreground">
-                          tickets in this category
+                        
+                        <div className="text-4xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                          {count}
+                        </div>
+                        
+                        <div className="text-sm text-muted-foreground font-medium">
+                          tiket dalam kategori ini
                         </div>
                       </div>
-                    </button>
-                  </div>
+                    </div>
+                  </button>
                 );
               })}
             </div>
@@ -458,7 +500,11 @@ export default function Dashboard() {
                       </TableHeader>
                       <TableBody>
                         {(selectedStatus || selectedCategory || selectedMetric ? filteredTickets : recentTickets).map((ticket, index) => (
-                          <TableRow key={ticket.id}>
+                          <TableRow 
+                            key={ticket.id}
+                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                            onClick={() => setSelectedTicket(ticket)}
+                          >
                             <TableCell className="font-medium">{index + 1}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.id}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
@@ -527,6 +573,128 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Ticket Detail Dialog */}
+      <Dialog open={!!selectedTicket} onOpenChange={() => setSelectedTicket(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Activity className="h-5 w-5 text-primary" />
+              Detail Tiket
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedTicket && (
+            <div className="space-y-6 mt-4">
+              {/* Status Badge */}
+              <div className="flex items-center justify-between pb-4 border-b">
+                <div>
+                  <h3 className="text-2xl font-bold">{selectedTicket.id}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Dibuat pada {new Date(selectedTicket.createdISO).toLocaleString("id-ID", {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
+                </div>
+                <StatusBadge status={selectedTicket.status} />
+              </div>
+
+              {/* Main Information */}
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Service ID</label>
+                    <p className="text-lg font-mono mt-1">{selectedTicket.serviceId}</p>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Category</label>
+                    <div className="mt-1">
+                      <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedTicket.category === "FEEDER"
+                          ? "bg-warning/20 text-warning"
+                          : "bg-primary/20 text-primary"
+                      }`}>
+                        {selectedTicket.category}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Constraint</label>
+                    <p className="text-lg font-medium mt-1 px-3 py-2 bg-muted rounded-md inline-block">
+                      {selectedTicket.constraint}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">SERPO</label>
+                    <p className="text-lg mt-1">{selectedTicket.serpo}</p>
+                  </div>
+
+                  {selectedTicket.category === "RITEL" && (
+                    <div>
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Customer Name</label>
+                      <p className="text-lg mt-1">{selectedTicket.customerName}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Technical Details */}
+              <div className="p-4 bg-muted/50 rounded-lg border">
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <Server className="h-4 w-4" />
+                  Technical Information
+                </h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground">Hostname OLT</label>
+                    <p className="text-sm font-mono mt-1">{selectedTicket.hostname}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground">FAT ID</label>
+                    <p className="text-sm font-mono mt-1">{selectedTicket.fatId}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground">SN ONT</label>
+                    <p className="text-sm font-mono mt-1">{selectedTicket.snOnt}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ticket Result */}
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <h4 className="font-semibold mb-2 text-primary">Ticket Result</h4>
+                <pre className="text-sm whitespace-pre-wrap font-mono bg-background p-3 rounded border">
+                  {selectedTicket.ticketResult}
+                </pre>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button variant="outline" onClick={() => setSelectedTicket(null)}>
+                  Tutup
+                </Button>
+                <Button onClick={() => {
+                  // Navigate to ticket management
+                  window.location.href = '/ticket-management';
+                }}>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Edit Tiket
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
