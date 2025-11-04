@@ -37,6 +37,7 @@ export default function Dashboard() {
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [filterDialogTitle, setFilterDialogTitle] = useState("");
   const [filterDialogTickets, setFilterDialogTickets] = useState<Ticket[]>([]);
+  const [showOltList, setShowOltList] = useState(false);
 
   // Load shift reports from localStorage
   useEffect(() => {
@@ -164,10 +165,13 @@ export default function Dashboard() {
                 filtered = tickets.filter((t) => FEEDER_CONSTRAINTS_SET.has(t.constraint));
                 title = "Tiket Impact Feeder";
               } else if (card.metric === "olt") {
-                filtered = tickets.filter((t) => t.constraint === "OLT DOWN");
-                title = "Tiket OLT DOWN";
+                setShowOltList(true);
+                setFilterDialogTitle("Daftar OLT Unik");
+                setFilterDialogOpen(true);
+                return;
               }
               
+              setShowOltList(false);
               setFilterDialogTickets(filtered);
               setFilterDialogTitle(title);
               setFilterDialogOpen(true);
@@ -235,13 +239,14 @@ export default function Dashboard() {
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
-                      onClick={() => {
-                        setSelectedStatus(selectedStatus === item.status ? null : item.status);
-                        const filtered = tickets.filter((t) => t.status === item.status);
-                        setFilterDialogTickets(filtered);
-                        setFilterDialogTitle(`Tiket dengan Status: ${item.status}`);
-                        setFilterDialogOpen(true);
-                      }}
+                         onClick={() => {
+                          setSelectedStatus(selectedStatus === item.status ? null : item.status);
+                          const filtered = tickets.filter((t) => t.status === item.status);
+                          setShowOltList(false);
+                          setFilterDialogTickets(filtered);
+                          setFilterDialogTitle(`Tiket dengan Status: ${item.status}`);
+                          setFilterDialogOpen(true);
+                        }}
                       className={`
                         relative overflow-hidden rounded-xl border-2 
                         transition-all duration-300 hover:scale-105 hover:shadow-2xl
@@ -360,6 +365,7 @@ export default function Dashboard() {
                           onClick={() => {
                             setSelectedCategory(selectedCategory === item.category ? null : item.category);
                             const filtered = tickets.filter((t) => t.category === item.category);
+                            setShowOltList(false);
                             setFilterDialogTickets(filtered);
                             setFilterDialogTitle(`Tiket dengan Category: ${item.category}`);
                             setFilterDialogOpen(true);
@@ -717,7 +723,7 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Filter Dialog - Shows tickets by Status or Category */}
+      {/* Filter Dialog - Shows tickets by Status or Category or OLT List */}
       <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -728,92 +734,142 @@ export default function Dashboard() {
           </DialogHeader>
           
           <div className="mt-4">
-            {filterDialogTickets.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                Tidak ada tiket dalam kategori ini
-              </p>
-            ) : (
+            {showOltList ? (
+              /* OLT List View */
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-12">No</TableHead>
-                      <TableHead>Tiket ID</TableHead>
-                      <TableHead>Service ID</TableHead>
-                      <TableHead>Customer / Info</TableHead>
-                      <TableHead>SERPO</TableHead>
-                      <TableHead>Hostname</TableHead>
-                      <TableHead>FAT ID</TableHead>
-                      <TableHead>SN ONT</TableHead>
-                      <TableHead>Constraint</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Created</TableHead>
+                      <TableHead>Hostname OLT</TableHead>
+                      <TableHead>Jumlah Tiket</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filterDialogTickets.map((ticket, index) => (
-                      <TableRow 
-                        key={ticket.id}
-                        className="cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => {
-                          setFilterDialogOpen(false);
-                          setSelectedTicket(ticket);
-                        }}
-                      >
-                        <TableCell className="font-medium">{index + 1}</TableCell>
-                        <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
-                        <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
-                        <TableCell className="max-w-[200px] truncate">
-                          {ticket.category === "FEEDER" 
-                            ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
-                                ? `${ticket.fatId} - ${ticket.hostname}`
-                                : ticket.constraint === "PORT DOWN"
-                                  ? (() => {
-                                      const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
-                                      const portInfo = match ? match[1] : "PORT";
-                                      return `${portInfo} - ${ticket.hostname}`;
-                                    })()
-                                  : ticket.customerName || "-")
-                            : (ticket.customerName || "-")
-                          }
-                        </TableCell>
-                        <TableCell className="font-medium text-xs">{ticket.serpo}</TableCell>
-                        <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
-                        <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
-                        <TableCell className="font-mono text-xs">{ticket.snOnt}</TableCell>
-                        <TableCell>
-                          <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
-                            {ticket.constraint}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <span
-                            className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
-                              ticket.category === "FEEDER"
-                                ? "bg-warning/20 text-warning"
-                                : "bg-primary/20 text-primary"
-                            }`}
-                          >
-                            {ticket.category}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={ticket.status} />
-                        </TableCell>
-                        <TableCell className="text-xs whitespace-nowrap">
-                          {new Date(ticket.createdISO).toLocaleString("id-ID", {
-                            day: "2-digit",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </TableCell>
-                      </TableRow>
-                     ))}
+                    {(() => {
+                      const oltMap = new Map<string, number>();
+                      tickets.forEach(ticket => {
+                        if (ticket.hostname) {
+                          oltMap.set(ticket.hostname, (oltMap.get(ticket.hostname) || 0) + 1);
+                        }
+                      });
+                      
+                      const uniqueOlts = Array.from(oltMap.entries())
+                        .sort((a, b) => a[0].localeCompare(b[0]));
+                      
+                      return uniqueOlts.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                            Tidak ada data OLT
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        uniqueOlts.map(([hostname, count], index) => (
+                          <TableRow key={hostname} className="hover:bg-muted/50">
+                            <TableCell className="font-medium">{index + 1}</TableCell>
+                            <TableCell className="font-semibold font-mono">{hostname}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg font-bold text-primary">{count}</span>
+                                <span className="text-xs text-muted-foreground">tiket</span>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      );
+                    })()}
                   </TableBody>
                 </Table>
               </div>
+            ) : (
+              /* Ticket List View */
+              filterDialogTickets.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  Tidak ada tiket dalam kategori ini
+                </p>
+              ) : (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12">No</TableHead>
+                        <TableHead>Tiket ID</TableHead>
+                        <TableHead>Service ID</TableHead>
+                        <TableHead>Customer / Info</TableHead>
+                        <TableHead>SERPO</TableHead>
+                        <TableHead>Hostname</TableHead>
+                        <TableHead>FAT ID</TableHead>
+                        <TableHead>SN ONT</TableHead>
+                        <TableHead>Constraint</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Created</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filterDialogTickets.map((ticket, index) => (
+                        <TableRow 
+                          key={ticket.id}
+                          className="cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => {
+                            setFilterDialogOpen(false);
+                            setSelectedTicket(ticket);
+                          }}
+                        >
+                          <TableCell className="font-medium">{index + 1}</TableCell>
+                          <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
+                          <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
+                          <TableCell className="max-w-[200px] truncate">
+                            {ticket.category === "FEEDER" 
+                              ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
+                                  ? `${ticket.fatId} - ${ticket.hostname}`
+                                  : ticket.constraint === "PORT DOWN"
+                                    ? (() => {
+                                        const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
+                                        const portInfo = match ? match[1] : "PORT";
+                                        return `${portInfo} - ${ticket.hostname}`;
+                                      })()
+                                    : ticket.customerName || "-")
+                              : (ticket.customerName || "-")
+                            }
+                          </TableCell>
+                          <TableCell className="font-medium text-xs">{ticket.serpo}</TableCell>
+                          <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
+                          <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
+                          <TableCell className="font-mono text-xs">{ticket.snOnt}</TableCell>
+                          <TableCell>
+                            <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
+                              {ticket.constraint}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
+                                ticket.category === "FEEDER"
+                                  ? "bg-warning/20 text-warning"
+                                  : "bg-primary/20 text-primary"
+                              }`}
+                            >
+                              {ticket.category}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <StatusBadge status={ticket.status} />
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            {new Date(ticket.createdISO).toLocaleString("id-ID", {
+                              day: "2-digit",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </TableCell>
+                        </TableRow>
+                       ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )
             )}
           </div>
           
