@@ -64,20 +64,29 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <div className="mt-auto p-4 border-t border-sidebar-border">
-          <Button
-            variant="ghost"
-            size={collapsed ? "icon" : "default"}
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-            {!collapsed && <span className="ml-2">Dark Mode</span>}
-          </Button>
+        <div className="mt-auto border-t border-sidebar-border">
+          <div className="p-4">
+            <Button
+              variant="ghost"
+              size={collapsed ? "icon" : "default"}
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+              {!collapsed && <span className="ml-2">Dark Mode</span>}
+            </Button>
+          </div>
+          {!collapsed && (
+            <div className="px-4 pb-4 text-center">
+              <p className="text-xs text-sidebar-foreground/50">
+                © RZ Corp. All Rights Reserved
+              </p>
+            </div>
+          )}
         </div>
       </SidebarContent>
     </Sidebar>

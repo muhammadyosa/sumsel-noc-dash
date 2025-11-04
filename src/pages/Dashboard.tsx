@@ -147,13 +147,37 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            onClick={() => setSelectedMetric(selectedMetric === card.metric ? null : card.metric)}
+            onClick={() => {
+              let filtered: Ticket[] = [];
+              let title = "";
+              
+              if (card.metric === "total") {
+                filtered = tickets;
+                title = "Semua Tiket";
+              } else if (card.metric === "overSLA") {
+                filtered = tickets.filter((t) => {
+                  const ageMs = new Date().getTime() - new Date(t.createdISO).getTime();
+                  return ageMs > 24 * 60 * 60 * 1000 && t.status !== "Resolved";
+                });
+                title = "Tiket Over SLA (>24h)";
+              } else if (card.metric === "feeder") {
+                filtered = tickets.filter((t) => FEEDER_CONSTRAINTS_SET.has(t.constraint));
+                title = "Tiket Impact Feeder";
+              } else if (card.metric === "olt") {
+                filtered = tickets.filter((t) => t.constraint === "OLT DOWN");
+                title = "Tiket OLT DOWN";
+              }
+              
+              setFilterDialogTickets(filtered);
+              setFilterDialogTitle(title);
+              setFilterDialogOpen(true);
+            }}
             className={`
               relative cursor-pointer group
               rounded-2xl border-2 overflow-hidden
               transition-all duration-300
               hover:scale-105 hover:shadow-2xl ${card.glowColor}
-              ${selectedMetric === card.metric ? `ring-4 ring-primary shadow-2xl ${card.glowColor}` : "hover:border-primary/50"}
+              hover:border-primary/50
             `}
           >
             {/* Background Gradient */}
@@ -483,7 +507,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* Tickets/OLT List Section */}
+      {/* Recent Tickets Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -491,99 +515,40 @@ export default function Dashboard() {
       >
         <Card className="shadow-2xl border-2">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>
-                {selectedMetric === "olt" ? "List OLT" : 
-                 selectedStatus || selectedCategory || selectedMetric ? "Detail Tiket" : "Recent Tickets"}
-              </span>
-              {(selectedStatus || selectedCategory || selectedMetric) && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedStatus(null);
-                    setSelectedCategory(null);
-                    setSelectedMetric(null);
-                  }}
-                >
-                  Clear Filter
-                </Button>
-              )}
-            </CardTitle>
+            <CardTitle>Recent Tickets</CardTitle>
           </CardHeader>
           <CardContent>
-            {selectedMetric === "olt" ? (
-              // Display OLT List when Total OLT is selected
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">No</TableHead>
-                      <TableHead>Provinsi</TableHead>
-                      <TableHead>ID FAT</TableHead>
-                      <TableHead>Hostname OLT</TableHead>
-                      <TableHead>Tikor FAT</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {oltData.length === 0 ? (
+            <div className="space-y-3">
+              {recentTickets.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Belum ada tiket
+                </p>
+              ) : (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
-                          Belum ada data OLT
-                        </TableCell>
+                        <TableHead className="w-12">No</TableHead>
+                        <TableHead>Tiket ID</TableHead>
+                        <TableHead>Service ID</TableHead>
+                        <TableHead>Customer / Info</TableHead>
+                        <TableHead>SERPO</TableHead>
+                        <TableHead>Hostname</TableHead>
+                        <TableHead>FAT ID</TableHead>
+                        <TableHead>SN ONT</TableHead>
+                        <TableHead>Constraint</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Created</TableHead>
                       </TableRow>
-                    ) : (
-                      oltData.slice(0, 50).map((olt, index) => (
-                        <TableRow key={olt.id}>
-                          <TableCell className="font-medium">{index + 1}</TableCell>
-                          <TableCell>{olt.provinsi}</TableCell>
-                          <TableCell className="font-mono text-xs">{olt.fatId}</TableCell>
-                          <TableCell className="font-mono text-xs">{olt.hostname}</TableCell>
-                          <TableCell>{olt.tikor}</TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-                {oltData.length > 50 && (
-                  <div className="p-3 text-sm text-muted-foreground text-center border-t">
-                    Menampilkan 50 dari {oltData.length} OLT. Lihat semua di halaman List OLT.
-                  </div>
-                )}
-              </div>
-            ) : (
-              // Display Detailed Tickets
-              <div className="space-y-3">
-                {(selectedStatus || selectedCategory || selectedMetric ? filteredTickets : recentTickets).length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    {selectedStatus || selectedCategory || selectedMetric ? "Tidak ada tiket yang sesuai filter" : "Belum ada tiket"}
-                  </p>
-                ) : (
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-12">No</TableHead>
-                          <TableHead>Tiket ID</TableHead>
-                          <TableHead>Service ID</TableHead>
-                          <TableHead>Customer / Info</TableHead>
-                          <TableHead>SERPO</TableHead>
-                          <TableHead>Hostname</TableHead>
-                          <TableHead>FAT ID</TableHead>
-                          <TableHead>SN ONT</TableHead>
-                          <TableHead>Constraint</TableHead>
-                          <TableHead>Category</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Created</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {(selectedStatus || selectedCategory || selectedMetric ? filteredTickets : recentTickets).map((ticket, index) => (
-                          <TableRow 
-                            key={ticket.id}
-                            className="cursor-pointer hover:bg-muted/50 transition-colors"
-                            onClick={() => setSelectedTicket(ticket)}
-                          >
+                    </TableHeader>
+                    <TableBody>
+                      {recentTickets.map((ticket, index) => (
+                        <TableRow 
+                          key={ticket.id}
+                          className="cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => setSelectedTicket(ticket)}
+                        >
                             <TableCell className="font-medium">{index + 1}</TableCell>
                             <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
@@ -633,13 +598,12 @@ export default function Dashboard() {
                               })}
                             </TableCell>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </div>
-            )}
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </motion.div>
@@ -846,11 +810,17 @@ export default function Dashboard() {
                           })}
                         </TableCell>
                       </TableRow>
-                    ))}
+                     ))}
                   </TableBody>
                 </Table>
               </div>
             )}
+          </div>
+          
+          <div className="flex justify-end pt-4 border-t mt-4">
+            <Button variant="outline" onClick={() => setFilterDialogOpen(false)}>
+              Tutup
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
