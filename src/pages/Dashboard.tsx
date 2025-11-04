@@ -34,6 +34,9 @@ export default function Dashboard() {
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [oltData, setOltData] = useState<OLT[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const [filterDialogTitle, setFilterDialogTitle] = useState("");
+  const [filterDialogTickets, setFilterDialogTickets] = useState<Ticket[]>([]);
 
   // Load shift reports from localStorage
   useEffect(() => {
@@ -208,7 +211,13 @@ export default function Dashboard() {
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
-                      onClick={() => setSelectedStatus(selectedStatus === item.status ? null : item.status)}
+                      onClick={() => {
+                        setSelectedStatus(selectedStatus === item.status ? null : item.status);
+                        const filtered = tickets.filter((t) => t.status === item.status);
+                        setFilterDialogTickets(filtered);
+                        setFilterDialogTitle(`Tiket dengan Status: ${item.status}`);
+                        setFilterDialogOpen(true);
+                      }}
                       className={`
                         relative overflow-hidden rounded-xl border-2 
                         transition-all duration-300 hover:scale-105 hover:shadow-2xl
@@ -324,7 +333,13 @@ export default function Dashboard() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.4, delay: 0.8 + index * 0.1 }}
-                          onClick={() => setSelectedCategory(selectedCategory === item.category ? null : item.category)}
+                          onClick={() => {
+                            setSelectedCategory(selectedCategory === item.category ? null : item.category);
+                            const filtered = tickets.filter((t) => t.category === item.category);
+                            setFilterDialogTickets(filtered);
+                            setFilterDialogTitle(`Tiket dengan Category: ${item.category}`);
+                            setFilterDialogOpen(true);
+                          }}
                           className={`
                             relative overflow-hidden rounded-xl border-2 p-4
                             transition-all duration-300 hover:scale-105 hover:shadow-2xl
@@ -572,7 +587,20 @@ export default function Dashboard() {
                             <TableCell className="font-medium">{index + 1}</TableCell>
                             <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
-                            <TableCell className="max-w-[200px] truncate">{ticket.customerName || "-"}</TableCell>
+                            <TableCell className="max-w-[200px] truncate">
+                              {ticket.category === "FEEDER" 
+                                ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
+                                    ? `${ticket.fatId} - ${ticket.hostname}`
+                                    : ticket.constraint === "PORT DOWN"
+                                      ? (() => {
+                                          const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
+                                          const portInfo = match ? match[1] : "PORT";
+                                          return `${portInfo} - ${ticket.hostname}`;
+                                        })()
+                                      : ticket.customerName || "-")
+                                : (ticket.customerName || "-")
+                              }
+                            </TableCell>
                             <TableCell className="font-medium text-xs">{ticket.serpo}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
@@ -715,19 +743,115 @@ export default function Dashboard() {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t">
+              <div className="flex justify-end pt-4 border-t">
                 <Button variant="outline" onClick={() => setSelectedTicket(null)}>
                   Tutup
-                </Button>
-                <Button onClick={() => {
-                  window.location.href = '/ticket-management';
-                }}>
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Edit Tiket
                 </Button>
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Filter Dialog - Shows tickets by Status or Category */}
+      <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              {filterDialogTitle}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="mt-4">
+            {filterDialogTickets.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                Tidak ada tiket dalam kategori ini
+              </p>
+            ) : (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">No</TableHead>
+                      <TableHead>Tiket ID</TableHead>
+                      <TableHead>Service ID</TableHead>
+                      <TableHead>Customer / Info</TableHead>
+                      <TableHead>SERPO</TableHead>
+                      <TableHead>Hostname</TableHead>
+                      <TableHead>FAT ID</TableHead>
+                      <TableHead>SN ONT</TableHead>
+                      <TableHead>Constraint</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Created</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filterDialogTickets.map((ticket, index) => (
+                      <TableRow 
+                        key={ticket.id}
+                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => {
+                          setFilterDialogOpen(false);
+                          setSelectedTicket(ticket);
+                        }}
+                      >
+                        <TableCell className="font-medium">{index + 1}</TableCell>
+                        <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
+                        <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
+                        <TableCell className="max-w-[200px] truncate">
+                          {ticket.category === "FEEDER" 
+                            ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
+                                ? `${ticket.fatId} - ${ticket.hostname}`
+                                : ticket.constraint === "PORT DOWN"
+                                  ? (() => {
+                                      const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
+                                      const portInfo = match ? match[1] : "PORT";
+                                      return `${portInfo} - ${ticket.hostname}`;
+                                    })()
+                                  : ticket.customerName || "-")
+                            : (ticket.customerName || "-")
+                          }
+                        </TableCell>
+                        <TableCell className="font-medium text-xs">{ticket.serpo}</TableCell>
+                        <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
+                        <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
+                        <TableCell className="font-mono text-xs">{ticket.snOnt}</TableCell>
+                        <TableCell>
+                          <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
+                            {ticket.constraint}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
+                              ticket.category === "FEEDER"
+                                ? "bg-warning/20 text-warning"
+                                : "bg-primary/20 text-primary"
+                            }`}
+                          >
+                            {ticket.category}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={ticket.status} />
+                        </TableCell>
+                        <TableCell className="text-xs whitespace-nowrap">
+                          {new Date(ticket.createdISO).toLocaleString("id-ID", {
+                            day: "2-digit",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
