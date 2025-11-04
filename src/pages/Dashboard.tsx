@@ -572,7 +572,7 @@ export default function Dashboard() {
                             <TableCell className="font-medium">{index + 1}</TableCell>
                             <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
-                            <TableCell className="max-w-[200px] truncate">{ticket.customerName || ticket.info || "-"}</TableCell>
+                            <TableCell className="max-w-[200px] truncate">{ticket.customerName || "-"}</TableCell>
                             <TableCell className="font-medium text-xs">{ticket.serpo}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
                             <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
@@ -681,10 +681,6 @@ export default function Dashboard() {
                     <p className="text-sm">{selectedTicket.customerName || "-"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Info</p>
-                    <p className="text-sm">{selectedTicket.info || "-"}</p>
-                  </div>
-                  <div>
                     <p className="text-xs text-muted-foreground mb-1">SERPO</p>
                     <p className="text-sm font-semibold">{selectedTicket.serpo}</p>
                   </div>
@@ -702,10 +698,6 @@ export default function Dashboard() {
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">FAT ID</p>
                     <p className="text-sm font-mono">{selectedTicket.fatId}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Port/Slot</p>
-                    <p className="text-sm font-mono">{selectedTicket.port}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">SN ONT</p>
