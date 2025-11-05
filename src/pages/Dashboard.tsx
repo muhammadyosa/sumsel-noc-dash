@@ -56,8 +56,8 @@ export default function Dashboard() {
     return ageMs > 24 * 60 * 60 * 1000 && t.status !== "Resolved";
   }).length;
   const feederImpact = tickets.filter((t) => FEEDER_CONSTRAINTS_SET.has(t.constraint)).length;
-  // Count unique OLT hostnames only
-  const totalOLT = new Set(oltData.map((olt) => olt.hostname).filter(Boolean)).size || 0;
+  // Count unique OLT hostnames from tickets (impact)
+  const totalOLT = new Set(tickets.map((t) => t.hostname).filter(Boolean)).size || 0;
 
   const recentTickets = tickets.slice(0, 5);
   
@@ -135,7 +135,7 @@ export default function Dashboard() {
             glowColor: "shadow-amber-500/50"
           },
           { 
-            title: "Total OLT", 
+            title: "Impact OLT", 
             value: totalOLT, 
             icon: Server, 
             metric: "olt",
@@ -166,7 +166,7 @@ export default function Dashboard() {
                 title = "Tiket Impact Feeder";
               } else if (card.metric === "olt") {
                 setShowOltList(true);
-                setFilterDialogTitle("Daftar OLT Unik");
+                setFilterDialogTitle("Daftar OLT Terdampak");
                 setFilterDialogOpen(true);
                 return;
               }
