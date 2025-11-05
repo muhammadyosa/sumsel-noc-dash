@@ -137,7 +137,7 @@ ${r.oltDown || "-"}
 LAPORAN PORT DOWN:
 ${r.portDown || "-"}
 
-LAPORAN FAT LOSS SBS:
+LAPORAN FAT LOSS:
 ${r.fatLoss || "-"}
 
 KENDALA/MASALAH:
@@ -272,11 +272,11 @@ Dibuat: ${new Date(r.createdAt).toLocaleString("id-ID")}
                     <div className="space-y-2">
                       <Label htmlFor="fatLoss" className="flex items-center gap-2">
                         <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">FAT LOSS</span>
-                        Laporan FAT Loss SBS
+                        Laporan FAT Loss
                       </Label>
                       <Textarea
                         id="fatLoss"
-                        placeholder="Laporan FAT loss SBS..."
+                        placeholder="Laporan FAT loss..."
                         rows={3}
                         value={shiftReport.fatLoss}
                         onChange={(e) =>

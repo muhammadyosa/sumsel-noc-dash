@@ -84,7 +84,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen space-y-8 p-6">
+    <div className="min-h-screen space-y-6 p-4 md:p-6 lg:p-8">
       {/* Header Section */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
@@ -108,7 +108,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* KPI Cards Section */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { 
             title: "Total Incident", 
@@ -208,7 +208,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         {/* Status Distribution */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -290,7 +290,7 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        {/* Category Distribution with Pie Chart */}
+        {/* Category Distribution - Simple */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -309,91 +309,65 @@ export default function Dashboard() {
                 const feederCount = tickets.filter((t) => t.category === "FEEDER").length;
                 const ritelPercentage = totalIncidents > 0 ? (ritelCount / totalIncidents) * 100 : 0;
                 const feederPercentage = totalIncidents > 0 ? (feederCount / totalIncidents) * 100 : 0;
-                
-                const pieData = [
-                  { name: "RITEL", value: ritelCount, color: "hsl(217, 91%, 60%)" },
-                  { name: "FEEDER", value: feederCount, color: "hsl(38, 92%, 50%)" }
-                ];
 
                 return (
-                  <div className="space-y-6">
-                    {/* Pie Chart */}
-                    {totalIncidents > 0 ? (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6, delay: 0.7 }}
-                        className="h-64"
+                  <div className="grid gap-4">
+                    {[
+                      { category: "RITEL", count: ritelCount, percentage: ritelPercentage, gradient: "from-blue-500 to-indigo-600", icon: "🔵" },
+                      { category: "FEEDER", count: feederCount, percentage: feederPercentage, gradient: "from-amber-500 to-orange-600", icon: "🟠" }
+                    ].map((item, index) => (
+                      <motion.button
+                        key={item.category}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+                        onClick={() => {
+                          setSelectedCategory(selectedCategory === item.category ? null : item.category);
+                          const filtered = tickets.filter((t) => t.category === item.category);
+                          setShowOltList(false);
+                          setFilterDialogTickets(filtered);
+                          setFilterDialogTitle(`Tiket dengan Category: ${item.category}`);
+                          setFilterDialogOpen(true);
+                        }}
+                        className={`
+                          relative overflow-hidden rounded-xl border-2 
+                          transition-all duration-300 hover:scale-105 hover:shadow-2xl
+                          backdrop-blur-lg bg-card/50 group
+                          ${selectedCategory === item.category 
+                            ? "ring-4 ring-accent ring-offset-2 shadow-2xl scale-105" 
+                            : "hover:border-accent/50"}
+                        `}
                       >
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={pieData}
-                              cx="50%"
-                              cy="50%"
-                              labelLine={false}
-                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                              outerRadius={80}
-                              fill="#8884d8"
-                              dataKey="value"
-                            >
-                              {pieData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </motion.div>
-                    ) : (
-                      <div className="h-64 flex items-center justify-center text-muted-foreground">
-                        Tidak ada data tiket
-                      </div>
-                    )}
-                    
-                    {/* Category Cards */}
-                    <div className="grid grid-cols-2 gap-4">
-                      {[
-                        { category: "RITEL", count: ritelCount, percentage: ritelPercentage, gradient: "from-blue-500 to-indigo-600", icon: "🔵" },
-                        { category: "FEEDER", count: feederCount, percentage: feederPercentage, gradient: "from-amber-500 to-orange-600", icon: "🟠" }
-                      ].map((item, index) => (
-                        <motion.button
-                          key={item.category}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, delay: 0.8 + index * 0.1 }}
-                          onClick={() => {
-                            setSelectedCategory(selectedCategory === item.category ? null : item.category);
-                            const filtered = tickets.filter((t) => t.category === item.category);
-                            setShowOltList(false);
-                            setFilterDialogTickets(filtered);
-                            setFilterDialogTitle(`Tiket dengan Category: ${item.category}`);
-                            setFilterDialogOpen(true);
-                          }}
-                          className={`
-                            relative overflow-hidden rounded-xl border-2 p-4
-                            transition-all duration-300 hover:scale-105 hover:shadow-2xl
-                            backdrop-blur-lg bg-card/50 group
-                            ${selectedCategory === item.category 
-                              ? "ring-4 ring-accent ring-offset-2 shadow-2xl scale-105" 
-                              : "hover:border-accent/50"}
-                          `}
-                        >
-                          <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-5 group-hover:opacity-10 transition-opacity`} />
-                          
-                          <div className="relative text-center">
-                            <div className="text-2xl mb-2">{item.icon}</div>
-                            <div className="text-lg font-bold mb-1">{item.category}</div>
-                            <div className="text-3xl font-bold mb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
-                              {item.count}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {item.percentage.toFixed(0)}% dari total
-                            </div>
+                        <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
+                        
+                        <div className="relative p-5 text-left">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-3xl drop-shadow-lg">{item.icon}</span>
+                            <span className="text-xs font-bold px-3 py-1 bg-accent/20 text-accent rounded-full">
+                              {item.category}
+                            </span>
                           </div>
-                        </motion.button>
-                      ))}
-                    </div>
+                          
+                          <div className="text-3xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                            {item.count}
+                          </div>
+                          
+                          <div className="text-xs text-muted-foreground font-medium mb-3">
+                            {item.percentage.toFixed(1)}% dari total
+                          </div>
+                          
+                          {/* Progress Bar */}
+                          <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${item.percentage}%` }}
+                              transition={{ duration: 1, delay: 0.7 + index * 0.1, ease: "easeOut" }}
+                              className={`absolute inset-y-0 left-0 bg-gradient-to-r ${item.gradient} rounded-full shadow-lg`}
+                            />
+                          </div>
+                        </div>
+                      </motion.button>
+                    ))}
                   </div>
                 );
               })()}
@@ -475,7 +449,7 @@ export default function Dashboard() {
                       {report.fatLoss && (
                         <div className="bg-primary/5 p-3 rounded-lg border border-primary/20">
                           <div className="text-xs font-bold text-primary mb-2 flex items-center gap-1">
-                            📊 LAPORAN FAT LOSS SBS
+                            📊 LAPORAN FAT LOSS
                           </div>
                           <pre className="text-xs leading-relaxed whitespace-pre-wrap font-sans text-foreground/90">
                             {report.fatLoss}
