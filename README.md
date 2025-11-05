@@ -1,73 +1,92 @@
-# Welcome to your Lovable project
+# NOC RITEL Dashboard
 
-## Project info
+Dashboard monitoring incident NOC RITEL dengan sinkronisasi GitHub otomatis.
 
-**URL**: https://lovable.dev/projects/0c98ee9b-235c-4e7f-9842-25da3f12b562
+## 🚀 Deploy ke GitHub Pages
 
-## How can I edit this code?
+### 1. Setup Repository
 
-There are several ways of editing your application.
+1. Push project ini ke GitHub repository
+2. Buka **Settings** → **Pages**
+3. Di **Source**, pilih **GitHub Actions**
+4. Workflow akan otomatis deploy setiap push ke `main` branch
 
-**Use Lovable**
+### 2. Konfigurasi
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/0c98ee9b-235c-4e7f-9842-25da3f12b562) and start prompting.
+Edit `vite.config.ts` dan ubah `base` sesuai nama repository:
 
-Changes made via Lovable will be committed automatically to this repo.
+```ts
+base: mode === 'production' ? '/nama-repo-anda/' : '/',
+```
 
-**Use your preferred IDE**
+### 3. GitHub Personal Access Token
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Untuk bisa menyimpan data ke GitHub:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Buka [GitHub Settings → Developer Settings → Personal Access Tokens](https://github.com/settings/tokens)
+2. Generate new token (classic)
+3. Pilih scope: `repo` (Full control of private repositories)
+4. Copy token yang di-generate
+5. Di aplikasi, klik tombol **Key** di pojok kiri bawah
+6. Paste token dan simpan
 
-Follow these steps:
+## 🔄 Cara Kerja
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Data disimpan di folder `data/`** dalam format JSON
+- **Auto-sync setiap 5 detik** - data otomatis diperbarui tanpa reload
+- **Offline mode** - jika koneksi terputus, data tersimpan di localStorage dan sync otomatis saat online kembali
+- **Multi-user** - semua user melihat data yang sama (real-time collaboration)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 📁 Struktur Data
 
-# Step 3: Install the necessary dependencies.
-npm i
+```
+data/
+├── tickets.json      # Data tiket
+├── excel-data.json   # Data import Excel
+└── olt-data.json     # Data OLT
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## 🌐 URL Aplikasi
+
+Setelah deploy, aplikasi akan tersedia di:
+```
+https://username.github.io/nama-repo/
+```
+
+## 💡 Fitur
+
+- ✅ Deploy otomatis dengan GitHub Actions
+- ✅ Sinkronisasi data real-time (5 detik)
+- ✅ Offline support dengan localStorage fallback
+- ✅ Status koneksi dan last update timestamp
+- ✅ Tidak perlu hosting berbayar
+- ✅ Multi-user collaboration
+
+## 🔧 Development
+
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📦 Build
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm run build
+```
 
-**Use GitHub Codespaces**
+## 🔐 Security Note
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+**Jangan commit GitHub token ke repository!** Token disimpan di localStorage browser, bukan di kode.
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Project info
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+**Lovable URL**: https://lovable.dev/projects/0c98ee9b-235c-4e7f-9842-25da3f12b562
 
-## How can I deploy this project?
+## Technologies
 
-Simply open [Lovable](https://lovable.dev/projects/0c98ee9b-235c-4e7f-9842-25da3f12b562) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Vite + React + TypeScript
+- shadcn-ui + Tailwind CSS
+- GitHub API for data persistence
