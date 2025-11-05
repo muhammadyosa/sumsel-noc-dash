@@ -22,6 +22,8 @@ import { toast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
 import { OLT, OLTExcelRecord } from "@/types/olt";
 import { loadOLTData, saveOLTData, clearOLTData } from "@/lib/indexedDB";
+import { z } from "zod";
+import { MAX_FILE_SIZE, MAX_RECORDS, oltDataSchema, sanitizeForCSV } from "@/lib/validation";
 
 const OLTList = () => {
   const [oltData, setOltData] = useState<OLT[]>([]);
@@ -49,6 +51,16 @@ const OLTList = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File terlalu besar",
+        description: `Maksimal ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
@@ -60,6 +72,16 @@ const OLTList = () => {
           raw: false,
           defval: "",
         });
+
+        // Validate record count
+        if (jsonData.length > MAX_RECORDS) {
+          toast({
+            title: "Terlalu banyak record",
+            description: `Maksimal ${MAX_RECORDS.toLocaleString()} record`,
+            variant: "destructive",
+          });
+          return;
+        }
 
         const processedData: OLT[] = jsonData
           .map((row) => {
@@ -112,12 +134,29 @@ const OLTList = () => {
           return;
         }
 
+        // Validate with zod (validate data fields only, id/createdAt already added)
+        processedData.forEach((item) => {
+          oltDataSchema.parse({
+            provinsi: item.provinsi,
+            fatId: item.fatId,
+            hostname: item.hostname,
+            tikor: item.tikor,
+          });
+        });
+
         const newData = [...oltData, ...processedData];
         setOltData(newData);
         
         // Save to IndexedDB
         saveOLTData(newData).catch((error) => {
-          console.error("Error saving OLT data:", error);
+          if (import.meta.env.DEV) {
+            console.error("Error saving OLT data:", error);
+          }
+          toast({
+            title: "Gagal menyimpan",
+            description: "Terjadi kesalahan saat menyimpan data.",
+            variant: "destructive",
+          });
         });
 
         toast({
@@ -125,12 +164,22 @@ const OLTList = () => {
           description: `${processedData.length} data OLT berhasil diimport dan disimpan secara permanen.`,
         });
       } catch (error) {
-        console.error("Error processing file:", error);
-        toast({
-          title: "Import gagal",
-          description: "Terjadi kesalahan saat memproses file.",
-          variant: "destructive",
-        });
+        if (error instanceof z.ZodError) {
+          toast({
+            title: "Validasi gagal",
+            description: error.errors[0].message,
+            variant: "destructive",
+          });
+        } else {
+          if (import.meta.env.DEV) {
+            console.error("Error processing file:", error);
+          }
+          toast({
+            title: "Import gagal",
+            description: "Terjadi kesalahan saat memproses file.",
+            variant: "destructive",
+          });
+        }
       }
     };
 
@@ -149,11 +198,11 @@ const OLTList = () => {
     }
 
     const exportData = filteredData.map((olt) => ({
-      "Nama Provinsi": olt.provinsi,
-      "ID FAT": olt.fatId,
-      "Hostname OLT": olt.hostname,
-      "Tikor OLT": olt.tikor,
-      "Tanggal Import": new Date(olt.createdAt).toLocaleString("id-ID"),
+      "Nama Provinsi": sanitizeForCSV(olt.provinsi),
+      "ID FAT": sanitizeForCSV(olt.fatId),
+      "Hostname OLT": sanitizeForCSV(olt.hostname),
+      "Tikor OLT": sanitizeForCSV(olt.tikor),
+      "Tanggal Import": sanitizeForCSV(new Date(olt.createdAt).toLocaleString("id-ID")),
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);

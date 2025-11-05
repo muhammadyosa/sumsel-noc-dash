@@ -38,6 +38,8 @@ import {
 import { StatusBadge } from "@/components/StatusBadge";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { z } from "zod";
+import { MAX_FILE_SIZE, MAX_RECORDS, excelRecordSchema, sanitizeForCSV } from "@/lib/validation";
 
 export default function TicketManagement() {
   const { tickets, excelData, isLoadingExcel, addTicket, updateTicket, deleteTicket, importExcelData } =
@@ -65,24 +67,46 @@ export default function TicketManagement() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`File terlalu besar. Maksimal ${MAX_FILE_SIZE / 1024 / 1024}MB`);
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (evt) => {
-      const data = evt.target?.result;
-      const workbook = XLSX.read(data, { type: "binary" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(sheet);
+      try {
+        const data = evt.target?.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-      const mapped = jsonData.map((row: any) => ({
-        customer: row["Customer Name"] || row["customer"] || "",
-        service: row["Service ID"] || row["service"] || "",
-        hostname: row["Hostname OLT"] || row["hostname"] || "",
-        fat: row["ID FAT"] || row["fat"] || "",
-        sn: row["SN ONT"] || row["sn"] || "",
-      }));
+        // Validate record count
+        if (jsonData.length > MAX_RECORDS) {
+          toast.error(`Terlalu banyak record. Maksimal ${MAX_RECORDS.toLocaleString()}`);
+          return;
+        }
 
-      importExcelData(mapped);
-      toast.success(`Berhasil import ${mapped.length} data`);
+        const mapped = jsonData.map((row: any) => ({
+          customer: row["Customer Name"] || row["customer"] || "",
+          service: row["Service ID"] || row["service"] || "",
+          hostname: row["Hostname OLT"] || row["hostname"] || "",
+          fat: row["ID FAT"] || row["fat"] || "",
+          sn: row["SN ONT"] || row["sn"] || "",
+        }));
+
+        // Validate with zod
+        const validated = z.array(excelRecordSchema).parse(mapped);
+        importExcelData(validated);
+        toast.success(`Berhasil import ${validated.length} data`);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          toast.error(`Validasi gagal: ${error.errors[0].message}`);
+        } else {
+          toast.error("Terjadi kesalahan saat memproses file");
+        }
+      }
     };
     reader.readAsBinaryString(file);
   };
@@ -177,18 +201,18 @@ export default function TicketManagement() {
       "Ticket Result",
     ];
     const rows = tickets.map((t) => [
-      t.id,
-      t.category,
-      t.serviceId,
-      t.customerName,
-      t.serpo,
-      t.hostname,
-      t.fatId,
-      t.snOnt,
-      t.constraint,
-      t.status,
-      t.createdAt,
-      t.ticketResult,
+      sanitizeForCSV(t.id),
+      sanitizeForCSV(t.category),
+      sanitizeForCSV(t.serviceId),
+      sanitizeForCSV(t.customerName),
+      sanitizeForCSV(t.serpo),
+      sanitizeForCSV(t.hostname),
+      sanitizeForCSV(t.fatId),
+      sanitizeForCSV(t.snOnt),
+      sanitizeForCSV(t.constraint),
+      sanitizeForCSV(t.status),
+      sanitizeForCSV(t.createdAt),
+      sanitizeForCSV(t.ticketResult),
     ]);
     const csv = [
       headers.join(","),
