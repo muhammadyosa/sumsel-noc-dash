@@ -17,6 +17,7 @@ import TicketManagement from "./pages/TicketManagement";
 import Teams from "./pages/Teams";
 import OLTList from "./pages/OLTList";
 import Report from "./pages/Report";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ const App = () => {
                       <Route path="/teams" element={<Teams />} />
                       <Route path="/olt" element={<OLTList />} />
                       <Route path="/report" element={<Report />} />
+                      <Route path="/settings" element={<Settings />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </main>

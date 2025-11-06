@@ -1,4 +1,4 @@
-import { LayoutDashboard, Ticket, Users, Moon, Sun, Radio, FileText } from "lucide-react";
+import { LayoutDashboard, Ticket, Users, Moon, Sun, Radio, FileText, Settings } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -20,6 +20,7 @@ const menuItems = [
   { title: "List Team", icon: Users, path: "/teams" },
   { title: "List OLT", icon: Radio, path: "/olt" },
   { title: "Report", icon: FileText, path: "/report" },
+  { title: "Settings", icon: Settings, path: "/settings" },
 ];
 
 export function AppSidebar() {
@@ -34,7 +35,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-sidebar-foreground">NOC RITEL</h2>
-              <p className="text-xs text-sidebar-foreground/70">SBU SUMBAGSEL</p>
+              <p className="text-xs text-sidebar-foreground/70">PLN Icon Plus</p>
             </div>
           )}
         </div>

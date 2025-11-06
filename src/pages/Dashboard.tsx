@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User, ExternalLink, TrendingUp, BarChart3 } from "lucide-react";
+import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User, ExternalLink, TrendingUp, BarChart3, Building2, Cable } from "lucide-react";
 import { useTickets } from "@/hooks/useTickets";
 import { FEEDER_CONSTRAINTS_SET, Ticket } from "@/types/ticket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -310,64 +310,85 @@ export default function Dashboard() {
                 const ritelPercentage = totalIncidents > 0 ? (ritelCount / totalIncidents) * 100 : 0;
                 const feederPercentage = totalIncidents > 0 ? (feederCount / totalIncidents) * 100 : 0;
 
+                const categoryData = [
+                  { 
+                    category: "RITEL", 
+                    count: ritelCount, 
+                    percentage: ritelPercentage, 
+                    gradient: "from-blue-500 to-indigo-600", 
+                    icon: Building2,
+                    shadowColor: "shadow-blue-500/50"
+                  },
+                  { 
+                    category: "FEEDER", 
+                    count: feederCount, 
+                    percentage: feederPercentage, 
+                    gradient: "from-amber-500 to-orange-600", 
+                    icon: Cable,
+                    shadowColor: "shadow-amber-500/50"
+                  }
+                ];
+
                 return (
                   <div className="grid gap-4">
-                    {[
-                      { category: "RITEL", count: ritelCount, percentage: ritelPercentage, gradient: "from-blue-500 to-indigo-600", icon: "🔵" },
-                      { category: "FEEDER", count: feederCount, percentage: feederPercentage, gradient: "from-amber-500 to-orange-600", icon: "🟠" }
-                    ].map((item, index) => (
-                      <motion.button
-                        key={item.category}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-                        onClick={() => {
-                          setSelectedCategory(selectedCategory === item.category ? null : item.category);
-                          const filtered = tickets.filter((t) => t.category === item.category);
-                          setShowOltList(false);
-                          setFilterDialogTickets(filtered);
-                          setFilterDialogTitle(`Tiket dengan Category: ${item.category}`);
-                          setFilterDialogOpen(true);
-                        }}
-                        className={`
-                          relative overflow-hidden rounded-xl border-2 
-                          transition-all duration-300 hover:scale-105 hover:shadow-2xl
-                          backdrop-blur-lg bg-card/50 group
-                          ${selectedCategory === item.category 
-                            ? "ring-4 ring-accent ring-offset-2 shadow-2xl scale-105" 
-                            : "hover:border-accent/50"}
-                        `}
-                      >
-                        <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
-                        
-                        <div className="relative p-5 text-left">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="text-3xl drop-shadow-lg">{item.icon}</span>
-                            <span className="text-xs font-bold px-3 py-1 bg-accent/20 text-accent rounded-full">
-                              {item.category}
-                            </span>
-                          </div>
+                    {categoryData.map((item, index) => {
+                      const Icon = item.icon;
+                      return (
+                        <motion.button
+                          key={item.category}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+                          onClick={() => {
+                            setSelectedCategory(selectedCategory === item.category ? null : item.category);
+                            const filtered = tickets.filter((t) => t.category === item.category);
+                            setShowOltList(false);
+                            setFilterDialogTickets(filtered);
+                            setFilterDialogTitle(`Tiket dengan Category: ${item.category}`);
+                            setFilterDialogOpen(true);
+                          }}
+                          className={`
+                            relative overflow-hidden rounded-xl border-2 
+                            transition-all duration-300 hover:scale-105 hover:shadow-2xl
+                            backdrop-blur-lg bg-card/50 group
+                            ${selectedCategory === item.category 
+                              ? "ring-4 ring-accent ring-offset-2 shadow-2xl scale-105" 
+                              : "hover:border-accent/50"}
+                          `}
+                        >
+                          <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
                           
-                          <div className="text-3xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
-                            {item.count}
+                          <div className="relative p-5 text-left">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className={`p-3 rounded-xl bg-gradient-to-br ${item.gradient} ${item.shadowColor} shadow-lg group-hover:scale-110 transition-transform`}>
+                                <Icon className="h-6 w-6 text-white" />
+                              </div>
+                              <span className="text-xs font-bold px-3 py-1 bg-accent/20 text-accent rounded-full">
+                                {item.category}
+                              </span>
+                            </div>
+                            
+                            <div className="text-3xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                              {item.count}
+                            </div>
+                            
+                            <div className="text-xs text-muted-foreground font-medium mb-3">
+                              {item.percentage.toFixed(1)}% dari total
+                            </div>
+                            
+                            {/* Progress Bar */}
+                            <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${item.percentage}%` }}
+                                transition={{ duration: 1, delay: 0.7 + index * 0.1, ease: "easeOut" }}
+                                className={`absolute inset-y-0 left-0 bg-gradient-to-r ${item.gradient} rounded-full shadow-lg`}
+                              />
+                            </div>
                           </div>
-                          
-                          <div className="text-xs text-muted-foreground font-medium mb-3">
-                            {item.percentage.toFixed(1)}% dari total
-                          </div>
-                          
-                          {/* Progress Bar */}
-                          <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${item.percentage}%` }}
-                              transition={{ duration: 1, delay: 0.7 + index * 0.1, ease: "easeOut" }}
-                              className={`absolute inset-y-0 left-0 bg-gradient-to-r ${item.gradient} rounded-full shadow-lg`}
-                            />
-                          </div>
-                        </div>
-                      </motion.button>
-                    ))}
+                        </motion.button>
+                      );
+                    })}
                   </div>
                 );
               })()}
