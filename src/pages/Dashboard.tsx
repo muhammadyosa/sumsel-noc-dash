@@ -359,9 +359,7 @@ export default function Dashboard() {
                           
                           <div className="relative p-5 text-left">
                             <div className="flex items-center justify-between mb-3">
-                              <div className={`p-3 rounded-xl bg-gradient-to-br ${item.gradient} ${item.shadowColor} shadow-lg group-hover:scale-110 transition-transform flex items-center justify-center`}>
-                                <span className="text-3xl">{item.icon}</span>
-                              </div>
+                              <span className="text-3xl drop-shadow-lg">{item.icon}</span>
                               <span className="text-xs font-bold px-3 py-1 bg-accent/20 text-accent rounded-full">
                                 {item.category}
                               </span>
