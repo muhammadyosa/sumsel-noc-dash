@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User, ExternalLink, TrendingUp, BarChart3, Building2, Cable } from "lucide-react";
+import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User, ExternalLink, TrendingUp, BarChart3 } from "lucide-react";
 import { useTickets } from "@/hooks/useTickets";
 import { FEEDER_CONSTRAINTS_SET, Ticket } from "@/types/ticket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -316,7 +316,7 @@ export default function Dashboard() {
                     count: ritelCount, 
                     percentage: ritelPercentage, 
                     gradient: "from-blue-500 to-indigo-600", 
-                    icon: Building2,
+                    icon: "🔖",
                     shadowColor: "shadow-blue-500/50"
                   },
                   { 
@@ -324,7 +324,7 @@ export default function Dashboard() {
                     count: feederCount, 
                     percentage: feederPercentage, 
                     gradient: "from-amber-500 to-orange-600", 
-                    icon: Cable,
+                    icon: "🛰",
                     shadowColor: "shadow-amber-500/50"
                   }
                 ];
@@ -332,7 +332,6 @@ export default function Dashboard() {
                 return (
                   <div className="grid gap-4">
                     {categoryData.map((item, index) => {
-                      const Icon = item.icon;
                       return (
                         <motion.button
                           key={item.category}
@@ -360,8 +359,8 @@ export default function Dashboard() {
                           
                           <div className="relative p-5 text-left">
                             <div className="flex items-center justify-between mb-3">
-                              <div className={`p-3 rounded-xl bg-gradient-to-br ${item.gradient} ${item.shadowColor} shadow-lg group-hover:scale-110 transition-transform`}>
-                                <Icon className="h-6 w-6 text-white" />
+                              <div className={`p-3 rounded-xl bg-gradient-to-br ${item.gradient} ${item.shadowColor} shadow-lg group-hover:scale-110 transition-transform flex items-center justify-center`}>
+                                <span className="text-3xl">{item.icon}</span>
                               </div>
                               <span className="text-xs font-bold px-3 py-1 bg-accent/20 text-accent rounded-full">
                                 {item.category}
