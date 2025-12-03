@@ -15,6 +15,7 @@ import UPEList from "./pages/UPEList";
 import BNGList from "./pages/BNGList";
 import Report from "./pages/Report";
 import Settings from "./pages/Settings";
+import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => {
                       <Route path="/bng" element={<BNGList />} />
                       <Route path="/report" element={<Report />} />
                       <Route path="/settings" element={<Settings />} />
+                      <Route path="/install" element={<Install />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </main>

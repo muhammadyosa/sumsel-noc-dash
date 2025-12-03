@@ -39,7 +39,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { z } from "zod";
-import { MAX_FILE_SIZE, MAX_RECORDS, excelRecordSchema, sanitizeForCSV } from "@/lib/validation";
+import { MAX_RECORDS, excelRecordSchema, sanitizeForCSV } from "@/lib/validation";
 
 export default function TicketManagement() {
   const { tickets, excelData, isLoadingExcel, addTicket, updateTicket, deleteTicket, importExcelData } =
@@ -66,12 +66,6 @@ export default function TicketManagement() {
   const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error(`File terlalu besar. Maksimal ${MAX_FILE_SIZE / 1024 / 1024}MB`);
-      return;
-    }
 
     const reader = new FileReader();
     reader.onload = (evt) => {

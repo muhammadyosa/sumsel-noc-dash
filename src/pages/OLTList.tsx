@@ -23,7 +23,7 @@ import * as XLSX from "xlsx";
 import { OLT, OLTExcelRecord } from "@/types/olt";
 import { loadOLTData, saveOLTData, clearOLTData } from "@/lib/indexedDB";
 import { z } from "zod";
-import { MAX_FILE_SIZE, MAX_RECORDS, oltDataSchema, sanitizeForCSV } from "@/lib/validation";
+import { MAX_RECORDS, oltDataSchema, sanitizeForCSV } from "@/lib/validation";
 
 const OLTList = () => {
   const [oltData, setOltData] = useState<OLT[]>([]);
@@ -50,16 +50,6 @@ const OLTList = () => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      toast({
-        title: "File terlalu besar",
-        description: `Maksimal ${MAX_FILE_SIZE / 1024 / 1024}MB`,
-        variant: "destructive",
-      });
-      return;
-    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
