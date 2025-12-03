@@ -1,4 +1,4 @@
-import { LayoutDashboard, Ticket, Users, Moon, Sun, Radio, FileText, Settings } from "lucide-react";
+import { LayoutDashboard, Ticket, Users, Moon, Sun, Radio, Server, Network, FileText, Settings } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -19,6 +19,8 @@ const menuItems = [
   { title: "Ticket Management", icon: Ticket, path: "/tickets" },
   { title: "List Team", icon: Users, path: "/teams" },
   { title: "List OLT", icon: Radio, path: "/olt" },
+  { title: "List UPE", icon: Server, path: "/upe" },
+  { title: "List BNG", icon: Network, path: "/bng" },
   { title: "Report", icon: FileText, path: "/report" },
   { title: "Settings", icon: Settings, path: "/settings" },
 ];
