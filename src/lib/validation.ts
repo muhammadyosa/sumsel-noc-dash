@@ -1,8 +1,7 @@
 import { z } from "zod";
 
-// File upload limits
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-export const MAX_RECORDS = 10000;
+// File upload limits - no size limit
+export const MAX_RECORDS = 100000; // 100k records max
 
 // Excel record validation schemas
 export const excelRecordSchema = z.object({

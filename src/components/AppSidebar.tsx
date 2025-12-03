@@ -1,4 +1,4 @@
-import { LayoutDashboard, Ticket, Users, Moon, Sun, Radio, Server, Network, FileText, Settings } from "lucide-react";
+import { LayoutDashboard, Ticket, Users, Moon, Sun, Radio, Server, Network, FileText, Settings, Download } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -23,6 +23,7 @@ const menuItems = [
   { title: "List BNG", icon: Network, path: "/bng" },
   { title: "Report", icon: FileText, path: "/report" },
   { title: "Settings", icon: Settings, path: "/settings" },
+  { title: "Install App", icon: Download, path: "/install" },
 ];
 
 export function AppSidebar() {
