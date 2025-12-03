@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,11 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { ConnectionStatus } from "@/components/ConnectionStatus";
-import { GitHubTokenDialog } from "@/components/GitHubTokenDialog";
-import { Button } from "@/components/ui/button";
-import { Zap, Key } from "lucide-react";
-import { isOnline } from "@/lib/github";
+import { Zap } from "lucide-react";
 import Dashboard from "./pages/Dashboard";
 import TicketManagement from "./pages/TicketManagement";
 import Teams from "./pages/Teams";
@@ -23,10 +18,6 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [online, setOnline] = useState(isOnline());
-  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
-  const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
@@ -61,19 +52,6 @@ const App = () => {
                 </div>
               </div>
             </SidebarProvider>
-            
-            <ConnectionStatus online={online} lastUpdate={lastUpdate} />
-            
-            <Button
-              size="icon"
-              variant="outline"
-              className="fixed bottom-4 left-4 z-50 rounded-full shadow-lg"
-              onClick={() => setTokenDialogOpen(true)}
-            >
-              <Key className="h-4 w-4" />
-            </Button>
-            
-            <GitHubTokenDialog open={tokenDialogOpen} onOpenChange={setTokenDialogOpen} />
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
