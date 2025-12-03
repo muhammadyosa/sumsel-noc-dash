@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import TicketManagement from "./pages/TicketManagement";
 import Teams from "./pages/Teams";
 import OLTList from "./pages/OLTList";
+import UPEList from "./pages/UPEList";
+import BNGList from "./pages/BNGList";
 import Report from "./pages/Report";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -44,6 +46,8 @@ const App = () => {
                       <Route path="/tickets" element={<TicketManagement />} />
                       <Route path="/teams" element={<Teams />} />
                       <Route path="/olt" element={<OLTList />} />
+                      <Route path="/upe" element={<UPEList />} />
+                      <Route path="/bng" element={<BNGList />} />
                       <Route path="/report" element={<Report />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="*" element={<NotFound />} />
