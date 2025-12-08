@@ -77,17 +77,17 @@ export default function TicketManagement() {
         const jsonData = XLSX.utils.sheet_to_json(sheet);
 
         const mapped = jsonData.map((row: any) => ({
-          customer: row["Customer Name"] || row["customer"] || "",
-          service: row["Service ID"] || row["service"] || "",
-          hostname: row["Hostname OLT"] || row["hostname"] || "",
-          fat: row["ID FAT"] || row["fat"] || "",
-          sn: row["SN ONT"] || row["sn"] || "",
+          customer: String(row["Customer Name"] || row["customer"] || "").trim(),
+          service: String(row["Service ID"] || row["service"] || "").trim(),
+          hostname: String(row["Hostname OLT"] || row["hostname"] || "").trim(),
+          fat: String(row["ID FAT"] || row["fat"] || "").trim(),
+          sn: String(row["SN ONT"] || row["sn"] || "").trim(),
         }));
 
-        // Validate with zod
-        const validated = z.array(excelRecordSchema).parse(mapped);
-        importExcelData(validated);
-        toast.success(`Berhasil import ${validated.length} data`);
+        // Filter out empty rows and import
+        const validData = mapped.filter((r: any) => r.customer || r.service || r.hostname || r.fat || r.sn);
+        importExcelData(validData);
+        toast.success(`Berhasil import ${validData.length} data`);
       } catch (error) {
         if (error instanceof z.ZodError) {
           toast.error(`Validasi gagal: ${error.errors[0].message}`);
