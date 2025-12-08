@@ -24,10 +24,8 @@ import { sanitizeForCSV } from "@/lib/validation";
 
 interface UPE {
   id: string;
-  provinsi: string;
-  hostname: string;
-  ipAddress: string;
-  lokasi: string;
+  hostnameUPE: string;
+  hostnameOLT: string;
   createdAt: string;
 }
 
@@ -107,9 +105,8 @@ async function clearUPEData(): Promise<void> {
 const UPEList = () => {
   const [upeData, setUpeData] = useState<UPE[]>([]);
   const [searchFilters, setSearchFilters] = useState({
-    provinsi: "",
-    hostname: "",
-    ipAddress: "",
+    hostnameUPE: "",
+    hostnameOLT: "",
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -140,19 +137,26 @@ const UPEList = () => {
 
         const processedData: UPE[] = jsonData
           .map((row) => {
-            const provinsi = row.provinsi || row.Provinsi || row["Nama Provinsi"] || "";
-            const hostname = row.hostname || row.Hostname || row["Hostname UPE"] || "";
-            const ipAddress = row.ip || row.IP || row["IP Address"] || row.ipAddress || "";
-            const lokasi = row.lokasi || row.Lokasi || row["Lokasi UPE"] || "";
+            const hostnameUPE = 
+              row["Hostname UPE"] || 
+              row["hostname upe"] || 
+              row["HOSTNAME UPE"] ||
+              row.hostnameUPE || 
+              row.hostname_upe || "";
+            
+            const hostnameOLT = 
+              row["Hostname OLT"] || 
+              row["hostname olt"] || 
+              row["HOSTNAME OLT"] ||
+              row.hostnameOLT || 
+              row.hostname_olt || "";
 
-            if (!provinsi && !hostname && !ipAddress) return null;
+            if (!hostnameUPE && !hostnameOLT) return null;
 
             return {
               id: `UPE-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              provinsi: String(provinsi).trim(),
-              hostname: String(hostname).trim(),
-              ipAddress: String(ipAddress).trim(),
-              lokasi: String(lokasi).trim(),
+              hostnameUPE: String(hostnameUPE).trim(),
+              hostnameOLT: String(hostnameOLT).trim(),
               createdAt: new Date().toISOString(),
             };
           })
@@ -205,10 +209,8 @@ const UPEList = () => {
     }
 
     const exportData = filteredData.map((upe) => ({
-      "Nama Provinsi": sanitizeForCSV(upe.provinsi),
-      "Hostname UPE": sanitizeForCSV(upe.hostname),
-      "IP Address": sanitizeForCSV(upe.ipAddress),
-      "Lokasi": sanitizeForCSV(upe.lokasi),
+      "Hostname UPE": sanitizeForCSV(upe.hostnameUPE),
+      "Hostname OLT": sanitizeForCSV(upe.hostnameOLT),
       "Tanggal Import": sanitizeForCSV(new Date(upe.createdAt).toLocaleString("id-ID")),
     }));
 
@@ -243,14 +245,12 @@ const UPEList = () => {
   };
 
   const filteredData = upeData.filter((upe) => {
-    const provinsi = String(upe.provinsi || "").toLowerCase();
-    const hostname = String(upe.hostname || "").toLowerCase();
-    const ipAddress = String(upe.ipAddress || "").toLowerCase();
+    const hostnameUPE = String(upe.hostnameUPE || "").toLowerCase();
+    const hostnameOLT = String(upe.hostnameOLT || "").toLowerCase();
 
     return (
-      (!searchFilters.provinsi || provinsi.includes(searchFilters.provinsi.toLowerCase())) &&
-      (!searchFilters.hostname || hostname.includes(searchFilters.hostname.toLowerCase())) &&
-      (!searchFilters.ipAddress || ipAddress.includes(searchFilters.ipAddress.toLowerCase()))
+      (!searchFilters.hostnameUPE || hostnameUPE.includes(searchFilters.hostnameUPE.toLowerCase())) &&
+      (!searchFilters.hostnameOLT || hostnameOLT.includes(searchFilters.hostnameOLT.toLowerCase()))
     );
   });
 
@@ -315,7 +315,7 @@ const UPEList = () => {
             </div>
           </CardTitle>
           <CardDescription>
-            Upload file Excel/CSV dengan kolom: Nama Provinsi, Hostname UPE, IP Address, Lokasi
+            Upload file Excel/CSV dengan kolom: Hostname UPE, Hostname OLT
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -324,34 +324,24 @@ const UPEList = () => {
               <Search className="h-4 w-4" />
               Search & Filter
             </p>
-            <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <Label>📜 Nama Provinsi</Label>
-                <Input
-                  placeholder="Cari Provinsi..."
-                  value={searchFilters.provinsi}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, provinsi: e.target.value })
-                  }
-                />
-              </div>
+            <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <Label>🖥️ Hostname UPE</Label>
                 <Input
-                  placeholder="Cari Hostname..."
-                  value={searchFilters.hostname}
+                  placeholder="Cari Hostname UPE..."
+                  value={searchFilters.hostnameUPE}
                   onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, hostname: e.target.value })
+                    setSearchFilters({ ...searchFilters, hostnameUPE: e.target.value })
                   }
                 />
               </div>
               <div>
-                <Label>🌐 IP Address</Label>
+                <Label>📍 Hostname OLT</Label>
                 <Input
-                  placeholder="Cari IP Address..."
-                  value={searchFilters.ipAddress}
+                  placeholder="Cari Hostname OLT..."
+                  value={searchFilters.hostnameOLT}
                   onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, ipAddress: e.target.value })
+                    setSearchFilters({ ...searchFilters, hostnameOLT: e.target.value })
                   }
                 />
               </div>
@@ -363,22 +353,20 @@ const UPEList = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-16">No</TableHead>
-                  <TableHead>Nama Provinsi</TableHead>
                   <TableHead>Hostname UPE</TableHead>
-                  <TableHead>IP Address</TableHead>
-                  <TableHead>Lokasi</TableHead>
+                  <TableHead>Hostname OLT</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    <TableCell colSpan={3} className="text-center text-muted-foreground">
                       Memuat data UPE...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    <TableCell colSpan={3} className="text-center text-muted-foreground">
                       {upeData.length === 0
                         ? "Belum ada data UPE. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
@@ -388,10 +376,8 @@ const UPEList = () => {
                   filteredData.slice(0, 100).map((upe, index) => (
                     <TableRow key={upe.id}>
                       <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell className="font-medium">{upe.provinsi}</TableCell>
-                      <TableCell className="font-mono text-xs">{upe.hostname}</TableCell>
-                      <TableCell className="font-mono text-xs">{upe.ipAddress}</TableCell>
-                      <TableCell>{upe.lokasi}</TableCell>
+                      <TableCell className="font-mono text-xs">{upe.hostnameUPE}</TableCell>
+                      <TableCell className="font-mono text-xs">{upe.hostnameOLT}</TableCell>
                     </TableRow>
                   ))
                 )}
