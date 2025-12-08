@@ -23,7 +23,7 @@ import * as XLSX from "xlsx";
 import { OLT, OLTExcelRecord } from "@/types/olt";
 import { loadOLTData, saveOLTData, clearOLTData } from "@/lib/indexedDB";
 import { z } from "zod";
-import { MAX_RECORDS, oltDataSchema, sanitizeForCSV } from "@/lib/validation";
+import { oltDataSchema, sanitizeForCSV } from "@/lib/validation";
 
 const OLTList = () => {
   const [oltData, setOltData] = useState<OLT[]>([]);
@@ -62,16 +62,6 @@ const OLTList = () => {
           raw: false,
           defval: "",
         });
-
-        // Validate record count
-        if (jsonData.length > MAX_RECORDS) {
-          toast({
-            title: "Terlalu banyak record",
-            description: `Maksimal ${MAX_RECORDS.toLocaleString()} record`,
-            variant: "destructive",
-          });
-          return;
-        }
 
         const processedData: OLT[] = jsonData
           .map((row) => {
@@ -134,11 +124,11 @@ const OLTList = () => {
           });
         });
 
-        const newData = [...oltData, ...processedData];
-        setOltData(newData);
+        // Replace old data with new data
+        setOltData(processedData);
         
-        // Save to IndexedDB
-        saveOLTData(newData).catch((error) => {
+        // Save to IndexedDB (replaces existing data)
+        saveOLTData(processedData).catch((error) => {
           if (import.meta.env.DEV) {
             console.error("Error saving OLT data:", error);
           }
