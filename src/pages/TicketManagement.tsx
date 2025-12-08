@@ -39,7 +39,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { z } from "zod";
-import { MAX_RECORDS, excelRecordSchema, sanitizeForCSV } from "@/lib/validation";
+import { excelRecordSchema, sanitizeForCSV } from "@/lib/validation";
 
 export default function TicketManagement() {
   const { tickets, excelData, isLoadingExcel, addTicket, updateTicket, deleteTicket, importExcelData } =
@@ -75,12 +75,6 @@ export default function TicketManagement() {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(sheet);
-
-        // Validate record count
-        if (jsonData.length > MAX_RECORDS) {
-          toast.error(`Terlalu banyak record. Maksimal ${MAX_RECORDS.toLocaleString()}`);
-          return;
-        }
 
         const mapped = jsonData.map((row: any) => ({
           customer: row["Customer Name"] || row["customer"] || "",
