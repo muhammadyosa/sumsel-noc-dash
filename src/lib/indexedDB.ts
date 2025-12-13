@@ -4,11 +4,13 @@ import { OLT } from "@/types/olt";
 const DB_NAME = "NOC_Database";
 const STORE_NAME = "excel_data";
 const OLT_STORE_NAME = "olt_data";
-const DB_VERSION = 2;
+const UPE_STORE_NAME = "upe_data";
+const BNG_STORE_NAME = "bng_data";
+const DB_VERSION = 4;
 
 let dbInstance: IDBDatabase | null = null;
 
-function openDB(): Promise<IDBDatabase> {
+export function openDB(): Promise<IDBDatabase> {
   if (dbInstance) {
     return Promise.resolve(dbInstance);
   }
@@ -32,6 +34,12 @@ function openDB(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains(OLT_STORE_NAME)) {
         db.createObjectStore(OLT_STORE_NAME);
+      }
+      if (!db.objectStoreNames.contains(UPE_STORE_NAME)) {
+        db.createObjectStore(UPE_STORE_NAME);
+      }
+      if (!db.objectStoreNames.contains(BNG_STORE_NAME)) {
+        db.createObjectStore(BNG_STORE_NAME);
       }
     };
   });
