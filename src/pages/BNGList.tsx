@@ -21,6 +21,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
 import { sanitizeForCSV } from "@/lib/validation";
+import { openDB } from "@/lib/indexedDB";
 
 interface BNG {
   id: string;
@@ -37,44 +38,7 @@ interface BNG {
   createdAt: string;
 }
 
-const DB_NAME = "NOC_Database";
 const BNG_STORE_NAME = "bng_data";
-const DB_VERSION = 4;
-
-let dbInstance: IDBDatabase | null = null;
-
-function openDB(): Promise<IDBDatabase> {
-  if (dbInstance) {
-    return Promise.resolve(dbInstance);
-  }
-
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onerror = () => reject(request.error);
-
-    request.onsuccess = () => {
-      dbInstance = request.result;
-      resolve(request.result);
-    };
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains("excel_data")) {
-        db.createObjectStore("excel_data");
-      }
-      if (!db.objectStoreNames.contains("olt_data")) {
-        db.createObjectStore("olt_data");
-      }
-      if (!db.objectStoreNames.contains("upe_data")) {
-        db.createObjectStore("upe_data");
-      }
-      if (!db.objectStoreNames.contains(BNG_STORE_NAME)) {
-        db.createObjectStore(BNG_STORE_NAME);
-      }
-    };
-  });
-}
 
 async function saveBNGData(data: BNG[]): Promise<void> {
   const db = await openDB();

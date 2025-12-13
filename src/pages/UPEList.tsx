@@ -21,6 +21,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
 import { sanitizeForCSV } from "@/lib/validation";
+import { openDB } from "@/lib/indexedDB";
 
 interface UPE {
   id: string;
@@ -29,41 +30,7 @@ interface UPE {
   createdAt: string;
 }
 
-const DB_NAME = "NOC_Database";
 const UPE_STORE_NAME = "upe_data";
-const DB_VERSION = 3;
-
-let dbInstance: IDBDatabase | null = null;
-
-function openDB(): Promise<IDBDatabase> {
-  if (dbInstance) {
-    return Promise.resolve(dbInstance);
-  }
-
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onerror = () => reject(request.error);
-
-    request.onsuccess = () => {
-      dbInstance = request.result;
-      resolve(request.result);
-    };
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains("excel_data")) {
-        db.createObjectStore("excel_data");
-      }
-      if (!db.objectStoreNames.contains("olt_data")) {
-        db.createObjectStore("olt_data");
-      }
-      if (!db.objectStoreNames.contains(UPE_STORE_NAME)) {
-        db.createObjectStore(UPE_STORE_NAME);
-      }
-    };
-  });
-}
 
 async function saveUPEData(data: UPE[]): Promise<void> {
   const db = await openDB();
