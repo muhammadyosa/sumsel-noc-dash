@@ -53,6 +53,18 @@ export default function TicketManagement() {
     sn: "",
   });
 
+  // Filter untuk Daftar Tiket
+  const [ticketSearchFilters, setTicketSearchFilters] = useState({
+    ticketId: "",
+    category: "",
+    customerType: "",
+    serviceId: "",
+    constraint: "",
+    serpo: "",
+    status: "",
+    created: "",
+  });
+
   const [selectedRecord, setSelectedRecord] = useState<ExcelRecord | null>(null);
   const [formData, setFormData] = useState({
     ticketId: "",
@@ -113,6 +125,39 @@ export default function TicketManagement() {
       (!searchFilters.hostname || hostname.includes(searchFilters.hostname.toLowerCase())) &&
       (!searchFilters.fat || fat.includes(searchFilters.fat.toLowerCase())) &&
       (!searchFilters.sn || sn.includes(searchFilters.sn.toLowerCase()))
+    );
+  });
+
+  // Filter untuk Daftar Tiket
+  const filteredTickets = tickets.filter((ticket) => {
+    const getCustomerType = (t: Ticket) => {
+      if (t.category === "FEEDER") {
+        if (t.constraint === "OLT DOWN") return t.hostname;
+        if (t.constraint === "PORT DOWN") return t.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || t.hostname;
+        if (t.constraint === "FAT LOSS" || t.constraint === "FAT LOW RX") return `${t.fatId} ${t.hostname}`;
+        return t.constraint;
+      }
+      return t.customerName;
+    };
+
+    const ticketId = ticket.id.toLowerCase();
+    const category = ticket.category.toLowerCase();
+    const customerType = getCustomerType(ticket).toLowerCase();
+    const serviceId = ticket.serviceId.toLowerCase();
+    const constraint = ticket.constraint.toLowerCase();
+    const serpo = ticket.serpo.toLowerCase();
+    const status = ticket.status.toLowerCase();
+    const created = ticket.createdAt.toLowerCase();
+
+    return (
+      (!ticketSearchFilters.ticketId || ticketId.includes(ticketSearchFilters.ticketId.toLowerCase())) &&
+      (!ticketSearchFilters.category || category.includes(ticketSearchFilters.category.toLowerCase())) &&
+      (!ticketSearchFilters.customerType || customerType.includes(ticketSearchFilters.customerType.toLowerCase())) &&
+      (!ticketSearchFilters.serviceId || serviceId.includes(ticketSearchFilters.serviceId.toLowerCase())) &&
+      (!ticketSearchFilters.constraint || constraint.includes(ticketSearchFilters.constraint.toLowerCase())) &&
+      (!ticketSearchFilters.serpo || serpo.includes(ticketSearchFilters.serpo.toLowerCase())) &&
+      (!ticketSearchFilters.status || status.includes(ticketSearchFilters.status.toLowerCase())) &&
+      (!ticketSearchFilters.created || created.includes(ticketSearchFilters.created.toLowerCase()))
     );
   });
 
@@ -475,10 +520,85 @@ export default function TicketManagement() {
 
       <Card className="shadow-card">
         <CardHeader>
-          <CardTitle>Daftar Tiket ({tickets.length})</CardTitle>
+          <CardTitle>Daftar Tiket ({filteredTickets.length})</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
+        <CardContent className="space-y-4">
+          {/* Search filters untuk Daftar Tiket */}
+          <div className="grid gap-3 md:grid-cols-4 lg:grid-cols-8">
+            <div>
+              <Label className="text-xs">Ticket ID</Label>
+              <Input
+                placeholder="Cari..."
+                value={ticketSearchFilters.ticketId}
+                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, ticketId: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Category</Label>
+              <Input
+                placeholder="Cari..."
+                value={ticketSearchFilters.category}
+                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, category: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Customer/Type</Label>
+              <Input
+                placeholder="Cari..."
+                value={ticketSearchFilters.customerType}
+                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, customerType: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Service ID</Label>
+              <Input
+                placeholder="Cari..."
+                value={ticketSearchFilters.serviceId}
+                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, serviceId: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Constraint</Label>
+              <Input
+                placeholder="Cari..."
+                value={ticketSearchFilters.constraint}
+                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, constraint: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Serpo</Label>
+              <Input
+                placeholder="Cari..."
+                value={ticketSearchFilters.serpo}
+                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, serpo: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Status</Label>
+              <Input
+                placeholder="Cari..."
+                value={ticketSearchFilters.status}
+                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, status: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Created</Label>
+              <Input
+                placeholder="Cari..."
+                value={ticketSearchFilters.created}
+                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, created: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+          </div>
+          <div className="rounded-md border overflow-auto max-h-96">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -501,7 +621,7 @@ export default function TicketManagement() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  tickets.map((ticket) => (
+                  filteredTickets.map((ticket) => (
                     <TableRow key={ticket.id}>
                       <TableCell className="font-medium">{ticket.id}</TableCell>
                       <TableCell>
