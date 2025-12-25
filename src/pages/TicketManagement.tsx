@@ -271,10 +271,6 @@ export default function TicketManagement() {
           <p className="text-muted-foreground">Kelola tiket incident NOC</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={handleExportCSV} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -520,8 +516,12 @@ export default function TicketManagement() {
       )}
 
       <Card className="shadow-card">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Daftar Tiket ({filteredTickets.length})</CardTitle>
+          <Button onClick={handleExportCSV} variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Search filter untuk Daftar Tiket */}
