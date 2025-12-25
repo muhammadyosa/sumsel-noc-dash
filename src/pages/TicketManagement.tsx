@@ -53,17 +53,9 @@ export default function TicketManagement() {
     sn: "",
   });
 
-  // Filter untuk Daftar Tiket
-  const [ticketSearchFilters, setTicketSearchFilters] = useState({
-    ticketId: "",
-    category: "",
-    customerType: "",
-    serviceId: "",
-    constraint: "",
-    serpo: "",
-    status: "",
-    created: "",
-  });
+  // Filter untuk Daftar Tiket - single search with field selector
+  const [ticketSearchField, setTicketSearchField] = useState<string>("all");
+  const [ticketSearchQuery, setTicketSearchQuery] = useState("");
 
   const [selectedRecord, setSelectedRecord] = useState<ExcelRecord | null>(null);
   const [formData, setFormData] = useState({
@@ -130,6 +122,10 @@ export default function TicketManagement() {
 
   // Filter untuk Daftar Tiket
   const filteredTickets = tickets.filter((ticket) => {
+    if (!ticketSearchQuery.trim()) return true;
+    
+    const query = ticketSearchQuery.toLowerCase();
+    
     const getCustomerType = (t: Ticket) => {
       if (t.category === "FEEDER") {
         if (t.constraint === "OLT DOWN") return t.hostname;
@@ -140,25 +136,30 @@ export default function TicketManagement() {
       return t.customerName;
     };
 
-    const ticketId = ticket.id.toLowerCase();
-    const category = ticket.category.toLowerCase();
-    const customerType = getCustomerType(ticket).toLowerCase();
-    const serviceId = ticket.serviceId.toLowerCase();
-    const constraint = ticket.constraint.toLowerCase();
-    const serpo = ticket.serpo.toLowerCase();
-    const status = ticket.status.toLowerCase();
-    const created = ticket.createdAt.toLowerCase();
+    if (ticketSearchField === "all") {
+      return (
+        ticket.id.toLowerCase().includes(query) ||
+        ticket.category.toLowerCase().includes(query) ||
+        getCustomerType(ticket).toLowerCase().includes(query) ||
+        ticket.serviceId.toLowerCase().includes(query) ||
+        ticket.constraint.toLowerCase().includes(query) ||
+        ticket.serpo.toLowerCase().includes(query) ||
+        ticket.status.toLowerCase().includes(query) ||
+        ticket.createdAt.toLowerCase().includes(query)
+      );
+    }
 
-    return (
-      (!ticketSearchFilters.ticketId || ticketId.includes(ticketSearchFilters.ticketId.toLowerCase())) &&
-      (!ticketSearchFilters.category || category.includes(ticketSearchFilters.category.toLowerCase())) &&
-      (!ticketSearchFilters.customerType || customerType.includes(ticketSearchFilters.customerType.toLowerCase())) &&
-      (!ticketSearchFilters.serviceId || serviceId.includes(ticketSearchFilters.serviceId.toLowerCase())) &&
-      (!ticketSearchFilters.constraint || constraint.includes(ticketSearchFilters.constraint.toLowerCase())) &&
-      (!ticketSearchFilters.serpo || serpo.includes(ticketSearchFilters.serpo.toLowerCase())) &&
-      (!ticketSearchFilters.status || status.includes(ticketSearchFilters.status.toLowerCase())) &&
-      (!ticketSearchFilters.created || created.includes(ticketSearchFilters.created.toLowerCase()))
-    );
+    switch (ticketSearchField) {
+      case "ticketId": return ticket.id.toLowerCase().includes(query);
+      case "category": return ticket.category.toLowerCase().includes(query);
+      case "customerType": return getCustomerType(ticket).toLowerCase().includes(query);
+      case "serviceId": return ticket.serviceId.toLowerCase().includes(query);
+      case "constraint": return ticket.constraint.toLowerCase().includes(query);
+      case "serpo": return ticket.serpo.toLowerCase().includes(query);
+      case "status": return ticket.status.toLowerCase().includes(query);
+      case "created": return ticket.createdAt.toLowerCase().includes(query);
+      default: return true;
+    }
   });
 
   const handleSubmitTicket = () => {
@@ -523,79 +524,38 @@ export default function TicketManagement() {
           <CardTitle>Daftar Tiket ({filteredTickets.length})</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search filters untuk Daftar Tiket */}
-          <div className="grid gap-3 md:grid-cols-4 lg:grid-cols-8">
-            <div>
-              <Label className="text-xs">Ticket ID</Label>
-              <Input
-                placeholder="Cari..."
-                value={ticketSearchFilters.ticketId}
-                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, ticketId: e.target.value })}
-                className="h-8 text-xs"
-              />
+          {/* Search filter untuk Daftar Tiket */}
+          <div className="flex gap-3 items-end">
+            <div className="w-48">
+              <Label className="text-xs">Search By</Label>
+              <Select value={ticketSearchField} onValueChange={setTicketSearchField}>
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Field</SelectItem>
+                  <SelectItem value="ticketId">Ticket ID</SelectItem>
+                  <SelectItem value="category">Category</SelectItem>
+                  <SelectItem value="customerType">Customer/Type</SelectItem>
+                  <SelectItem value="serviceId">Service ID</SelectItem>
+                  <SelectItem value="constraint">Constraint</SelectItem>
+                  <SelectItem value="serpo">Serpo</SelectItem>
+                  <SelectItem value="status">Status</SelectItem>
+                  <SelectItem value="created">Created</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div>
-              <Label className="text-xs">Category</Label>
-              <Input
-                placeholder="Cari..."
-                value={ticketSearchFilters.category}
-                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, category: e.target.value })}
-                className="h-8 text-xs"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Customer/Type</Label>
-              <Input
-                placeholder="Cari..."
-                value={ticketSearchFilters.customerType}
-                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, customerType: e.target.value })}
-                className="h-8 text-xs"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Service ID</Label>
-              <Input
-                placeholder="Cari..."
-                value={ticketSearchFilters.serviceId}
-                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, serviceId: e.target.value })}
-                className="h-8 text-xs"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Constraint</Label>
-              <Input
-                placeholder="Cari..."
-                value={ticketSearchFilters.constraint}
-                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, constraint: e.target.value })}
-                className="h-8 text-xs"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Serpo</Label>
-              <Input
-                placeholder="Cari..."
-                value={ticketSearchFilters.serpo}
-                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, serpo: e.target.value })}
-                className="h-8 text-xs"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Status</Label>
-              <Input
-                placeholder="Cari..."
-                value={ticketSearchFilters.status}
-                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, status: e.target.value })}
-                className="h-8 text-xs"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Created</Label>
-              <Input
-                placeholder="Cari..."
-                value={ticketSearchFilters.created}
-                onChange={(e) => setTicketSearchFilters({ ...ticketSearchFilters, created: e.target.value })}
-                className="h-8 text-xs"
-              />
+            <div className="flex-1">
+              <Label className="text-xs">Pencarian</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={`Cari ${ticketSearchField === "all" ? "di semua field" : ticketSearchField}...`}
+                  value={ticketSearchQuery}
+                  onChange={(e) => setTicketSearchQuery(e.target.value)}
+                  className="h-9 pl-9"
+                />
+              </div>
             </div>
           </div>
           <div className="rounded-md border overflow-auto max-h-96">
