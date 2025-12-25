@@ -409,16 +409,16 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
                 {shiftReports.slice(-3).reverse().map((report) => (
                   <div
                     key={report.id}
                     className="p-4 rounded-lg bg-card border border-primary/10 shadow-sm hover:shadow-md transition-all hover:border-primary/30"
                   >
-                    <div className="space-y-3 mb-4 pb-3 border-b border-border/50">
+                    <div className="space-y-2 mb-4 pb-3 border-b border-border/50">
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="h-4 w-4 text-primary flex-shrink-0" />
-                        <span className="font-semibold text-xs md:text-sm">
+                        <span className="font-semibold text-xs">
                           {new Date(report.date).toLocaleDateString("id-ID", { 
                             weekday: 'short', 
                             year: 'numeric', 
@@ -427,16 +427,16 @@ export default function Dashboard() {
                           })}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Clock className="h-4 w-4 text-primary flex-shrink-0" />
-                          <span className="font-medium capitalize px-2 py-1 bg-primary/10 rounded-md text-xs">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <Clock className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                          <span className="font-medium capitalize px-2 py-0.5 bg-primary/10 rounded-md">
                             Shift {report.shift}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <User className="h-4 w-4 text-primary flex-shrink-0" />
-                          <span className="font-medium text-xs truncate max-w-[120px]">{report.officer}</span>
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <User className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                          <span className="font-medium truncate max-w-[100px]">{report.officer}</span>
                         </div>
                       </div>
                     </div>
@@ -522,7 +522,7 @@ export default function Dashboard() {
                   Belum ada tiket
                 </p>
               ) : (
-                <div className="rounded-md border">
+                <div className="rounded-md border overflow-auto max-h-96">
                   <Table>
                     <TableHeader>
                       <TableRow>
