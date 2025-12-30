@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Upload, Download, Trash2, Search, Server } from "lucide-react";
+import { Upload, Download, Trash2, Server, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -31,6 +31,12 @@ interface UPE {
 }
 
 const UPE_STORE_NAME = "upe_data";
+
+const UPE_FIELDS = [
+  { value: "all", label: "Semua Field" },
+  { value: "hostnameUPE", label: "Hostname UPE" },
+  { value: "hostnameOLT", label: "Hostname OLT" },
+];
 
 async function saveUPEData(data: UPE[]): Promise<void> {
   const db = await openDB();
@@ -71,10 +77,8 @@ async function clearUPEData(): Promise<void> {
 
 const UPEList = () => {
   const [upeData, setUpeData] = useState<UPE[]>([]);
-  const [searchFilters, setSearchFilters] = useState({
-    hostnameUPE: "",
-    hostnameOLT: "",
-  });
+  const [searchField, setSearchField] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -138,7 +142,6 @@ const UPEList = () => {
           return;
         }
 
-        // Replace old data with new data
         setUpeData(processedData);
         saveUPEData(processedData).catch(() => {
           toast({
@@ -212,13 +215,19 @@ const UPEList = () => {
   };
 
   const filteredData = upeData.filter((upe) => {
-    const hostnameUPE = String(upe.hostnameUPE || "").toLowerCase();
-    const hostnameOLT = String(upe.hostnameOLT || "").toLowerCase();
-
-    return (
-      (!searchFilters.hostnameUPE || hostnameUPE.includes(searchFilters.hostnameUPE.toLowerCase())) &&
-      (!searchFilters.hostnameOLT || hostnameOLT.includes(searchFilters.hostnameOLT.toLowerCase()))
-    );
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    
+    if (searchField === "all") {
+      return (
+        String(upe.hostnameUPE || "").toLowerCase().includes(query) ||
+        String(upe.hostnameOLT || "").toLowerCase().includes(query)
+      );
+    }
+    
+    const fieldValue = String(upe[searchField as keyof UPE] || "").toLowerCase();
+    return fieldValue.includes(query);
   });
 
   return (
@@ -286,32 +295,30 @@ const UPEList = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm font-medium flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              Search & Filter
-            </p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <Label>🖥️ Hostname UPE</Label>
-                <Input
-                  placeholder="Cari Hostname UPE..."
-                  value={searchFilters.hostnameUPE}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, hostnameUPE: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>📍 Hostname OLT</Label>
-                <Input
-                  placeholder="Cari Hostname OLT..."
-                  value={searchFilters.hostnameOLT}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, hostnameOLT: e.target.value })
-                  }
-                />
-              </div>
+          {/* Simplified Search & Filter */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <Select value={searchField} onValueChange={setSearchField}>
+                <SelectTrigger className="w-[180px] h-9 bg-background">
+                  <SelectValue placeholder="Pilih Field" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border shadow-lg z-50">
+                  {UPE_FIELDS.map((field) => (
+                    <SelectItem key={field.value} value={field.value}>
+                      {field.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1 w-full sm:max-w-md">
+              <Input
+                placeholder={`Cari ${UPE_FIELDS.find(f => f.value === searchField)?.label || "data"}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9"
+              />
             </div>
           </div>
 

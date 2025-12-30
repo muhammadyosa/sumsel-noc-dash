@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Upload, Download, Trash2, Search } from "lucide-react";
+import { Upload, Download, Trash2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -25,16 +25,20 @@ import { loadOLTData, saveOLTData, clearOLTData } from "@/lib/indexedDB";
 import { z } from "zod";
 import { oltDataSchema, sanitizeForCSV } from "@/lib/validation";
 
+const OLT_FIELDS = [
+  { value: "all", label: "Semua Field" },
+  { value: "provinsi", label: "Nama Provinsi" },
+  { value: "fatId", label: "ID FAT" },
+  { value: "hostname", label: "Hostname OLT" },
+  { value: "tikor", label: "Tikor FAT" },
+];
+
 const OLTList = () => {
   const [oltData, setOltData] = useState<OLT[]>([]);
-  const [searchFilters, setSearchFilters] = useState({
-    provinsi: "",
-    fatId: "",
-    hostname: "",
-  });
+  const [searchField, setSearchField] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load OLT data from IndexedDB on mount
   useEffect(() => {
     loadOLTData()
       .then((data) => {
@@ -114,7 +118,6 @@ const OLTList = () => {
           return;
         }
 
-        // Validate with zod (validate data fields only, id/createdAt already added)
         processedData.forEach((item) => {
           oltDataSchema.parse({
             provinsi: item.provinsi,
@@ -124,10 +127,8 @@ const OLTList = () => {
           });
         });
 
-        // Replace old data with new data
         setOltData(processedData);
         
-        // Save to IndexedDB (replaces existing data)
         saveOLTData(processedData).catch((error) => {
           if (import.meta.env.DEV) {
             console.error("Error saving OLT data:", error);
@@ -217,15 +218,21 @@ const OLTList = () => {
   };
 
   const filteredData = oltData.filter((olt) => {
-    const provinsi = String(olt.provinsi || "").toLowerCase();
-    const fatId = String(olt.fatId || "").toLowerCase();
-    const hostname = String(olt.hostname || "").toLowerCase();
-
-    return (
-      (!searchFilters.provinsi || provinsi.includes(searchFilters.provinsi.toLowerCase())) &&
-      (!searchFilters.fatId || fatId.includes(searchFilters.fatId.toLowerCase())) &&
-      (!searchFilters.hostname || hostname.includes(searchFilters.hostname.toLowerCase()))
-    );
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    
+    if (searchField === "all") {
+      return (
+        String(olt.provinsi || "").toLowerCase().includes(query) ||
+        String(olt.fatId || "").toLowerCase().includes(query) ||
+        String(olt.hostname || "").toLowerCase().includes(query) ||
+        String(olt.tikor || "").toLowerCase().includes(query)
+      );
+    }
+    
+    const fieldValue = String(olt[searchField as keyof OLT] || "").toLowerCase();
+    return fieldValue.includes(query);
   });
 
   return (
@@ -290,40 +297,30 @@ const OLTList = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm font-medium flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              Search & Filter
-            </p>
-            <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <Label>📜 Nama Provinsi</Label>
-                <Input
-                  placeholder="Cari Provinsi..."
-                  value={searchFilters.provinsi}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, provinsi: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>🛠️ ID FAT</Label>
-                <Input
-                  placeholder="Cari ID FAT..."
-                  value={searchFilters.fatId}
-                  onChange={(e) => setSearchFilters({ ...searchFilters, fatId: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>📍 Hostname OLT</Label>
-                <Input
-                  placeholder="Cari Hostname..."
-                  value={searchFilters.hostname}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, hostname: e.target.value })
-                  }
-                />
-              </div>
+          {/* Simplified Search & Filter */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <Select value={searchField} onValueChange={setSearchField}>
+                <SelectTrigger className="w-[180px] h-9 bg-background">
+                  <SelectValue placeholder="Pilih Field" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border shadow-lg z-50">
+                  {OLT_FIELDS.map((field) => (
+                    <SelectItem key={field.value} value={field.value}>
+                      {field.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1 w-full sm:max-w-md">
+              <Input
+                placeholder={`Cari ${OLT_FIELDS.find(f => f.value === searchField)?.label || "data"}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9"
+              />
             </div>
           </div>
 
