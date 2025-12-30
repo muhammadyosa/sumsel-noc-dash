@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Upload, Download, Trash2, Search, Network } from "lucide-react";
+import { Upload, Download, Trash2, Network, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -39,6 +39,20 @@ interface BNG {
 }
 
 const BNG_STORE_NAME = "bng_data";
+
+const BNG_FIELDS = [
+  { value: "all", label: "Semua Field" },
+  { value: "ipRadius", label: "IP RADIUS" },
+  { value: "hostnameRadius", label: "HOSTNAME RADIUS" },
+  { value: "ipBng", label: "IP BNG" },
+  { value: "hostnameBng", label: "HOSTNAME BNG" },
+  { value: "npe", label: "NPE" },
+  { value: "vlan", label: "VLAN" },
+  { value: "hostnameOlt", label: "HOSTNAME OLT" },
+  { value: "upe", label: "UPE" },
+  { value: "portUpe", label: "PORT UPE" },
+  { value: "kotaKabupaten", label: "KOTA/KABUPATEN" },
+];
 
 async function saveBNGData(data: BNG[]): Promise<void> {
   const db = await openDB();
@@ -79,18 +93,8 @@ async function clearBNGData(): Promise<void> {
 
 const BNGList = () => {
   const [bngData, setBngData] = useState<BNG[]>([]);
-  const [searchFilters, setSearchFilters] = useState({
-    ipRadius: "",
-    hostnameRadius: "",
-    ipBng: "",
-    hostnameBng: "",
-    npe: "",
-    vlan: "",
-    hostnameOlt: "",
-    upe: "",
-    portUpe: "",
-    kotaKabupaten: "",
-  });
+  const [searchField, setSearchField] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -131,7 +135,6 @@ const BNGList = () => {
             const portUpe = row["PORT UPE"] || row["port upe"] || row["PORT_UPE"] || row.portUpe || "";
             const kotaKabupaten = row["KOTA/KABUPATEN"] || row["kota/kabupaten"] || row["KOTA_KABUPATEN"] || row.kotaKabupaten || row["Kota/Kabupaten"] || "";
 
-            // Skip empty rows
             if (!ipRadius && !hostnameRadius && !ipBng && !hostnameBng && !hostnameOlt) return null;
 
             return {
@@ -241,29 +244,27 @@ const BNGList = () => {
   };
 
   const filteredData = bngData.filter((bng) => {
-    const ipRadius = String(bng.ipRadius || "").toLowerCase();
-    const hostnameRadius = String(bng.hostnameRadius || "").toLowerCase();
-    const ipBng = String(bng.ipBng || "").toLowerCase();
-    const hostnameBng = String(bng.hostnameBng || "").toLowerCase();
-    const npe = String(bng.npe || "").toLowerCase();
-    const vlan = String(bng.vlan || "").toLowerCase();
-    const hostnameOlt = String(bng.hostnameOlt || "").toLowerCase();
-    const upe = String(bng.upe || "").toLowerCase();
-    const portUpe = String(bng.portUpe || "").toLowerCase();
-    const kotaKabupaten = String(bng.kotaKabupaten || "").toLowerCase();
-
-    return (
-      (!searchFilters.ipRadius || ipRadius.includes(searchFilters.ipRadius.toLowerCase())) &&
-      (!searchFilters.hostnameRadius || hostnameRadius.includes(searchFilters.hostnameRadius.toLowerCase())) &&
-      (!searchFilters.ipBng || ipBng.includes(searchFilters.ipBng.toLowerCase())) &&
-      (!searchFilters.hostnameBng || hostnameBng.includes(searchFilters.hostnameBng.toLowerCase())) &&
-      (!searchFilters.npe || npe.includes(searchFilters.npe.toLowerCase())) &&
-      (!searchFilters.vlan || vlan.includes(searchFilters.vlan.toLowerCase())) &&
-      (!searchFilters.hostnameOlt || hostnameOlt.includes(searchFilters.hostnameOlt.toLowerCase())) &&
-      (!searchFilters.upe || upe.includes(searchFilters.upe.toLowerCase())) &&
-      (!searchFilters.portUpe || portUpe.includes(searchFilters.portUpe.toLowerCase())) &&
-      (!searchFilters.kotaKabupaten || kotaKabupaten.includes(searchFilters.kotaKabupaten.toLowerCase()))
-    );
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    
+    if (searchField === "all") {
+      return (
+        String(bng.ipRadius || "").toLowerCase().includes(query) ||
+        String(bng.hostnameRadius || "").toLowerCase().includes(query) ||
+        String(bng.ipBng || "").toLowerCase().includes(query) ||
+        String(bng.hostnameBng || "").toLowerCase().includes(query) ||
+        String(bng.npe || "").toLowerCase().includes(query) ||
+        String(bng.vlan || "").toLowerCase().includes(query) ||
+        String(bng.hostnameOlt || "").toLowerCase().includes(query) ||
+        String(bng.upe || "").toLowerCase().includes(query) ||
+        String(bng.portUpe || "").toLowerCase().includes(query) ||
+        String(bng.kotaKabupaten || "").toLowerCase().includes(query)
+      );
+    }
+    
+    const fieldValue = String(bng[searchField as keyof BNG] || "").toLowerCase();
+    return fieldValue.includes(query);
   });
 
   return (
@@ -331,112 +332,30 @@ const BNGList = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm font-medium flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              Search & Filter
-            </p>
-            <div className="grid gap-4 md:grid-cols-5">
-              <div>
-                <Label>🌐 IP RADIUS</Label>
-                <Input
-                  placeholder="Cari IP Radius..."
-                  value={searchFilters.ipRadius}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, ipRadius: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>🖥️ HOSTNAME RADIUS</Label>
-                <Input
-                  placeholder="Cari Hostname Radius..."
-                  value={searchFilters.hostnameRadius}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, hostnameRadius: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>🌐 IP BNG</Label>
-                <Input
-                  placeholder="Cari IP BNG..."
-                  value={searchFilters.ipBng}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, ipBng: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>🖥️ HOSTNAME BNG</Label>
-                <Input
-                  placeholder="Cari Hostname BNG..."
-                  value={searchFilters.hostnameBng}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, hostnameBng: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>📡 NPE</Label>
-                <Input
-                  placeholder="Cari NPE..."
-                  value={searchFilters.npe}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, npe: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>🔢 VLAN</Label>
-                <Input
-                  placeholder="Cari VLAN..."
-                  value={searchFilters.vlan}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, vlan: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>📶 HOSTNAME OLT</Label>
-                <Input
-                  placeholder="Cari Hostname OLT..."
-                  value={searchFilters.hostnameOlt}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, hostnameOlt: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>🔌 UPE</Label>
-                <Input
-                  placeholder="Cari UPE..."
-                  value={searchFilters.upe}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, upe: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>🔗 PORT UPE</Label>
-                <Input
-                  placeholder="Cari Port UPE..."
-                  value={searchFilters.portUpe}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, portUpe: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <Label>📍 KOTA/KABUPATEN</Label>
-                <Input
-                  placeholder="Cari Kota/Kabupaten..."
-                  value={searchFilters.kotaKabupaten}
-                  onChange={(e) =>
-                    setSearchFilters({ ...searchFilters, kotaKabupaten: e.target.value })
-                  }
-                />
-              </div>
+          {/* Simplified Search & Filter */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <Select value={searchField} onValueChange={setSearchField}>
+                <SelectTrigger className="w-[180px] h-9 bg-background">
+                  <SelectValue placeholder="Pilih Field" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border shadow-lg z-50">
+                  {BNG_FIELDS.map((field) => (
+                    <SelectItem key={field.value} value={field.value}>
+                      {field.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1 w-full sm:max-w-md">
+              <Input
+                placeholder={`Cari ${BNG_FIELDS.find(f => f.value === searchField)?.label || "data"}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9"
+              />
             </div>
           </div>
 
