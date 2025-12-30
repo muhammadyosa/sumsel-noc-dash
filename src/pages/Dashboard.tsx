@@ -1,6 +1,6 @@
-import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User, ExternalLink, TrendingUp, BarChart3 } from "lucide-react";
+import { Activity, AlertTriangle, Zap, Server, Calendar, Clock, User, ExternalLink, TrendingUp, BarChart3, FileText } from "lucide-react";
 import { useTickets } from "@/hooks/useTickets";
-import { FEEDER_CONSTRAINTS_SET, Ticket } from "@/types/ticket";
+import { FEEDER_CONSTRAINTS_SET, Ticket, ALL_CONSTRAINTS } from "@/types/ticket";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -9,6 +9,7 @@ import { OLT } from "@/types/olt";
 import { loadOLTData } from "@/lib/indexedDB";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
@@ -38,6 +39,7 @@ export default function Dashboard() {
   const [filterDialogTitle, setFilterDialogTitle] = useState("");
   const [filterDialogTickets, setFilterDialogTickets] = useState<Ticket[]>([]);
   const [showOltList, setShowOltList] = useState(false);
+  const [selectedConstraint, setSelectedConstraint] = useState<string>("all");
 
   // Load shift reports from localStorage
   useEffect(() => {
@@ -59,7 +61,9 @@ export default function Dashboard() {
   // Count unique OLT hostnames from tickets (impact)
   const totalOLT = new Set(tickets.map((t) => t.hostname).filter(Boolean)).size || 0;
 
-  const recentTickets = tickets.slice(0, 5);
+  const recentTickets = tickets
+    .filter((t) => selectedConstraint === "all" || t.constraint === selectedConstraint)
+    .slice(0, 10);
   
   const filteredTickets = tickets.filter((ticket) => {
     if (selectedStatus && ticket.status !== selectedStatus) return false;
@@ -512,8 +516,24 @@ export default function Dashboard() {
         transition={{ duration: 0.6, delay: 0.7 }}
       >
         <Card className="shadow-2xl border-2">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle>Recent Tickets</CardTitle>
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <Select value={selectedConstraint} onValueChange={setSelectedConstraint}>
+                <SelectTrigger className="w-[180px] h-9">
+                  <SelectValue placeholder="Filter Constraint" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Constraint</SelectItem>
+                  {ALL_CONSTRAINTS.map((constraint) => (
+                    <SelectItem key={constraint} value={constraint}>
+                      {constraint}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
