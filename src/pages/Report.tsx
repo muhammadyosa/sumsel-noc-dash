@@ -20,6 +20,26 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { FileText, Download } from "lucide-react";
+import { z } from "zod";
+
+// Validation schemas for form inputs
+const shiftReportSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format tanggal tidak valid"),
+  shift: z.enum(["pagi", "siang", "malam"]),
+  officer: z.string().trim().min(1, "Nama petugas wajib diisi").max(100, "Nama petugas maksimal 100 karakter"),
+  oltDown: z.string().trim().max(2000, "Laporan OLT Down maksimal 2000 karakter"),
+  portDown: z.string().trim().max(2000, "Laporan Port Down maksimal 2000 karakter"),
+  fatLoss: z.string().trim().max(2000, "Laporan FAT Loss maksimal 2000 karakter"),
+  issues: z.string().trim().max(5000, "Kendala/Masalah maksimal 5000 karakter"),
+  notes: z.string().trim().max(5000, "Catatan maksimal 5000 karakter"),
+});
+
+const ticketUpdateSchema = z.object({
+  ticketId: z.string().trim().min(1, "ID Ticket wajib diisi").max(50, "ID Ticket maksimal 50 karakter"),
+  update: z.string().trim().min(1, "Update wajib diisi").max(5000, "Update maksimal 5000 karakter"),
+  status: z.string().optional(),
+  resolvedBy: z.string().trim().max(100, "Nama petugas maksimal 100 karakter"),
+});
 
 const Report = () => {
   const [shiftReport, setShiftReport] = useState({
@@ -41,10 +61,21 @@ const Report = () => {
   });
 
   const handleShiftReportSubmit = () => {
-    if (!shiftReport.officer || (!shiftReport.oltDown && !shiftReport.portDown && !shiftReport.fatLoss)) {
+    // Validate with Zod schema
+    const result = shiftReportSchema.safeParse(shiftReport);
+    if (!result.success) {
+      toast({
+        title: "Validasi gagal",
+        description: result.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!shiftReport.oltDown && !shiftReport.portDown && !shiftReport.fatLoss) {
       toast({
         title: "Data tidak lengkap",
-        description: "Mohon lengkapi petugas dan minimal satu ringkasan shift.",
+        description: "Mohon lengkapi minimal satu ringkasan shift.",
         variant: "destructive",
       });
       return;
@@ -78,10 +109,12 @@ const Report = () => {
   };
 
   const handleTicketUpdateSubmit = () => {
-    if (!ticketUpdate.ticketId || !ticketUpdate.update) {
+    // Validate with Zod schema
+    const result = ticketUpdateSchema.safeParse(ticketUpdate);
+    if (!result.success) {
       toast({
-        title: "Data tidak lengkap",
-        description: "Mohon lengkapi ID Ticket dan update.",
+        title: "Validasi gagal",
+        description: result.error.errors[0].message,
         variant: "destructive",
       });
       return;

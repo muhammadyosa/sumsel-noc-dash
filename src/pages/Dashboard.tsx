@@ -49,7 +49,11 @@ export default function Dashboard() {
 
   // Load OLT data
   useEffect(() => {
-    loadOLTData().then(setOltData).catch(console.error);
+    loadOLTData().then(setOltData).catch((error) => {
+      if (import.meta.env.DEV) {
+        console.error("Error loading OLT data:", error);
+      }
+    });
   }, []);
 
   const totalIncidents = tickets.length;
