@@ -11,7 +11,9 @@ export function useTickets() {
       const saved = localStorage.getItem(STORAGE_KEY);
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      console.error("Error loading tickets from localStorage:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error loading tickets from localStorage:", error);
+      }
       return [];
     }
   });
@@ -28,7 +30,9 @@ export function useTickets() {
         setIsLoadingExcel(false);
       })
       .catch((error) => {
-        console.error("Error loading Excel data from IndexedDB:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error loading Excel data from IndexedDB:", error);
+        }
         setIsLoadingExcel(false);
       });
   }, []);
@@ -37,7 +41,9 @@ export function useTickets() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
     } catch (error) {
-      console.error("Error saving tickets to localStorage:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error saving tickets to localStorage:", error);
+      }
       if (error instanceof DOMException && error.name === "QuotaExceededError") {
         toast.error(
           "Storage penuh! Silakan export dan hapus tiket lama untuk membuat ruang."
@@ -66,7 +72,9 @@ export function useTickets() {
       setExcelData(data);
       toast.success("Data Excel berhasil disimpan secara permanen!");
     } catch (error) {
-      console.error("Error saving Excel data to IndexedDB:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error saving Excel data to IndexedDB:", error);
+      }
       toast.error("Gagal menyimpan data Excel.");
     }
   };

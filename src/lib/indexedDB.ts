@@ -71,7 +71,9 @@ export async function loadExcelData(): Promise<ExcelRecord[]> {
       request.onerror = () => reject(request.error);
     });
   } catch (error) {
-    console.error("Error loading Excel data from IndexedDB:", error);
+    if (import.meta.env.DEV) {
+      console.error("Error loading Excel data from IndexedDB:", error);
+    }
     return [];
   }
 }
@@ -115,7 +117,9 @@ export async function loadOLTData(): Promise<OLT[]> {
       request.onerror = () => reject(request.error);
     });
   } catch (error) {
-    console.error("Error loading OLT data from IndexedDB:", error);
+    if (import.meta.env.DEV) {
+      console.error("Error loading OLT data from IndexedDB:", error);
+    }
     return [];
   }
 }

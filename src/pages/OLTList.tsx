@@ -46,7 +46,9 @@ const OLTList = () => {
         setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Error loading OLT data:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error loading OLT data:", error);
+        }
         setIsLoading(false);
       });
   }, []);
@@ -207,7 +209,9 @@ const OLTList = () => {
           description: "Semua data OLT berhasil dihapus.",
         });
       } catch (error) {
-        console.error("Error clearing OLT data:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error clearing OLT data:", error);
+        }
         toast({
           title: "Gagal menghapus",
           description: "Terjadi kesalahan saat menghapus data.",
