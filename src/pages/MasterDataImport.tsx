@@ -144,13 +144,13 @@ export default function MasterDataImport() {
   const getTypeLabel = (type: string | null) => {
     switch (type) {
       case "user":
-        return { label: "Data User", color: "bg-blue-500" };
+        return { label: "List User", color: "bg-blue-500" };
       case "fat":
-        return { label: "Data OLT/FAT", color: "bg-green-500" };
+        return { label: "List OLT", color: "bg-green-500" };
       case "upe":
-        return { label: "Data UPE", color: "bg-purple-500" };
+        return { label: "List UPE", color: "bg-purple-500" };
       case "bng":
-        return { label: "Data BNG", color: "bg-orange-500" };
+        return { label: "List BNG", color: "bg-orange-500" };
       default:
         return { label: "Tidak Dikenali", color: "bg-muted" };
     }
@@ -171,7 +171,7 @@ export default function MasterDataImport() {
       <div>
         <h1 className="text-2xl font-bold">Import Master Data</h1>
         <p className="text-muted-foreground">
-          Upload file Excel dengan multiple sheet untuk mengisi data User, OLT, UPE, dan BNG sekaligus
+          Upload file Excel sekali saja - data langsung tersimpan permanen dan terintegrasi ke Ticket Management, List OLT, List UPE, dan List BNG
         </p>
       </div>
 
@@ -182,9 +182,9 @@ export default function MasterDataImport() {
             <FileSpreadsheet className="h-5 w-5" />
             Upload File Excel
           </CardTitle>
-          <CardDescription>
-            Pilih file Excel (.xlsx, .xls) yang berisi sheet User, FAT/OLT, UPE, dan BNG
-          </CardDescription>
+        <CardDescription>
+          Pilih file Excel (.xlsx, .xls) - data tersimpan permanen di aplikasi (hanya perlu upload 1x)
+        </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
@@ -273,11 +273,11 @@ export default function MasterDataImport() {
                           <TableCell>
                             <Badge className={typeInfo.color}>{typeInfo.label}</Badge>
                           </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {sheet.type === "user" && "Ticket Management"}
-                            {sheet.type === "fat" && "Data OLT"}
-                            {sheet.type === "upe" && "Data UPE"}
-                            {sheet.type === "bng" && "Data BNG"}
+                        <TableCell className="text-muted-foreground">
+                            {sheet.type === "user" && "→ Ticket Management"}
+                            {sheet.type === "fat" && "→ List OLT"}
+                            {sheet.type === "upe" && "→ List UPE"}
+                            {sheet.type === "bng" && "→ List BNG"}
                           </TableCell>
                         </TableRow>
                       );
@@ -333,20 +333,33 @@ export default function MasterDataImport() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg text-center">
                 <div className="text-2xl font-bold text-blue-600">{importResult.summary.user.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Data User</div>
+                <div className="text-sm text-muted-foreground">List User → Ticket Management</div>
               </div>
               <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg text-center">
                 <div className="text-2xl font-bold text-green-600">{importResult.summary.olt.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Data OLT</div>
+                <div className="text-sm text-muted-foreground">List OLT → Data OLT</div>
               </div>
               <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg text-center">
                 <div className="text-2xl font-bold text-purple-600">{importResult.summary.upe.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Data UPE</div>
+                <div className="text-sm text-muted-foreground">List UPE → Data UPE</div>
               </div>
               <div className="bg-orange-50 dark:bg-orange-950 p-4 rounded-lg text-center">
                 <div className="text-2xl font-bold text-orange-600">{importResult.summary.bng.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Data BNG</div>
+                <div className="text-sm text-muted-foreground">List BNG → Data BNG</div>
               </div>
+            </div>
+
+            {/* Integration Status */}
+            <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+              <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                ✓ Data tersimpan permanen! Anda dapat langsung menggunakan:
+              </p>
+              <ul className="mt-2 text-sm text-green-700 dark:text-green-300 space-y-1">
+                {importResult.summary.user > 0 && <li>• Ticket Management - {importResult.summary.user.toLocaleString()} data user siap digunakan</li>}
+                {importResult.summary.olt > 0 && <li>• List OLT - {importResult.summary.olt.toLocaleString()} data OLT siap digunakan</li>}
+                {importResult.summary.upe > 0 && <li>• List UPE - {importResult.summary.upe.toLocaleString()} data UPE siap digunakan</li>}
+                {importResult.summary.bng > 0 && <li>• List BNG - {importResult.summary.bng.toLocaleString()} data BNG siap digunakan</li>}
+              </ul>
             </div>
 
             {/* Processed Sheets */}
@@ -395,7 +408,7 @@ export default function MasterDataImport() {
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium mb-2">📋 Sheet User (untuk Ticket Management)</h4>
+              <h4 className="font-medium mb-2">📋 List User (untuk Ticket Management)</h4>
               <p className="text-sm text-muted-foreground mb-2">Kolom yang didukung:</p>
               <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
                 <li>Customer Name / customer / nama pelanggan</li>
@@ -406,7 +419,7 @@ export default function MasterDataImport() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-2">📡 Sheet FAT/OLT (untuk Data OLT)</h4>
+              <h4 className="font-medium mb-2">📡 List OLT (untuk Data OLT)</h4>
               <p className="text-sm text-muted-foreground mb-2">Kolom yang didukung:</p>
               <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
                 <li>Provinsi</li>
@@ -416,7 +429,7 @@ export default function MasterDataImport() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-2">🔗 Sheet UPE (untuk Data UPE)</h4>
+              <h4 className="font-medium mb-2">🔗 List UPE (untuk Data UPE)</h4>
               <p className="text-sm text-muted-foreground mb-2">Kolom yang didukung:</p>
               <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
                 <li>Hostname OLT</li>
@@ -424,7 +437,7 @@ export default function MasterDataImport() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-2">🌐 Sheet BNG (untuk Data BNG)</h4>
+              <h4 className="font-medium mb-2">🌐 List BNG (untuk Data BNG)</h4>
               <p className="text-sm text-muted-foreground mb-2">Kolom yang didukung:</p>
               <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
                 <li>BNG / Hostname BNG</li>
