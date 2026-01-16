@@ -37,7 +37,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-sidebar-foreground">NOC RITEL</h2>
-              <p className="text-xs text-sidebar-foreground/70">PLN Icon Plus</p>
+              <p className="text-xs text-sidebar-foreground/70">Iconnet</p>
             </div>
           )}
         </div>
