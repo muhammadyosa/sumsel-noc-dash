@@ -146,7 +146,7 @@ export default function MasterDataImport() {
       case "user":
         return { label: "List User", color: "bg-blue-500" };
       case "fat":
-        return { label: "List OLT", color: "bg-green-500" };
+        return { label: "List FAT", color: "bg-green-500" };
       case "upe":
         return { label: "List UPE", color: "bg-purple-500" };
       case "bng":
@@ -171,7 +171,7 @@ export default function MasterDataImport() {
       <div>
         <h1 className="text-2xl font-bold">Import Master Data</h1>
         <p className="text-muted-foreground">
-          Upload file Excel sekali saja - data langsung tersimpan permanen dan terintegrasi ke Ticket Management, List OLT, List UPE, dan List BNG
+          Upload file Excel sekali saja - data langsung tersimpan permanen dan terintegrasi ke Ticket Management, List FAT, List UPE, dan List BNG
         </p>
       </div>
 
@@ -275,7 +275,7 @@ export default function MasterDataImport() {
                           </TableCell>
                         <TableCell className="text-muted-foreground">
                             {sheet.type === "user" && "→ Ticket Management"}
-                            {sheet.type === "fat" && "→ List OLT"}
+                            {sheet.type === "fat" && "→ List FAT"}
                             {sheet.type === "upe" && "→ List UPE"}
                             {sheet.type === "bng" && "→ List BNG"}
                           </TableCell>
@@ -337,7 +337,7 @@ export default function MasterDataImport() {
               </div>
               <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg text-center">
                 <div className="text-2xl font-bold text-green-600">{importResult.summary.olt.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">List OLT → Data OLT</div>
+                <div className="text-sm text-muted-foreground">List FAT → Data FAT</div>
               </div>
               <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg text-center">
                 <div className="text-2xl font-bold text-purple-600">{importResult.summary.upe.toLocaleString()}</div>
@@ -356,7 +356,7 @@ export default function MasterDataImport() {
               </p>
               <ul className="mt-2 text-sm text-green-700 dark:text-green-300 space-y-1">
                 {importResult.summary.user > 0 && <li>• Ticket Management - {importResult.summary.user.toLocaleString()} data user siap digunakan</li>}
-                {importResult.summary.olt > 0 && <li>• List OLT - {importResult.summary.olt.toLocaleString()} data OLT siap digunakan</li>}
+                {importResult.summary.olt > 0 && <li>• List FAT - {importResult.summary.olt.toLocaleString()} data FAT siap digunakan</li>}
                 {importResult.summary.upe > 0 && <li>• List UPE - {importResult.summary.upe.toLocaleString()} data UPE siap digunakan</li>}
                 {importResult.summary.bng > 0 && <li>• List BNG - {importResult.summary.bng.toLocaleString()} data BNG siap digunakan</li>}
               </ul>
@@ -419,11 +419,11 @@ export default function MasterDataImport() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-2">📡 List OLT (untuk Data OLT)</h4>
+              <h4 className="font-medium mb-2">📍 List FAT (untuk Data FAT)</h4>
               <p className="text-sm text-muted-foreground mb-2">Kolom yang didukung:</p>
               <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
                 <li>Provinsi</li>
-                <li>FAT ID / ID FAT</li>
+                <li>ID FAT / FAT ID</li>
                 <li>Hostname OLT</li>
                 <li>Tikor FAT / koordinat</li>
               </ul>
@@ -440,12 +440,16 @@ export default function MasterDataImport() {
               <h4 className="font-medium mb-2">🌐 List BNG (untuk Data BNG)</h4>
               <p className="text-sm text-muted-foreground mb-2">Kolom yang didukung:</p>
               <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                <li>BNG / Hostname BNG</li>
+                <li>IP RADIUS</li>
+                <li>HOSTNAME RADIUS</li>
+                <li>IP BNG</li>
+                <li>HOSTNAME BNG</li>
+                <li>NPE</li>
                 <li>VLAN</li>
-                <li>Hostname OLT</li>
-                <li>Hostname UPE</li>
-                <li>Port</li>
-                <li>Provinsi</li>
+                <li>HOSTNAME OLT</li>
+                <li>UPE</li>
+                <li>PORT UPE</li>
+                <li>KOTA/KABUPATEN</li>
               </ul>
             </div>
           </div>
