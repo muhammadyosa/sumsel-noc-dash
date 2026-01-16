@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Upload, Download, Trash2, Server, FileText } from "lucide-react";
+import { Download, Trash2, Server, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +22,7 @@ import { toast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
 import { sanitizeForCSV } from "@/lib/validation";
 import { openDB } from "@/lib/indexedDB";
+import { Link } from "react-router-dom";
 
 interface UPE {
   id: string;
@@ -37,17 +38,6 @@ const UPE_FIELDS = [
   { value: "hostnameUPE", label: "Hostname UPE" },
   { value: "hostnameOLT", label: "Hostname OLT" },
 ];
-
-async function saveUPEData(data: UPE[]): Promise<void> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([UPE_STORE_NAME], "readwrite");
-    const store = transaction.objectStore(UPE_STORE_NAME);
-    const request = store.put(data, "upe_records");
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-}
 
 async function loadUPEData(): Promise<UPE[]> {
   try {
@@ -89,84 +79,6 @@ const UPEList = () => {
       })
       .catch(() => setIsLoading(false));
   }, []);
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = new Uint8Array(event.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, {
-          raw: false,
-          defval: "",
-        });
-
-        const processedData: UPE[] = jsonData
-          .map((row) => {
-            const hostnameUPE = 
-              row["Hostname UPE"] || 
-              row["hostname upe"] || 
-              row["HOSTNAME UPE"] ||
-              row.hostnameUPE || 
-              row.hostname_upe || "";
-            
-            const hostnameOLT = 
-              row["Hostname OLT"] || 
-              row["hostname olt"] || 
-              row["HOSTNAME OLT"] ||
-              row.hostnameOLT || 
-              row.hostname_olt || "";
-
-            if (!hostnameUPE && !hostnameOLT) return null;
-
-            return {
-              id: `UPE-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              hostnameUPE: String(hostnameUPE).trim(),
-              hostnameOLT: String(hostnameOLT).trim(),
-              createdAt: new Date().toISOString(),
-            };
-          })
-          .filter((item): item is UPE => item !== null);
-
-        if (processedData.length === 0) {
-          toast({
-            title: "Tidak ada data valid",
-            description: "File tidak mengandung data UPE yang valid.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        setUpeData(processedData);
-        saveUPEData(processedData).catch(() => {
-          toast({
-            title: "Gagal menyimpan",
-            description: "Terjadi kesalahan saat menyimpan data.",
-            variant: "destructive",
-          });
-        });
-
-        toast({
-          title: "Import berhasil",
-          description: `${processedData.length} data UPE berhasil diimport (data lama digantikan).`,
-        });
-      } catch {
-        toast({
-          title: "Import gagal",
-          description: "Terjadi kesalahan saat memproses file.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    reader.readAsArrayBuffer(file);
-    e.target.value = "";
-  };
 
   const handleExport = () => {
     if (filteredData.length === 0) {
@@ -233,9 +145,9 @@ const UPEList = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">List UPE</h1>
+        <h1 className="text-3xl font-bold">🔗 List UPE</h1>
         <p className="text-muted-foreground">
-          Kelola data Universal Platform Equipment dengan import dari Excel/CSV
+          Data UPE diimport melalui <Link to="/import" className="text-primary underline hover:no-underline">Import Master Data</Link>
         </p>
       </div>
 
@@ -250,26 +162,20 @@ const UPEList = () => {
                   {isLoading ? (
                     "Memuat data UPE..."
                   ) : upeData.length > 0 ? (
-                    `✓ ${upeData.length} data tersimpan - upload baru akan menggantikan data lama`
+                    `✓ ${upeData.length} data tersimpan dari Import Master Data`
                   ) : (
-                    "Upload Excel/CSV, data tersimpan permanen di aplikasi"
+                    <span className="flex items-center gap-1">
+                      <Info className="h-3 w-3" />
+                      Belum ada data. Import melalui{" "}
+                      <Link to="/import" className="text-primary underline hover:no-underline">
+                        Import Master Data
+                      </Link>
+                    </span>
                   )}
                 </p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button asChild variant="default" size="sm">
-                <label className="cursor-pointer">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Import Excel/CSV
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".xlsx,.xls,.csv"
-                    onChange={handleFileUpload}
-                  />
-                </label>
-              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -291,7 +197,7 @@ const UPEList = () => {
             </div>
           </CardTitle>
           <CardDescription>
-            Upload file Excel/CSV dengan kolom: Hostname UPE, Hostname OLT
+            Kolom: Hostname UPE, Hostname OLT
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

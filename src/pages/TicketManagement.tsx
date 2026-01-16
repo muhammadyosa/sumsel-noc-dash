@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, Plus, Search, FileUp, Trash2, Edit } from "lucide-react";
+import { Download, Plus, Search, Trash2, Edit, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,12 +37,11 @@ import {
 } from "@/types/ticket";
 import { StatusBadge } from "@/components/StatusBadge";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
-import { z } from "zod";
-import { excelRecordSchema, sanitizeForCSV } from "@/lib/validation";
+import { sanitizeForCSV } from "@/lib/validation";
+import { Link } from "react-router-dom";
 
 export default function TicketManagement() {
-  const { tickets, excelData, isLoadingExcel, addTicket, updateTicket, deleteTicket, importExcelData } =
+  const { tickets, excelData, isLoadingExcel, addTicket, updateTicket, deleteTicket } =
     useTickets();
 
   const [searchFilters, setSearchFilters] = useState({
@@ -66,42 +65,6 @@ export default function TicketManagement() {
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTicket, setEditingTicket] = useState<Ticket | null>(null);
-
-  const handleImportExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const data = evt.target?.result;
-        const workbook = XLSX.read(data, { type: "binary" });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(sheet);
-
-        const mapped = jsonData.map((row: any) => ({
-          customer: String(row["Customer Name"] || row["customer"] || "").trim(),
-          service: String(row["Service ID"] || row["service"] || "").trim(),
-          hostname: String(row["Hostname OLT"] || row["hostname"] || "").trim(),
-          fat: String(row["ID FAT"] || row["fat"] || "").trim(),
-          sn: String(row["SN ONT"] || row["sn"] || "").trim(),
-        }));
-
-        // Filter out empty rows and import
-        const validData = mapped.filter((r: any) => r.customer || r.service || r.hostname || r.fat || r.sn);
-        importExcelData(validData);
-        toast.success(`Berhasil import ${validData.length} data`);
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          toast.error(`Validasi gagal: ${error.errors[0].message}`);
-        } else {
-          toast.error("Terjadi kesalahan saat memproses file");
-        }
-      }
-    };
-    reader.readAsBinaryString(file);
-  };
 
   const filteredData = excelData.filter((r) => {
     // Convert all fields to string to handle numeric values from Excel
@@ -382,32 +345,23 @@ export default function TicketManagement() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div>
-              <span>Search & Filter</span>
+              <span>📋 Preview Data User</span>
               <p className="text-xs text-muted-foreground font-normal mt-1">
                 {isLoadingExcel ? (
-                  "Memuat data Excel..."
+                  "Memuat data..."
                 ) : excelData.length > 0 ? (
-                  `✓ ${excelData.length} data tersimpan secara permanen - tidak perlu upload ulang!`
+                  `✓ ${excelData.length} data tersimpan dari Import Master Data`
                 ) : (
-                  "Upload Excel sekali, data tersimpan permanen di aplikasi"
+                  <span className="flex items-center gap-1">
+                    <Info className="h-3 w-3" />
+                    Belum ada data. Import melalui{" "}
+                    <Link to="/import" className="text-primary underline hover:no-underline">
+                      Import Master Data
+                    </Link>
+                  </span>
                 )}
               </p>
             </div>
-            <label>
-              <input
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={handleImportExcel}
-                className="hidden"
-                disabled={isLoadingExcel}
-              />
-              <Button variant="outline" size="sm" asChild disabled={isLoadingExcel}>
-                <span>
-                  <FileUp className="h-4 w-4 mr-2" />
-                  {isLoadingExcel ? "Loading..." : "Import Excel"}
-                </span>
-              </Button>
-            </label>
           </CardTitle>
         </CardHeader>
         <CardContent>
