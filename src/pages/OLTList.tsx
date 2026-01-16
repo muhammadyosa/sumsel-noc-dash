@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Upload, Download, Trash2, FileText } from "lucide-react";
+import { Download, Trash2, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,10 +20,10 @@ import {
 } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
-import { OLT, OLTExcelRecord } from "@/types/olt";
-import { loadOLTData, saveOLTData, clearOLTData } from "@/lib/indexedDB";
-import { z } from "zod";
-import { oltDataSchema, sanitizeForCSV } from "@/lib/validation";
+import { OLT } from "@/types/olt";
+import { loadOLTData, clearOLTData } from "@/lib/indexedDB";
+import { sanitizeForCSV } from "@/lib/validation";
+import { Link } from "react-router-dom";
 
 const OLT_FIELDS = [
   { value: "all", label: "Semua Field" },
@@ -52,123 +52,6 @@ const OLTList = () => {
         setIsLoading(false);
       });
   }, []);
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = new Uint8Array(event.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData: OLTExcelRecord[] = XLSX.utils.sheet_to_json(worksheet, {
-          raw: false,
-          defval: "",
-        });
-
-        const processedData: OLT[] = jsonData
-          .map((row) => {
-            const provinsi = 
-              row.provinsi || 
-              row.Provinsi || 
-              row["Nama Provinsi"] || 
-              row["nama provinsi"] || "";
-            
-            const fatId = 
-              row["id fat"] || 
-              row["fat id"] || 
-              row.fatid || 
-              row["ID FAT"] || 
-              row["Fat ID"] || "";
-            
-            const hostname = 
-              row.hostname || 
-              row.Hostname || 
-              row["hostname olt"] || 
-              row["Hostname OLT"] || "";
-            
-            const tikor = 
-              row.tikor || 
-              row.Tikor || 
-              row["tikor fat"] || 
-              row["Tikor FAT"] ||
-              row["tikor olt"] || 
-              row["Tikor OLT"] || "";
-
-            if (!provinsi && !fatId && !hostname && !tikor) return null;
-
-            return {
-              id: `OLT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              provinsi: String(provinsi).trim(),
-              fatId: String(fatId).trim(),
-              hostname: String(hostname).trim(),
-              tikor: String(tikor).trim(),
-              createdAt: new Date().toISOString(),
-            };
-          })
-          .filter((item): item is OLT => item !== null);
-
-        if (processedData.length === 0) {
-          toast({
-            title: "Tidak ada data valid",
-            description: "File tidak mengandung data OLT yang valid.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        processedData.forEach((item) => {
-          oltDataSchema.parse({
-            provinsi: item.provinsi,
-            fatId: item.fatId,
-            hostname: item.hostname,
-            tikor: item.tikor,
-          });
-        });
-
-        setOltData(processedData);
-        
-        saveOLTData(processedData).catch((error) => {
-          if (import.meta.env.DEV) {
-            console.error("Error saving OLT data:", error);
-          }
-          toast({
-            title: "Gagal menyimpan",
-            description: "Terjadi kesalahan saat menyimpan data.",
-            variant: "destructive",
-          });
-        });
-
-        toast({
-          title: "Import berhasil",
-          description: `${processedData.length} data OLT berhasil diimport dan disimpan secara permanen.`,
-        });
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          toast({
-            title: "Validasi gagal",
-            description: error.errors[0].message,
-            variant: "destructive",
-          });
-        } else {
-          if (import.meta.env.DEV) {
-            console.error("Error processing file:", error);
-          }
-          toast({
-            title: "Import gagal",
-            description: "Terjadi kesalahan saat memproses file.",
-            variant: "destructive",
-          });
-        }
-      }
-    };
-
-    reader.readAsArrayBuffer(file);
-    e.target.value = "";
-  };
 
   const handleExport = () => {
     if (filteredData.length === 0) {
@@ -242,9 +125,9 @@ const OLTList = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">List OLT</h1>
+        <h1 className="text-3xl font-bold">📡 List OLT</h1>
         <p className="text-muted-foreground">
-          Kelola data OLT dengan import dari Excel/CSV
+          Data OLT diimport melalui <Link to="/import" className="text-primary underline hover:no-underline">Import Master Data</Link>
         </p>
       </div>
 
@@ -257,25 +140,19 @@ const OLTList = () => {
                 {isLoading ? (
                   "Memuat data OLT..."
                 ) : oltData.length > 0 ? (
-                  `✓ ${oltData.length} data tersimpan secara permanen - tidak perlu upload ulang!`
+                  `✓ ${oltData.length} data tersimpan dari Import Master Data`
                 ) : (
-                  "Upload Excel/CSV sekali, data tersimpan permanen di aplikasi"
+                  <span className="flex items-center gap-1">
+                    <Info className="h-3 w-3" />
+                    Belum ada data. Import melalui{" "}
+                    <Link to="/import" className="text-primary underline hover:no-underline">
+                      Import Master Data
+                    </Link>
+                  </span>
                 )}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button asChild variant="default" size="sm">
-                <label className="cursor-pointer">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Import Excel/CSV
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".xlsx,.xls,.csv"
-                    onChange={handleFileUpload}
-                  />
-                </label>
-              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -297,7 +174,7 @@ const OLTList = () => {
             </div>
           </CardTitle>
           <CardDescription>
-            Upload file Excel/CSV dengan kolom: Nama Provinsi, ID FAT, Hostname OLT, Tikor OLT
+            Kolom: Nama Provinsi, ID FAT, Hostname OLT, Tikor FAT
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
