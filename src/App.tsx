@@ -17,7 +17,6 @@ import Report from "./pages/Report";
 import Settings from "./pages/Settings";
 import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
-import MasterDataImport from "./pages/MasterDataImport";
 
 const queryClient = new QueryClient();
 
@@ -45,7 +44,6 @@ const App = () => {
                   <main className="flex-1 p-6">
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
-                      <Route path="/import" element={<MasterDataImport />} />
                       <Route path="/tickets" element={<TicketManagement />} />
                       <Route path="/teams" element={<Teams />} />
                       <Route path="/olt" element={<OLTList />} />

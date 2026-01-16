@@ -1,4 +1,4 @@
-import { LayoutDashboard, Ticket, Users, Moon, Sun, Server, Network, FileText, FileSpreadsheet, MapPin } from "lucide-react";
+import { LayoutDashboard, Ticket, Users, Moon, Sun, Server, Network, FileText, Settings, MapPin } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -16,13 +16,13 @@ import { useTheme } from "next-themes";
 
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/" },
-  { title: "Import Master Data", icon: FileSpreadsheet, path: "/import" },
   { title: "Ticket Management", icon: Ticket, path: "/tickets" },
   { title: "List Team", icon: Users, path: "/teams" },
   { title: "List FAT", icon: MapPin, path: "/olt" },
   { title: "List UPE", icon: Server, path: "/upe" },
   { title: "List BNG", icon: Network, path: "/bng" },
   { title: "Report", icon: FileText, path: "/report" },
+  { title: "Settings", icon: Settings, path: "/settings" },
 ];
 
 export function AppSidebar() {
