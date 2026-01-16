@@ -1,4 +1,5 @@
 import { LayoutDashboard, Ticket, Users, Moon, Sun, Server, Network, FileText, Settings, MapPin } from "lucide-react";
+import iconnetLogo from "@/assets/iconnet-logo.png";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -34,10 +35,17 @@ export function AppSidebar() {
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
       <SidebarContent>
         <div className="p-4 border-b border-sidebar-border">
-          {!collapsed && (
-            <div className="space-y-1">
-              <h2 className="text-lg font-bold text-sidebar-foreground">NOC RITEL</h2>
-              <p className="text-xs text-sidebar-foreground/70">Iconnet</p>
+          {!collapsed ? (
+            <div className="flex items-center gap-3">
+              <img src={iconnetLogo} alt="Iconnet" className="h-10 w-10" />
+              <div className="space-y-0.5">
+                <h2 className="text-lg font-bold text-sidebar-foreground">NOC RITEL</h2>
+                <p className="text-xs text-sidebar-foreground/70">Iconnet</p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <img src={iconnetLogo} alt="Iconnet" className="h-8 w-8" />
             </div>
           )}
         </div>
