@@ -38,12 +38,12 @@ export interface ImportResult {
   };
 }
 
-// Sheet detection patterns
+// Sheet detection patterns - exact sheet name matching
 const SHEET_PATTERNS = {
-  user: ["user", "pelanggan", "customer", "data user"],
-  fat: ["fat", "olt", "data fat", "data olt"],
-  upe: ["upe", "data upe"],
-  bng: ["bng", "data bng"],
+  user: ["list user", "user", "pelanggan", "customer", "data user"],
+  fat: ["list olt", "list fat", "fat", "olt", "data fat", "data olt"],
+  upe: ["sheet list upe", "list upe", "upe", "data upe"],
+  bng: ["sheet list bng", "list bng", "bng", "data bng"],
 };
 
 // Column mapping for each sheet type
