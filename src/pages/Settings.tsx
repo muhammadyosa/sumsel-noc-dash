@@ -480,16 +480,10 @@ export default function Settings() {
             <CardContent className="space-y-4">
               <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
                 <p>
-                  Semoga aplikasi sederhana ini bisa bermanfaat dalam proses pekerjaan di Iconnet,
+                  Semoga aplikasi sederhana ini bisa bermanfaat dalam proses pekerjaan di Iconnet, mohon maaf apabila masih ada kekurangan di dalam aplikasi ini.
                 </p>
                 <p>
-                  mohon maaf apabila masih ada kekurangan di dalam aplikasi ini.
-                </p>
-                <p>
-                  Aplikasi ini belum mencapai versi final,
-                </p>
-                <p>
-                  yang artinya kalian dapat memberikan saran dan masukan agar kelak aplikasi ini dapat dikembangkan lagi untuk kedepannya.
+                  Aplikasi ini belum mencapai versi final, yang artinya kalian dapat memberikan saran dan masukan agar kelak aplikasi ini dapat dikembangkan lagi untuk kedepannya.
                 </p>
               </div>
               <blockquote className="border-l-4 border-primary pl-4 italic text-sm text-muted-foreground">
