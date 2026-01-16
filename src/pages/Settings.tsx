@@ -495,6 +495,9 @@ export default function Settings() {
               <blockquote className="border-l-4 border-primary pl-4 italic text-sm text-muted-foreground">
                 "When you plan something well, there's no need to rush"
               </blockquote>
+              <div className="pt-2 text-center">
+                <p className="text-sm font-medium">© RZ Corp By Muhammadyoss</p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
