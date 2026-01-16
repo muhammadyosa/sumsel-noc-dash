@@ -125,9 +125,9 @@ const OLTList = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">📡 List OLT</h1>
+        <h1 className="text-3xl font-bold">📍 List FAT</h1>
         <p className="text-muted-foreground">
-          Data OLT diimport melalui <Link to="/import" className="text-primary underline hover:no-underline">Import Master Data</Link>
+          Data FAT diimport melalui <Link to="/import" className="text-primary underline hover:no-underline">Import Master Data</Link>
         </p>
       </div>
 
@@ -135,10 +135,10 @@ const OLTList = () => {
         <CardHeader>
           <CardTitle className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <span>Data OLT</span>
+              <span>Data FAT</span>
               <p className="text-xs text-muted-foreground font-normal mt-1">
                 {isLoading ? (
-                  "Memuat data OLT..."
+                  "Memuat data FAT..."
                 ) : oltData.length > 0 ? (
                   `✓ ${oltData.length} data tersimpan dari Import Master Data`
                 ) : (
