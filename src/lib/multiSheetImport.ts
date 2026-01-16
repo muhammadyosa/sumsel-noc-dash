@@ -242,7 +242,7 @@ export async function importMultiSheetExcel(file: File): Promise<ImportResult> {
         // Process each sheet
         for (const sheetName of workbook.SheetNames) {
           const sheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(sheet);
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: false });
           
           if (jsonData.length === 0) {
             result.summary.skippedSheets.push(`${sheetName} (empty)`);
@@ -309,7 +309,7 @@ export async function getExcelSheets(file: File): Promise<{ name: string; rowCou
         
         const sheets = workbook.SheetNames.map((sheetName) => {
           const sheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(sheet);
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: false });
           const type = detectSheetType(sheetName, jsonData);
           
           return {
