@@ -469,39 +469,13 @@ export default function Settings() {
 
         {/* Info Tab */}
         <TabsContent value="info" className="space-y-6">
-
-          {/* App Info */}
+          {/* Note Section */}
           <Card className="shadow-lg border-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Info className="h-5 w-5" />
-                Informasi Aplikasi
+                Note
               </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Versi</span>
-                <span className="text-sm font-medium">1.0.0</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Organisasi</span>
-                <span className="text-sm font-medium">PLN Icon Plus</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Departemen</span>
-                <span className="text-sm font-medium">NOC RITEL</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Jumlah Petugas</span>
-                <span className="text-sm font-medium">14 Orang</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Note Section */}
-          <Card className="shadow-lg border-2 bg-gradient-to-br from-primary/5 to-primary/10">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-primary">Note</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
@@ -521,9 +495,6 @@ export default function Settings() {
               <blockquote className="border-l-4 border-primary pl-4 italic text-sm text-muted-foreground">
                 "When you plan something well, there's no need to rush"
               </blockquote>
-              <div className="pt-2 text-center">
-                <p className="text-sm font-medium text-primary">© RZ Corp By Muhammadyoss</p>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
