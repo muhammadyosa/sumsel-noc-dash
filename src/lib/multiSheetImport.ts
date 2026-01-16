@@ -60,10 +60,10 @@ const COLUMN_MAPPINGS = {
     sn: ["SN ONT", "sn", "sn_ont", "ont"],
   },
   fat: {
-    provinsi: ["Provinsi", "provinsi", "province", "nama provinsi", "PROVINSI"],
-    fatId: ["FAT ID", "fat", "fat_id", "id fat", "id_fat", "ID FAT"],
-    hostname: ["Hostname OLT", "hostname", "hostname_olt", "olt", "hostname olt", "HOSTNAME OLT"],
-    tikor: ["Tikor FAT", "tikor", "koordinat", "coordinate", "tikor_fat", "TIKOR FAT", "tikor fat"],
+    provinsi: ["Provinsi", "provinsi", "province", "nama provinsi", "PROVINSI", "Nama Provinsi", "NAMA PROVINSI"],
+    fatId: ["ID FAT", "id fat", "ID_FAT", "FAT ID", "fat id", "FAT_ID", "fat", "fat_id", "id_fat", "IDFAT", "idfat"],
+    hostname: ["Hostname OLT", "hostname olt", "HOSTNAME OLT", "hostname", "hostname_olt", "olt", "HOSTNAME_OLT", "Hostname", "HOSTNAME"],
+    tikor: ["Tikor FAT", "tikor fat", "TIKOR FAT", "Tikor", "tikor", "TIKOR", "koordinat", "Koordinat", "KOORDINAT", "coordinate", "tikor_fat", "TIKOR_FAT"],
   },
   upe: {
     hostnameOLT: ["Hostname OLT", "hostname_olt", "olt", "hostname olt", "HOSTNAME OLT"],
@@ -85,15 +85,26 @@ const COLUMN_MAPPINGS = {
 
 // Helper to find column value with multiple possible headers
 function getColumnValue(row: any, possibleHeaders: string[]): string {
+  const keys = Object.keys(row);
+  
   for (const header of possibleHeaders) {
     // Check exact match first
     if (row[header] !== undefined && row[header] !== null) {
       return String(row[header]).trim();
     }
-    // Check case-insensitive
-    const keys = Object.keys(row);
+    
+    // Check case-insensitive match
     for (const key of keys) {
       if (key.toLowerCase() === header.toLowerCase()) {
+        return String(row[key] ?? "").trim();
+      }
+    }
+    
+    // Check if header contains the key (partial match)
+    for (const key of keys) {
+      const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const normalizedHeader = header.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (normalizedKey === normalizedHeader || normalizedKey.includes(normalizedHeader) || normalizedHeader.includes(normalizedKey)) {
         return String(row[key] ?? "").trim();
       }
     }
