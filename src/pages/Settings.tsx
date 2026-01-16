@@ -497,6 +497,35 @@ export default function Settings() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Note Section */}
+          <Card className="shadow-lg border-2 bg-gradient-to-br from-primary/5 to-primary/10">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-primary">Note</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
+                <p>
+                  Semoga aplikasi sederhana ini bisa bermanfaat dalam proses pekerjaan di Iconnet,
+                </p>
+                <p>
+                  mohon maaf apabila masih ada kekurangan di dalam aplikasi ini.
+                </p>
+                <p>
+                  Aplikasi ini belum mencapai versi final,
+                </p>
+                <p>
+                  yang artinya kalian dapat memberikan saran dan masukan agar kelak aplikasi ini dapat dikembangkan lagi untuk kedepannya.
+                </p>
+              </div>
+              <blockquote className="border-l-4 border-primary pl-4 italic text-sm text-muted-foreground">
+                "When you plan something well, there's no need to rush"
+              </blockquote>
+              <div className="pt-2 text-center">
+                <p className="text-sm font-medium text-primary">© RZ Corp By Muhammadyoss</p>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 
