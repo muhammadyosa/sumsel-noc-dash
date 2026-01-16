@@ -546,22 +546,22 @@ export default function Dashboard() {
                   Belum ada tiket
                 </p>
               ) : (
-                <div className="rounded-md border overflow-auto max-h-96">
-                  <Table>
+                <div className="rounded-md border overflow-x-auto">
+                  <Table className="min-w-full">
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-12">No</TableHead>
-                        <TableHead>Tiket ID</TableHead>
-                        <TableHead>Service ID</TableHead>
-                        <TableHead>Customer / Info</TableHead>
-                        <TableHead>SERPO</TableHead>
-                        <TableHead>Hostname</TableHead>
-                        <TableHead>FAT ID</TableHead>
-                        <TableHead>SN ONT</TableHead>
-                        <TableHead>Constraint</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Created</TableHead>
+                        <TableHead className="w-10 text-xs">No</TableHead>
+                        <TableHead className="text-xs whitespace-nowrap">Tiket ID</TableHead>
+                        <TableHead className="text-xs whitespace-nowrap hidden lg:table-cell">Service ID</TableHead>
+                        <TableHead className="text-xs">Info</TableHead>
+                        <TableHead className="text-xs hidden xl:table-cell">SERPO</TableHead>
+                        <TableHead className="text-xs whitespace-nowrap hidden md:table-cell">Hostname</TableHead>
+                        <TableHead className="text-xs hidden xl:table-cell">FAT ID</TableHead>
+                        <TableHead className="text-xs hidden 2xl:table-cell">SN ONT</TableHead>
+                        <TableHead className="text-xs">Constraint</TableHead>
+                        <TableHead className="text-xs hidden sm:table-cell">Category</TableHead>
+                        <TableHead className="text-xs">Status</TableHead>
+                        <TableHead className="text-xs hidden lg:table-cell">Created</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -571,10 +571,10 @@ export default function Dashboard() {
                           className="cursor-pointer hover:bg-muted/50 transition-colors"
                           onClick={() => setSelectedTicket(ticket)}
                         >
-                            <TableCell className="font-medium">{index + 1}</TableCell>
-                            <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
-                            <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
-                            <TableCell className="max-w-[200px] truncate">
+                            <TableCell className="font-medium text-xs">{index + 1}</TableCell>
+                            <TableCell className="font-semibold text-primary text-xs">{ticket.id}</TableCell>
+                            <TableCell className="font-mono text-xs hidden lg:table-cell">{ticket.serviceId}</TableCell>
+                            <TableCell className="max-w-[120px] truncate text-xs">
                               {ticket.category === "FEEDER" 
                                 ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
                                     ? `${ticket.fatId} - ${ticket.hostname}`
@@ -588,18 +588,18 @@ export default function Dashboard() {
                                 : (ticket.customerName || "-")
                               }
                             </TableCell>
-                            <TableCell className="font-medium text-xs">{ticket.serpo}</TableCell>
-                            <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
-                            <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
-                            <TableCell className="font-mono text-xs">{ticket.snOnt}</TableCell>
+                            <TableCell className="font-medium text-xs hidden xl:table-cell">{ticket.serpo}</TableCell>
+                            <TableCell className="font-mono text-xs hidden md:table-cell">{ticket.hostname}</TableCell>
+                            <TableCell className="font-mono text-xs hidden xl:table-cell">{ticket.fatId}</TableCell>
+                            <TableCell className="font-mono text-xs hidden 2xl:table-cell">{ticket.snOnt}</TableCell>
                             <TableCell>
-                              <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
+                              <span className="text-xs px-1.5 py-0.5 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
                                 {ticket.constraint}
                               </span>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden sm:table-cell">
                               <span
-                                className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
+                                className={`text-xs px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${
                                   ticket.category === "FEEDER"
                                     ? "bg-warning/20 text-warning"
                                     : "bg-primary/20 text-primary"
@@ -611,7 +611,7 @@ export default function Dashboard() {
                             <TableCell>
                               <StatusBadge status={ticket.status} />
                             </TableCell>
-                            <TableCell className="text-xs whitespace-nowrap">
+                            <TableCell className="text-xs whitespace-nowrap hidden lg:table-cell">
                               {new Date(ticket.createdISO).toLocaleString("id-ID", {
                                 day: "2-digit",
                                 month: "short",
