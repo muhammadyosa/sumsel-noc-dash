@@ -13,12 +13,16 @@ export interface UPERecord {
 
 export interface BNGRecord {
   id: string;
-  bng: string;
+  ipRadius: string;
+  hostnameRadius: string;
+  ipBng: string;
+  hostnameBng: string;
+  npe: string;
   vlan: string;
-  hostnameOLT: string;
-  hostnameUPE: string;
-  port: string;
-  provinsi: string;
+  hostnameOlt: string;
+  upe: string;
+  portUpe: string;
+  kotaKabupaten: string;
   createdAt: string;
 }
 
@@ -56,22 +60,26 @@ const COLUMN_MAPPINGS = {
     sn: ["SN ONT", "sn", "sn_ont", "ont"],
   },
   fat: {
-    provinsi: ["Provinsi", "provinsi", "province", "nama provinsi"],
-    fatId: ["FAT ID", "fat", "fat_id", "id fat", "id_fat"],
-    hostname: ["Hostname OLT", "hostname", "hostname_olt", "olt", "hostname olt"],
-    tikor: ["Tikor FAT", "tikor", "koordinat", "coordinate", "tikor_fat"],
+    provinsi: ["Provinsi", "provinsi", "province", "nama provinsi", "PROVINSI"],
+    fatId: ["FAT ID", "fat", "fat_id", "id fat", "id_fat", "ID FAT"],
+    hostname: ["Hostname OLT", "hostname", "hostname_olt", "olt", "hostname olt", "HOSTNAME OLT"],
+    tikor: ["Tikor FAT", "tikor", "koordinat", "coordinate", "tikor_fat", "TIKOR FAT", "tikor fat"],
   },
   upe: {
-    hostnameOLT: ["Hostname OLT", "hostname_olt", "olt", "hostname olt"],
-    hostnameUPE: ["Hostname UPE", "hostname_upe", "upe", "hostname upe"],
+    hostnameOLT: ["Hostname OLT", "hostname_olt", "olt", "hostname olt", "HOSTNAME OLT"],
+    hostnameUPE: ["Hostname UPE", "hostname_upe", "upe", "hostname upe", "HOSTNAME UPE"],
   },
   bng: {
-    bng: ["BNG", "bng", "hostname bng"],
+    ipRadius: ["IP RADIUS", "ip radius", "ip_radius", "ipradius"],
+    hostnameRadius: ["HOSTNAME RADIUS", "hostname radius", "hostname_radius"],
+    ipBng: ["IP BNG", "ip bng", "ip_bng", "ipbng"],
+    hostnameBng: ["HOSTNAME BNG", "hostname bng", "hostname_bng"],
+    npe: ["NPE", "npe"],
     vlan: ["VLAN", "vlan", "vlan_id"],
-    hostnameOLT: ["Hostname OLT", "hostname_olt", "olt"],
-    hostnameUPE: ["Hostname UPE", "hostname_upe", "upe"],
-    port: ["Port", "port", "port_id"],
-    provinsi: ["Provinsi", "provinsi", "province"],
+    hostnameOlt: ["HOSTNAME OLT", "hostname olt", "hostname_olt", "olt"],
+    upe: ["UPE", "upe", "hostname upe"],
+    portUpe: ["PORT UPE", "port upe", "port_upe", "port"],
+    kotaKabupaten: ["KOTA/KABUPATEN", "kota/kabupaten", "kota", "kabupaten", "kota kabupaten"],
   },
 };
 
@@ -179,15 +187,19 @@ function processBNGSheet(data: any[]): BNGRecord[] {
   return data
     .map((row, index) => ({
       id: `bng-${Date.now()}-${index}`,
-      bng: getColumnValue(row, COLUMN_MAPPINGS.bng.bng),
+      ipRadius: getColumnValue(row, COLUMN_MAPPINGS.bng.ipRadius),
+      hostnameRadius: getColumnValue(row, COLUMN_MAPPINGS.bng.hostnameRadius),
+      ipBng: getColumnValue(row, COLUMN_MAPPINGS.bng.ipBng),
+      hostnameBng: getColumnValue(row, COLUMN_MAPPINGS.bng.hostnameBng),
+      npe: getColumnValue(row, COLUMN_MAPPINGS.bng.npe),
       vlan: getColumnValue(row, COLUMN_MAPPINGS.bng.vlan),
-      hostnameOLT: getColumnValue(row, COLUMN_MAPPINGS.bng.hostnameOLT),
-      hostnameUPE: getColumnValue(row, COLUMN_MAPPINGS.bng.hostnameUPE),
-      port: getColumnValue(row, COLUMN_MAPPINGS.bng.port),
-      provinsi: getColumnValue(row, COLUMN_MAPPINGS.bng.provinsi),
+      hostnameOlt: getColumnValue(row, COLUMN_MAPPINGS.bng.hostnameOlt),
+      upe: getColumnValue(row, COLUMN_MAPPINGS.bng.upe),
+      portUpe: getColumnValue(row, COLUMN_MAPPINGS.bng.portUpe),
+      kotaKabupaten: getColumnValue(row, COLUMN_MAPPINGS.bng.kotaKabupaten),
       createdAt: new Date().toISOString(),
     }))
-    .filter((r) => r.bng || r.hostnameOLT || r.hostnameUPE);
+    .filter((r) => r.ipRadius || r.hostnameBng || r.hostnameOlt);
 }
 
 // Main function to import multi-sheet Excel file
