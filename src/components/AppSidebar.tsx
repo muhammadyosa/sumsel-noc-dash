@@ -60,15 +60,17 @@ export function AppSidebar() {
                     <NavLink
                       to={item.path}
                       className={({ isActive }) =>
-                        isActive
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                          : "hover:bg-sidebar-accent/50"
+                        `transition-all duration-200 ${
+                          isActive
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground scale-[1.02]"
+                            : "hover:bg-sidebar-accent/50 hover:scale-[1.02] hover:translate-x-1"
+                        }`
                       }
                     >
                       {item.emoji ? (
-                        <span className="text-base">{item.emoji}</span>
+                        <span className="text-base transition-transform duration-200 group-hover:scale-110">{item.emoji}</span>
                       ) : item.icon ? (
-                        <item.icon className="h-4 w-4" />
+                        <item.icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                       ) : null}
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
