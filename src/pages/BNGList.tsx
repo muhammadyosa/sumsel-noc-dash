@@ -149,7 +149,7 @@ const BNGList = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">🌐 List BNG</h1>
+        <h1 className="text-3xl font-bold">🛰 List BNG</h1>
         <p className="text-muted-foreground">
           Data BNG diimport melalui <Link to="/import" className="text-primary underline hover:no-underline">Import Master Data</Link>
         </p>
