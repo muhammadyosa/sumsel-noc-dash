@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, Trash2, FileText, Info } from "lucide-react";
+import { Download, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,7 +21,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
 import { OLT } from "@/types/olt";
-import { loadOLTData, clearOLTData } from "@/lib/indexedDB";
+import { loadOLTData } from "@/lib/indexedDB";
 import { sanitizeForCSV } from "@/lib/validation";
 import { Link } from "react-router-dom";
 
@@ -82,27 +82,6 @@ const OLTList = () => {
     });
   };
 
-  const handleClearData = async () => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus semua data OLT?")) {
-      try {
-        await clearOLTData();
-        setOltData([]);
-        toast({
-          title: "Data dihapus",
-          description: "Semua data OLT berhasil dihapus.",
-        });
-      } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error("Error clearing OLT data:", error);
-        }
-        toast({
-          title: "Gagal menghapus",
-          description: "Terjadi kesalahan saat menghapus data.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
 
   const filteredData = oltData.filter((olt) => {
     if (!searchQuery) return true;
@@ -152,26 +131,15 @@ const OLTList = () => {
                 )}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={filteredData.length === 0}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export Excel
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleClearData}
-                disabled={oltData.length === 0}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Hapus Semua Data
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              disabled={filteredData.length === 0}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export Excel
+            </Button>
           </CardTitle>
           <CardDescription>
             Kolom: Nama Provinsi, ID FAT, Hostname OLT, Tikor FAT

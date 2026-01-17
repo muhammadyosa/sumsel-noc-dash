@@ -279,7 +279,7 @@ export default function Settings() {
                     Hapus Semua Data
                   </Button>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Menghapus semua data: Ticket Management, List FAT, List UPE, List BNG
+                    Menghapus semua data: Ticket Management, List FAT, List UPE, List BNG, dan Report
                   </p>
                 </div>
               </div>
@@ -566,6 +566,7 @@ export default function Settings() {
                 <li>📍 Data List FAT</li>
                 <li>🔗 Data List UPE</li>
                 <li>🌐 Data List BNG</li>
+                <li>📝 Data Report (Shift Report & Ticket Updates)</li>
               </ul>
               <p className="font-medium text-destructive">Tindakan ini tidak dapat dibatalkan!</p>
             </DialogDescription>

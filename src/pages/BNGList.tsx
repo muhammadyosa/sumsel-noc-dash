@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, Trash2, Network, FileText, Info } from "lucide-react";
+import { Download, Network, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -70,16 +70,6 @@ async function loadBNGData(): Promise<BNG[]> {
   }
 }
 
-async function clearBNGData(): Promise<void> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([BNG_STORE_NAME], "readwrite");
-    const store = transaction.objectStore(BNG_STORE_NAME);
-    const request = store.delete("bng_records");
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-}
 
 const BNGList = () => {
   const [bngData, setBngData] = useState<BNG[]>([]);
@@ -131,24 +121,6 @@ const BNGList = () => {
     });
   };
 
-  const handleClearData = async () => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus semua data BNG?")) {
-      try {
-        await clearBNGData();
-        setBngData([]);
-        toast({
-          title: "Data dihapus",
-          description: "Semua data BNG berhasil dihapus.",
-        });
-      } catch {
-        toast({
-          title: "Gagal menghapus",
-          description: "Terjadi kesalahan saat menghapus data.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
 
   const filteredData = bngData.filter((bng) => {
     if (!searchQuery) return true;
@@ -207,26 +179,15 @@ const BNGList = () => {
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={filteredData.length === 0}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export Excel
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleClearData}
-                disabled={bngData.length === 0}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Hapus Semua Data
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              disabled={filteredData.length === 0}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export Excel
+            </Button>
           </CardTitle>
           <CardDescription>
             Kolom: IP RADIUS, HOSTNAME RADIUS, IP BNG, HOSTNAME BNG, NPE, VLAN, HOSTNAME OLT, UPE, PORT UPE, KOTA/KABUPATEN
