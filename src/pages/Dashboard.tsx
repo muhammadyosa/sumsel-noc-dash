@@ -236,10 +236,10 @@ export default function Dashboard() {
             <CardContent className="pt-6">
               {(() => {
                 const statusData = [
-                  { name: "On Progress", value: tickets.filter((t) => t.status === "On Progress").length, fill: "hsl(217, 91%, 60%)" },
-                  { name: "Critical", value: tickets.filter((t) => t.status === "Critical").length, fill: "hsl(0, 84%, 60%)" },
-                  { name: "Resolved", value: tickets.filter((t) => t.status === "Resolved").length, fill: "hsl(142, 71%, 45%)" },
-                  { name: "Pending", value: tickets.filter((t) => t.status === "Pending").length, fill: "hsl(38, 92%, 50%)" },
+                  { name: "⚙️ On Progress", value: tickets.filter((t) => t.status === "On Progress").length, fill: "hsl(217, 91%, 60%)", status: "On Progress" },
+                  { name: "🚨 Critical", value: tickets.filter((t) => t.status === "Critical").length, fill: "hsl(0, 84%, 60%)", status: "Critical" },
+                  { name: "✅ Resolved", value: tickets.filter((t) => t.status === "Resolved").length, fill: "hsl(142, 71%, 45%)", status: "Resolved" },
+                  { name: "⏳ Pending", value: tickets.filter((t) => t.status === "Pending").length, fill: "hsl(38, 92%, 50%)", status: "Pending" },
                 ];
 
                 const chartConfig: ChartConfig = {
@@ -252,8 +252,8 @@ export default function Dashboard() {
                       data={statusData}
                       margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
                       onClick={(data) => {
-                        if (data?.activePayload?.[0]?.payload?.name) {
-                          const status = data.activePayload[0].payload.name;
+                        if (data?.activePayload?.[0]?.payload?.status) {
+                          const status = data.activePayload[0].payload.status;
                           setSelectedStatus(selectedStatus === status ? null : status);
                           const filtered = tickets.filter((t) => t.status === status);
                           setShowOltList(false);
@@ -310,8 +310,8 @@ export default function Dashboard() {
                 const feederCount = tickets.filter((t) => t.category === "FEEDER").length;
 
                 const categoryData = [
-                  { name: "RITEL", value: ritelCount, fill: "hsl(217, 91%, 60%)" },
-                  { name: "FEEDER", value: feederCount, fill: "hsl(38, 92%, 50%)" },
+                  { name: "🔖 RITEL", value: ritelCount, fill: "hsl(217, 91%, 60%)", category: "RITEL" },
+                  { name: "🛰️ FEEDER", value: feederCount, fill: "hsl(38, 92%, 50%)", category: "FEEDER" },
                 ];
 
                 const chartConfig: ChartConfig = {
@@ -324,8 +324,8 @@ export default function Dashboard() {
                       data={categoryData}
                       margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                       onClick={(data) => {
-                        if (data?.activePayload?.[0]?.payload?.name) {
-                          const category = data.activePayload[0].payload.name;
+                        if (data?.activePayload?.[0]?.payload?.category) {
+                          const category = data.activePayload[0].payload.category;
                           setSelectedCategory(selectedCategory === category ? null : category);
                           const filtered = tickets.filter((t) => t.category === category);
                           setShowOltList(false);
