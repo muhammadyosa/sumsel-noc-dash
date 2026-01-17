@@ -115,7 +115,7 @@ const OLTDeviceList = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">🖥️ List OLT</h1>
+        <h1 className="text-3xl font-bold">📟 List OLT</h1>
         <p className="text-muted-foreground">
           Data OLT diambil dari data FAT yang diimport melalui{" "}
           <Link to="/settings" className="text-primary underline hover:no-underline">
