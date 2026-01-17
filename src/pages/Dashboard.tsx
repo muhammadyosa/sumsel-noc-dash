@@ -101,12 +101,9 @@ export default function Dashboard() {
         className="relative"
       >
         <div className="flex items-center gap-3 mb-2">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg">
-            <BarChart3 className="h-8 w-8 text-white" />
-          </div>
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Dashboard Overview
+            <h1 className="text-3xl font-bold">
+              🖥️ Dashboard Overview
             </h1>
             <p className="text-muted-foreground text-sm">
               Monitoring incident NOC RITEL
