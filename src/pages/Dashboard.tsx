@@ -266,9 +266,7 @@ export default function Dashboard() {
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                       <XAxis 
                         dataKey="name" 
-                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                        angle={-20}
-                        textAnchor="end"
+                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                       />
                       <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
                       <ChartTooltip
