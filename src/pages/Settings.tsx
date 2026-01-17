@@ -185,13 +185,8 @@ export default function Settings() {
     <div className="min-h-screen space-y-6 p-4 md:p-6 lg:p-8">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg">
-          <SettingsIcon className="h-8 w-8 text-white" />
-        </div>
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Settings
-          </h1>
+          <h1 className="text-3xl font-bold">🛠 Settings</h1>
           <p className="text-muted-foreground text-sm">
             Konfigurasi aplikasi dan import data
           </p>

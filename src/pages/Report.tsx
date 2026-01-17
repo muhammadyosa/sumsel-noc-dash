@@ -201,7 +201,7 @@ Dibuat: ${new Date(r.createdAt).toLocaleString("id-ID")}
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Report</h1>
+        <h1 className="text-3xl font-bold">📝 Report</h1>
         <p className="text-muted-foreground">
           Kelola report shift dan update ticket
         </p>
