@@ -201,9 +201,8 @@ export default function Dashboard() {
             {/* Content */}
             <div className="relative p-6">
               <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl bg-gradient-to-br ${card.gradient} shadow-lg flex items-center justify-center`}>
-                  <span className="text-2xl">{card.emoji}</span>
-                </div>
+                <span className="text-3xl drop-shadow-lg">{card.emoji}</span>
+                <TrendingUp className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                 <TrendingUp className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               
