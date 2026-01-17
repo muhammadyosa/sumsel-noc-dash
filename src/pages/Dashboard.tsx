@@ -11,7 +11,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Cell } from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 
 interface ShiftReport {
   id: string;
@@ -212,9 +218,9 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Charts Section */}
+      {/* Charts Section - Bar Charts */}
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Status Distribution */}
+        {/* Status Distribution Bar Chart */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -223,79 +229,69 @@ export default function Dashboard() {
           <Card className="shadow-2xl overflow-hidden border-2 backdrop-blur-lg bg-card/70">
             <CardHeader className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border-b">
               <CardTitle className="flex items-center gap-2">
-                <div className="h-6 w-1 bg-primary rounded-full" />
+                <BarChart3 className="h-5 w-5 text-primary" />
                 Status Distribution
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { status: "On Progress", icon: "⚙️", gradient: "from-blue-500 to-blue-600" },
-                  { status: "Critical", icon: "🚨", gradient: "from-red-500 to-red-600" },
-                  { status: "Resolved", icon: "✅", gradient: "from-green-500 to-green-600" },
-                  { status: "Pending", icon: "⏳", gradient: "from-amber-500 to-amber-600" }
-                ].map((item, index) => {
-                  const count = tickets.filter((t) => t.status === item.status).length;
-                  const percentage = totalIncidents > 0 ? (count / totalIncidents) * 100 : 0;
-                  
-                  return (
-                    <motion.button
-                      key={item.status}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
-                         onClick={() => {
-                          setSelectedStatus(selectedStatus === item.status ? null : item.status);
-                          const filtered = tickets.filter((t) => t.status === item.status);
+              {(() => {
+                const statusData = [
+                  { name: "On Progress", value: tickets.filter((t) => t.status === "On Progress").length, fill: "hsl(217, 91%, 60%)" },
+                  { name: "Critical", value: tickets.filter((t) => t.status === "Critical").length, fill: "hsl(0, 84%, 60%)" },
+                  { name: "Resolved", value: tickets.filter((t) => t.status === "Resolved").length, fill: "hsl(142, 71%, 45%)" },
+                  { name: "Pending", value: tickets.filter((t) => t.status === "Pending").length, fill: "hsl(38, 92%, 50%)" },
+                ];
+
+                const chartConfig: ChartConfig = {
+                  value: { label: "Jumlah" },
+                };
+
+                return (
+                  <ChartContainer config={chartConfig} className="h-[280px] w-full">
+                    <BarChart
+                      data={statusData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+                      onClick={(data) => {
+                        if (data?.activePayload?.[0]?.payload?.name) {
+                          const status = data.activePayload[0].payload.name;
+                          setSelectedStatus(selectedStatus === status ? null : status);
+                          const filtered = tickets.filter((t) => t.status === status);
                           setShowOltList(false);
                           setFilterDialogTickets(filtered);
-                          setFilterDialogTitle(`Tiket dengan Status: ${item.status}`);
+                          setFilterDialogTitle(`Tiket dengan Status: ${status}`);
                           setFilterDialogOpen(true);
-                        }}
-                      className={`
-                        relative overflow-hidden rounded-xl border-2 
-                        transition-all duration-300 hover:scale-105 hover:shadow-2xl
-                        backdrop-blur-lg bg-card/50 group
-                        ${selectedStatus === item.status 
-                          ? "ring-4 ring-primary ring-offset-2 shadow-2xl scale-105" 
-                          : "hover:border-primary/50"}
-                      `}
+                        }
+                      }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
-                      
-                      <div className="relative p-5 text-left">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-3xl drop-shadow-lg">{item.icon}</span>
-                          <StatusBadge status={item.status as any} />
-                        </div>
-                        
-                        <div className="text-3xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
-                          {count}
-                        </div>
-                        
-                        <div className="text-xs text-muted-foreground font-medium mb-3">
-                          {percentage.toFixed(1)}% dari total
-                        </div>
-                        
-                        {/* Progress Bar */}
-                        <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${percentage}%` }}
-                            transition={{ duration: 1, delay: 0.6 + index * 0.1, ease: "easeOut" }}
-                            className={`absolute inset-y-0 left-0 bg-gradient-to-r ${item.gradient} rounded-full shadow-lg`}
-                          />
-                        </div>
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis 
+                        dataKey="name" 
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        angle={-20}
+                        textAnchor="end"
+                      />
+                      <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                      <ChartTooltip
+                        content={<ChartTooltipContent />}
+                        cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }}
+                      />
+                      <Bar dataKey="value" radius={[6, 6, 0, 0]} cursor="pointer">
+                        {statusData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ChartContainer>
+                );
+              })()}
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Klik pada bar untuk melihat detail tiket
+              </p>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Category Distribution - Simple */}
+        {/* Category Distribution Bar Chart */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -304,7 +300,7 @@ export default function Dashboard() {
           <Card className="shadow-2xl overflow-hidden border-2 backdrop-blur-lg bg-card/70">
             <CardHeader className="bg-gradient-to-r from-accent/10 via-primary/5 to-accent/10 border-b">
               <CardTitle className="flex items-center gap-2">
-                <div className="h-6 w-1 bg-accent rounded-full" />
+                <BarChart3 className="h-5 w-5 text-accent" />
                 Category Distribution
               </CardTitle>
             </CardHeader>
@@ -312,88 +308,55 @@ export default function Dashboard() {
               {(() => {
                 const ritelCount = tickets.filter((t) => t.category === "RITEL").length;
                 const feederCount = tickets.filter((t) => t.category === "FEEDER").length;
-                const ritelPercentage = totalIncidents > 0 ? (ritelCount / totalIncidents) * 100 : 0;
-                const feederPercentage = totalIncidents > 0 ? (feederCount / totalIncidents) * 100 : 0;
 
                 const categoryData = [
-                  { 
-                    category: "RITEL", 
-                    count: ritelCount, 
-                    percentage: ritelPercentage, 
-                    gradient: "from-blue-500 to-indigo-600", 
-                    icon: "🔖",
-                    shadowColor: "shadow-blue-500/50"
-                  },
-                  { 
-                    category: "FEEDER", 
-                    count: feederCount, 
-                    percentage: feederPercentage, 
-                    gradient: "from-amber-500 to-orange-600", 
-                    icon: "🛰",
-                    shadowColor: "shadow-amber-500/50"
-                  }
+                  { name: "RITEL", value: ritelCount, fill: "hsl(217, 91%, 60%)" },
+                  { name: "FEEDER", value: feederCount, fill: "hsl(38, 92%, 50%)" },
                 ];
 
+                const chartConfig: ChartConfig = {
+                  value: { label: "Jumlah" },
+                };
+
                 return (
-                  <div className="grid gap-4">
-                    {categoryData.map((item, index) => {
-                      return (
-                        <motion.button
-                          key={item.category}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-                          onClick={() => {
-                            setSelectedCategory(selectedCategory === item.category ? null : item.category);
-                            const filtered = tickets.filter((t) => t.category === item.category);
-                            setShowOltList(false);
-                            setFilterDialogTickets(filtered);
-                            setFilterDialogTitle(`Tiket dengan Category: ${item.category}`);
-                            setFilterDialogOpen(true);
-                          }}
-                          className={`
-                            relative overflow-hidden rounded-xl border-2 
-                            transition-all duration-300 hover:scale-105 hover:shadow-2xl
-                            backdrop-blur-lg bg-card/50 group
-                            ${selectedCategory === item.category 
-                              ? "ring-4 ring-accent ring-offset-2 shadow-2xl scale-105" 
-                              : "hover:border-accent/50"}
-                          `}
-                        >
-                          <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
-                          
-                          <div className="relative p-5 text-left">
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-3xl drop-shadow-lg">{item.icon}</span>
-                              <span className="text-xs font-bold px-3 py-1 bg-accent/20 text-accent rounded-full">
-                                {item.category}
-                              </span>
-                            </div>
-                            
-                            <div className="text-3xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
-                              {item.count}
-                            </div>
-                            
-                            <div className="text-xs text-muted-foreground font-medium mb-3">
-                              {item.percentage.toFixed(1)}% dari total
-                            </div>
-                            
-                            {/* Progress Bar */}
-                            <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${item.percentage}%` }}
-                                transition={{ duration: 1, delay: 0.7 + index * 0.1, ease: "easeOut" }}
-                                className={`absolute inset-y-0 left-0 bg-gradient-to-r ${item.gradient} rounded-full shadow-lg`}
-                              />
-                            </div>
-                          </div>
-                        </motion.button>
-                      );
-                    })}
-                  </div>
+                  <ChartContainer config={chartConfig} className="h-[280px] w-full">
+                    <BarChart
+                      data={categoryData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                      onClick={(data) => {
+                        if (data?.activePayload?.[0]?.payload?.name) {
+                          const category = data.activePayload[0].payload.name;
+                          setSelectedCategory(selectedCategory === category ? null : category);
+                          const filtered = tickets.filter((t) => t.category === category);
+                          setShowOltList(false);
+                          setFilterDialogTickets(filtered);
+                          setFilterDialogTitle(`Tiket dengan Category: ${category}`);
+                          setFilterDialogOpen(true);
+                        }
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis 
+                        dataKey="name" 
+                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      />
+                      <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                      <ChartTooltip
+                        content={<ChartTooltipContent />}
+                        cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }}
+                      />
+                      <Bar dataKey="value" radius={[6, 6, 0, 0]} cursor="pointer">
+                        {categoryData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ChartContainer>
                 );
               })()}
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Klik pada bar untuk melihat detail tiket
+              </p>
             </CardContent>
           </Card>
         </motion.div>
