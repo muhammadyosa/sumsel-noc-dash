@@ -44,8 +44,8 @@ export function AppSidebar() {
               </div>
             </div>
           ) : (
-            <div className="flex justify-center">
-              <img src={iconnetLogo} alt="Iconnet" className="h-8 w-auto" />
+            <div className="flex justify-center items-center">
+              <img src={iconnetLogo} alt="Iconnet" className="h-6 w-6 object-contain" />
             </div>
           )}
         </div>
