@@ -92,7 +92,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen w-full max-w-full overflow-x-hidden space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen space-y-6 p-4 md:p-6 lg:p-8">
       {/* Header Section */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
@@ -100,15 +100,15 @@ export default function Dashboard() {
         transition={{ duration: 0.5 }}
         className="relative"
       >
-        <div className="flex items-center gap-2 sm:gap-3 mb-2">
-          <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg flex-shrink-0">
-            <BarChart3 className="h-5 w-5 sm:h-6 md:h-8 sm:w-6 md:w-8 text-white" />
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg">
+            <BarChart3 className="h-8 w-8 text-white" />
           </div>
-          <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent truncate">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Dashboard Overview
             </h1>
-            <p className="text-muted-foreground text-xs sm:text-sm truncate">
+            <p className="text-muted-foreground text-sm">
               Monitoring incident NOC RITEL SBU SUMBAGSEL
             </p>
           </div>
@@ -116,7 +116,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* KPI Cards Section */}
-      <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { 
             title: "Total Incident", 
@@ -186,9 +186,9 @@ export default function Dashboard() {
             }}
             className={`
               relative cursor-pointer group
-              rounded-xl sm:rounded-2xl border-2 overflow-hidden
+              rounded-2xl border-2 overflow-hidden
               transition-all duration-300
-              hover:scale-[1.02] sm:hover:scale-105 hover:shadow-2xl ${card.glowColor}
+              hover:scale-105 hover:shadow-2xl ${card.glowColor}
               hover:border-primary/50
             `}
           >
@@ -196,17 +196,17 @@ export default function Dashboard() {
             <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
             
             {/* Content */}
-            <div className="relative p-3 sm:p-4 md:p-6">
-              <div className="flex items-start justify-between mb-2 sm:mb-4">
-                <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gradient-to-br ${card.gradient} shadow-lg`}>
-                  <card.icon className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
+            <div className="relative p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className={`p-3 rounded-xl bg-gradient-to-br ${card.gradient} shadow-lg`}>
+                  <card.icon className="h-6 w-6 text-white" />
                 </div>
-                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <TrendingUp className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground font-medium mb-0.5 sm:mb-1 truncate">{card.title}</p>
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+              <div>
+                <p className="text-sm text-muted-foreground font-medium mb-1">{card.title}</p>
+                <p className="text-4xl font-bold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
                   {card.value}
                 </p>
               </div>
@@ -216,7 +216,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         {/* Status Distribution */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -230,8 +230,8 @@ export default function Dashboard() {
                 Status Distribution
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-3 sm:p-4 md:pt-6">
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-2 gap-4">
                 {[
                   { status: "On Progress", icon: "⚙️", gradient: "from-blue-500 to-blue-600" },
                   { status: "Critical", icon: "🚨", gradient: "from-red-500 to-red-600" },
@@ -256,32 +256,32 @@ export default function Dashboard() {
                           setFilterDialogOpen(true);
                         }}
                       className={`
-                        relative overflow-hidden rounded-lg sm:rounded-xl border-2 
-                        transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105 hover:shadow-2xl
-                        backdrop-blur-lg bg-card/50 group w-full
+                        relative overflow-hidden rounded-xl border-2 
+                        transition-all duration-300 hover:scale-105 hover:shadow-2xl
+                        backdrop-blur-lg bg-card/50 group
                         ${selectedStatus === item.status 
-                          ? "ring-2 sm:ring-4 ring-primary ring-offset-1 sm:ring-offset-2 shadow-2xl scale-[1.02]" 
+                          ? "ring-4 ring-primary ring-offset-2 shadow-2xl scale-105" 
                           : "hover:border-primary/50"}
                       `}
                     >
                       <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
                       
-                      <div className="relative p-2.5 sm:p-3 md:p-5 text-left">
-                        <div className="flex items-center justify-between mb-1.5 sm:mb-3 gap-1">
-                          <span className="text-lg sm:text-2xl md:text-3xl drop-shadow-lg flex-shrink-0">{item.icon}</span>
+                      <div className="relative p-5 text-left">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-3xl drop-shadow-lg">{item.icon}</span>
                           <StatusBadge status={item.status as any} />
                         </div>
                         
-                        <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-0.5 sm:mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                        <div className="text-3xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
                           {count}
                         </div>
                         
-                        <div className="text-[10px] sm:text-xs text-muted-foreground font-medium mb-1.5 sm:mb-3">
+                        <div className="text-xs text-muted-foreground font-medium mb-3">
                           {percentage.toFixed(1)}% dari total
                         </div>
                         
                         {/* Progress Bar */}
-                        <div className="relative h-1.5 sm:h-2 bg-secondary/50 rounded-full overflow-hidden">
+                        <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${percentage}%` }}
@@ -311,7 +311,7 @@ export default function Dashboard() {
                 Category Distribution
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-3 sm:p-4 md:pt-6">
+            <CardContent className="pt-6">
               {(() => {
                 const ritelCount = tickets.filter((t) => t.category === "RITEL").length;
                 const feederCount = tickets.filter((t) => t.category === "FEEDER").length;
@@ -338,7 +338,7 @@ export default function Dashboard() {
                 ];
 
                 return (
-                  <div className="grid gap-2 sm:gap-3 md:gap-4">
+                  <div className="grid gap-4">
                     {categoryData.map((item, index) => {
                       return (
                         <motion.button
@@ -355,34 +355,34 @@ export default function Dashboard() {
                             setFilterDialogOpen(true);
                           }}
                           className={`
-                            relative overflow-hidden rounded-lg sm:rounded-xl border-2 
-                            transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105 hover:shadow-2xl
-                            backdrop-blur-lg bg-card/50 group w-full
+                            relative overflow-hidden rounded-xl border-2 
+                            transition-all duration-300 hover:scale-105 hover:shadow-2xl
+                            backdrop-blur-lg bg-card/50 group
                             ${selectedCategory === item.category 
-                              ? "ring-2 sm:ring-4 ring-accent ring-offset-1 sm:ring-offset-2 shadow-2xl scale-[1.02]" 
+                              ? "ring-4 ring-accent ring-offset-2 shadow-2xl scale-105" 
                               : "hover:border-accent/50"}
                           `}
                         >
                           <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
                           
-                          <div className="relative p-2.5 sm:p-3 md:p-5 text-left">
-                            <div className="flex items-center justify-between mb-1.5 sm:mb-3 gap-1">
-                              <span className="text-lg sm:text-2xl md:text-3xl drop-shadow-lg flex-shrink-0">{item.icon}</span>
-                              <span className="text-[10px] sm:text-xs font-bold px-1.5 sm:px-3 py-0.5 sm:py-1 bg-accent/20 text-accent rounded-full truncate">
+                          <div className="relative p-5 text-left">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="text-3xl drop-shadow-lg">{item.icon}</span>
+                              <span className="text-xs font-bold px-3 py-1 bg-accent/20 text-accent rounded-full">
                                 {item.category}
                               </span>
                             </div>
                             
-                            <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-0.5 sm:mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                            <div className="text-3xl font-bold mb-2 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
                               {item.count}
                             </div>
                             
-                            <div className="text-[10px] sm:text-xs text-muted-foreground font-medium mb-1.5 sm:mb-3">
+                            <div className="text-xs text-muted-foreground font-medium mb-3">
                               {item.percentage.toFixed(1)}% dari total
                             </div>
                             
                             {/* Progress Bar */}
-                            <div className="relative h-1.5 sm:h-2 bg-secondary/50 rounded-full overflow-hidden">
+                            <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
                               <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${item.percentage}%` }}
@@ -519,13 +519,13 @@ export default function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.7 }}
       >
-        <Card className="shadow-2xl border-2 overflow-hidden">
-          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 space-y-0 p-3 sm:p-4 md:pb-4">
-            <CardTitle className="text-base sm:text-lg">Recent Tickets</CardTitle>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <FileText className="h-4 w-4 text-muted-foreground hidden sm:block" />
+        <Card className="shadow-2xl border-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle>Recent Tickets</CardTitle>
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
               <Select value={selectedConstraint} onValueChange={setSelectedConstraint}>
-                <SelectTrigger className="w-full sm:w-[180px] h-8 sm:h-9 text-xs sm:text-sm">
+                <SelectTrigger className="w-[180px] h-9">
                   <SelectValue placeholder="Filter Constraint" />
                 </SelectTrigger>
                 <SelectContent>
@@ -539,26 +539,29 @@ export default function Dashboard() {
               </Select>
             </div>
           </CardHeader>
-          <CardContent className="p-0 sm:p-3 md:p-6 md:pt-0">
+          <CardContent>
             <div className="space-y-3">
               {recentTickets.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
                   Belum ada tiket
                 </p>
               ) : (
-                <div className="rounded-none sm:rounded-md border-x-0 sm:border-x border-t sm:border overflow-x-auto">
-                  <Table className="w-full text-xs">
+                <div className="rounded-md border overflow-auto max-h-96">
+                  <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-8 sm:w-10 text-[10px] sm:text-xs px-1 sm:px-2">No</TableHead>
-                        <TableHead className="text-[10px] sm:text-xs whitespace-nowrap px-1 sm:px-2">Tiket ID</TableHead>
-                        <TableHead className="text-[10px] sm:text-xs px-1 sm:px-2 max-w-[80px] sm:max-w-none">Info</TableHead>
-                        <TableHead className="text-[10px] sm:text-xs px-1 sm:px-2">Constraint</TableHead>
-                        <TableHead className="text-[10px] sm:text-xs px-1 sm:px-2">Status</TableHead>
-                        <TableHead className="text-[10px] sm:text-xs hidden md:table-cell px-1 sm:px-2">Hostname</TableHead>
-                        <TableHead className="text-[10px] sm:text-xs hidden lg:table-cell px-1 sm:px-2">Service ID</TableHead>
-                        <TableHead className="text-[10px] sm:text-xs hidden xl:table-cell px-1 sm:px-2">Category</TableHead>
-                        <TableHead className="text-[10px] sm:text-xs hidden xl:table-cell px-1 sm:px-2">Created</TableHead>
+                        <TableHead className="w-12">No</TableHead>
+                        <TableHead>Tiket ID</TableHead>
+                        <TableHead>Service ID</TableHead>
+                        <TableHead>Customer / Info</TableHead>
+                        <TableHead>SERPO</TableHead>
+                        <TableHead>Hostname</TableHead>
+                        <TableHead>FAT ID</TableHead>
+                        <TableHead>SN ONT</TableHead>
+                        <TableHead>Constraint</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Created</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -568,44 +571,52 @@ export default function Dashboard() {
                           className="cursor-pointer hover:bg-muted/50 transition-colors"
                           onClick={() => setSelectedTicket(ticket)}
                         >
-                            <TableCell className="font-medium text-[10px] sm:text-xs px-1 sm:px-2">{index + 1}</TableCell>
-                            <TableCell className="font-semibold text-primary text-[10px] sm:text-xs px-1 sm:px-2 max-w-[60px] sm:max-w-none truncate">{ticket.id}</TableCell>
-                            <TableCell className="text-[10px] sm:text-xs px-1 sm:px-2 max-w-[60px] sm:max-w-[100px] truncate">
+                            <TableCell className="font-medium">{index + 1}</TableCell>
+                            <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
+                            <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
+                            <TableCell className="max-w-[200px] truncate">
                               {ticket.category === "FEEDER" 
                                 ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
-                                    ? `${ticket.fatId}`
+                                    ? `${ticket.fatId} - ${ticket.hostname}`
                                     : ticket.constraint === "PORT DOWN"
                                       ? (() => {
                                           const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
-                                          return match ? match[1] : "PORT";
+                                          const portInfo = match ? match[1] : "PORT";
+                                          return `${portInfo} - ${ticket.hostname}`;
                                         })()
                                       : ticket.customerName || "-")
                                 : (ticket.customerName || "-")
                               }
                             </TableCell>
-                            <TableCell className="px-1 sm:px-2">
-                              <span className="text-[9px] sm:text-xs px-1 sm:px-1.5 py-0.5 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
+                            <TableCell className="font-medium text-xs">{ticket.serpo}</TableCell>
+                            <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
+                            <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
+                            <TableCell className="font-mono text-xs">{ticket.snOnt}</TableCell>
+                            <TableCell>
+                              <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
                                 {ticket.constraint}
                               </span>
                             </TableCell>
-                            <TableCell className="px-1 sm:px-2">
-                              <StatusBadge status={ticket.status} />
-                            </TableCell>
-                            <TableCell className="font-mono text-[10px] sm:text-xs hidden md:table-cell px-1 sm:px-2 max-w-[100px] truncate">{ticket.hostname}</TableCell>
-                            <TableCell className="font-mono text-[10px] sm:text-xs hidden lg:table-cell px-1 sm:px-2">{ticket.serviceId}</TableCell>
-                            <TableCell className="hidden xl:table-cell px-1 sm:px-2">
-                              <span className={`text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${
-                                ticket.category === "FEEDER"
-                                  ? "bg-warning/20 text-warning"
-                                  : "bg-primary/20 text-primary"
-                              }`}>
+                            <TableCell>
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
+                                  ticket.category === "FEEDER"
+                                    ? "bg-warning/20 text-warning"
+                                    : "bg-primary/20 text-primary"
+                                }`}
+                              >
                                 {ticket.category}
                               </span>
                             </TableCell>
-                            <TableCell className="text-[10px] sm:text-xs hidden xl:table-cell whitespace-nowrap px-1 sm:px-2">
-                              {new Date(ticket.createdISO).toLocaleDateString("id-ID", {
+                            <TableCell>
+                              <StatusBadge status={ticket.status} />
+                            </TableCell>
+                            <TableCell className="text-xs whitespace-nowrap">
+                              {new Date(ticket.createdISO).toLocaleString("id-ID", {
                                 day: "2-digit",
                                 month: "short",
+                                hour: "2-digit",
+                                minute: "2-digit",
                               })}
                             </TableCell>
                           </TableRow>
