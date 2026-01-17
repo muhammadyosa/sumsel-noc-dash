@@ -202,8 +202,6 @@ export default function Dashboard() {
             <div className="relative p-6">
               <div className="flex items-start justify-between mb-4">
                 <span className="text-3xl drop-shadow-lg">{card.emoji}</span>
-                <TrendingUp className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                <TrendingUp className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               
               <div>
