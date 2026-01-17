@@ -135,3 +135,25 @@ export async function clearOLTData(): Promise<void> {
     request.onerror = () => reject(request.error);
   });
 }
+
+// Clear all data from all stores
+export async function clearAllData(): Promise<void> {
+  const db = await openDB();
+  
+  const clearStore = (storeName: string, key: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([storeName], "readwrite");
+      const store = transaction.objectStore(storeName);
+      const request = store.delete(key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  };
+
+  await Promise.all([
+    clearStore(STORE_NAME, "excel_records"),
+    clearStore(OLT_STORE_NAME, "olt_records"),
+    clearStore(UPE_STORE_NAME, "upe_records"),
+    clearStore(BNG_STORE_NAME, "bng_records"),
+  ]);
+}

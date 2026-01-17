@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings as SettingsIcon, Info, FileSpreadsheet, FileUp, Check, X, AlertCircle, RefreshCw, Database } from "lucide-react";
+import { Settings as SettingsIcon, Info, FileSpreadsheet, FileUp, Check, X, AlertCircle, RefreshCw, Database, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { importMultiSheetExcel, getExcelSheets, ImportResult } from "@/lib/multiSheetImport";
-import { saveExcelData, saveOLTData, openDB } from "@/lib/indexedDB";
+import { saveExcelData, saveOLTData, openDB, clearAllData } from "@/lib/indexedDB";
 
 const UPE_STORE_NAME = "upe_data";
 const BNG_STORE_NAME = "bng_data";
@@ -65,6 +65,8 @@ export default function Settings() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,6 +161,23 @@ export default function Settings() {
     setImportProgress(0);
   };
 
+  const handleDeleteAllData = async () => {
+    setIsDeleting(true);
+    try {
+      await clearAllData();
+      toast.success("Semua data berhasil dihapus");
+      setShowDeleteAllDialog(false);
+      resetImport();
+    } catch (error) {
+      toast.error("Gagal menghapus data");
+      if (import.meta.env.DEV) {
+        console.error("Error deleting all data:", error);
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const recognizedSheets = sheets.filter(s => s.type !== null);
   const unrecognizedSheets = sheets.filter(s => s.type === null);
 
@@ -248,6 +267,21 @@ export default function Settings() {
                     <Progress value={importProgress} className="h-2" />
                   </div>
                 )}
+
+                {/* Delete All Data Button */}
+                <div className="pt-4 border-t">
+                  <Button
+                    variant="destructive"
+                    onClick={() => setShowDeleteAllDialog(true)}
+                    disabled={isImporting || isDeleting}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Hapus Semua Data
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Menghapus semua data: Ticket Management, List FAT, List UPE, List BNG
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -497,7 +531,7 @@ export default function Settings() {
         </TabsContent>
       </Tabs>
 
-      {/* Confirm Dialog */}
+      {/* Confirm Import Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
@@ -512,6 +546,36 @@ export default function Settings() {
             </Button>
             <Button onClick={handleImport}>
               Ya, Import Data
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm Delete All Dialog */}
+      <Dialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <Trash2 className="h-5 w-5" />
+              Hapus Semua Data
+            </DialogTitle>
+            <DialogDescription className="space-y-2">
+              <p>Apakah Anda yakin ingin menghapus semua data? Tindakan ini akan menghapus:</p>
+              <ul className="list-disc list-inside text-sm space-y-1">
+                <li>📋 Data Ticket Management (List User)</li>
+                <li>📍 Data List FAT</li>
+                <li>🔗 Data List UPE</li>
+                <li>🌐 Data List BNG</li>
+              </ul>
+              <p className="font-medium text-destructive">Tindakan ini tidak dapat dibatalkan!</p>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteAllDialog(false)} disabled={isDeleting}>
+              Batal
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteAllData} disabled={isDeleting}>
+              {isDeleting ? "Menghapus..." : "Ya, Hapus Semua"}
             </Button>
           </DialogFooter>
         </DialogContent>
