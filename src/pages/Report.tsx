@@ -18,18 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { FileText, Download, Trash2 } from "lucide-react";
+import { FileText, Download } from "lucide-react";
 import { z } from "zod";
-import { clearAllData } from "@/lib/indexedDB";
 
 // Validation schemas for form inputs
 const shiftReportSchema = z.object({
@@ -68,29 +59,6 @@ const Report = () => {
     status: "",
     resolvedBy: "",
   });
-
-  const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const handleDeleteAllData = async () => {
-    setIsDeleting(true);
-    try {
-      await clearAllData();
-      toast({
-        title: "Berhasil",
-        description: "Semua data berhasil dihapus",
-      });
-      setShowDeleteAllDialog(false);
-    } catch (error) {
-      toast({
-        title: "Gagal",
-        description: "Gagal menghapus data",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
 
   const handleShiftReportSubmit = () => {
     // Validate with Zod schema
@@ -468,59 +436,6 @@ Dibuat: ${new Date(r.createdAt).toLocaleString("id-ID")}
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Delete All Data Card */}
-      <Card className="border-destructive/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-destructive">
-            <Trash2 className="h-5 w-5" />
-            Hapus Semua Data
-          </CardTitle>
-          <CardDescription>
-            Hapus semua data master: Ticket Management, List FAT, List UPE, List BNG
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            variant="destructive"
-            onClick={() => setShowDeleteAllDialog(true)}
-            disabled={isDeleting}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Hapus Semua Data
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Confirm Delete All Dialog */}
-      <Dialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
-              <Trash2 className="h-5 w-5" />
-              Hapus Semua Data
-            </DialogTitle>
-            <DialogDescription className="space-y-2">
-              <p>Apakah Anda yakin ingin menghapus semua data? Tindakan ini akan menghapus:</p>
-              <ul className="list-disc list-inside text-sm space-y-1">
-                <li>📋 Data Ticket Management (List User)</li>
-                <li>📍 Data List FAT</li>
-                <li>🔗 Data List UPE</li>
-                <li>🌐 Data List BNG</li>
-              </ul>
-              <p className="font-medium text-destructive">Tindakan ini tidak dapat dibatalkan!</p>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteAllDialog(false)} disabled={isDeleting}>
-              Batal
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteAllData} disabled={isDeleting}>
-              {isDeleting ? "Menghapus..." : "Ya, Hapus Semua"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

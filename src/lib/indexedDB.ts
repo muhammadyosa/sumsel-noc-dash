@@ -136,7 +136,7 @@ export async function clearOLTData(): Promise<void> {
   });
 }
 
-// Clear all data from all stores
+// Clear all data from all stores including localStorage
 export async function clearAllData(): Promise<void> {
   const db = await openDB();
   
@@ -150,10 +150,16 @@ export async function clearAllData(): Promise<void> {
     });
   };
 
+  // Clear IndexedDB stores
   await Promise.all([
     clearStore(STORE_NAME, "excel_records"),
     clearStore(OLT_STORE_NAME, "olt_records"),
     clearStore(UPE_STORE_NAME, "upe_records"),
     clearStore(BNG_STORE_NAME, "bng_records"),
   ]);
+
+  // Clear localStorage data (Report data, tickets, etc.)
+  localStorage.removeItem("shiftReports");
+  localStorage.removeItem("ticketUpdates");
+  localStorage.removeItem("noc_tickets");
 }

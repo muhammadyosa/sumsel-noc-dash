@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, Trash2, Server, FileText, Info } from "lucide-react";
+import { Download, Server, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -54,16 +54,6 @@ async function loadUPEData(): Promise<UPE[]> {
   }
 }
 
-async function clearUPEData(): Promise<void> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([UPE_STORE_NAME], "readwrite");
-    const store = transaction.objectStore(UPE_STORE_NAME);
-    const request = store.delete("upe_records");
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-}
 
 const UPEList = () => {
   const [upeData, setUpeData] = useState<UPE[]>([]);
@@ -107,24 +97,6 @@ const UPEList = () => {
     });
   };
 
-  const handleClearData = async () => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus semua data UPE?")) {
-      try {
-        await clearUPEData();
-        setUpeData([]);
-        toast({
-          title: "Data dihapus",
-          description: "Semua data UPE berhasil dihapus.",
-        });
-      } catch {
-        toast({
-          title: "Gagal menghapus",
-          description: "Terjadi kesalahan saat menghapus data.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
 
   const filteredData = upeData.filter((upe) => {
     if (!searchQuery) return true;
@@ -175,26 +147,15 @@ const UPEList = () => {
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={filteredData.length === 0}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export Excel
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleClearData}
-                disabled={upeData.length === 0}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Hapus Semua Data
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              disabled={filteredData.length === 0}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export Excel
+            </Button>
           </CardTitle>
           <CardDescription>
             Kolom: Hostname UPE, Hostname OLT
