@@ -355,8 +355,8 @@ export default function TicketManagement() {
                   <span className="flex items-center gap-1">
                     <Info className="h-3 w-3" />
                     Belum ada data. Import melalui{" "}
-                    <Link to="/import" className="text-primary underline hover:no-underline">
-                      Import Master Data
+                    <Link to="/settings" className="text-primary underline hover:no-underline">
+                      Settings → Import Master Data
                     </Link>
                   </span>
                 )}
