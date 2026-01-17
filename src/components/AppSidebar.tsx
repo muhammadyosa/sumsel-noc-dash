@@ -1,4 +1,4 @@
-import { LayoutDashboard, Ticket, Users, Moon, Sun, Server, Network, FileText, Settings, MapPin } from "lucide-react";
+import { LayoutDashboard, Ticket, Users, Moon, Sun, Network, FileText, Settings, MapPin } from "lucide-react";
 import iconnetLogo from "@/assets/iconnet-logo.png";
 import { NavLink } from "react-router-dom";
 import {
@@ -16,15 +16,15 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 
 const menuItems = [
-  { title: "Dashboard", icon: LayoutDashboard, path: "/" },
-  { title: "Ticket Management", icon: Ticket, path: "/tickets" },
-  { title: "List Team", icon: Users, path: "/teams" },
-  { title: "List FAT", icon: MapPin, path: "/fat" },
-  { title: "List OLT", icon: Server, path: "/olt" },
-  { title: "List UPE", icon: Network, path: "/upe" },
-  { title: "List BNG", icon: Network, path: "/bng" },
-  { title: "Report", icon: FileText, path: "/report" },
-  { title: "Settings", icon: Settings, path: "/settings" },
+  { title: "Dashboard", icon: LayoutDashboard, path: "/", emoji: null },
+  { title: "Ticket Management", icon: Ticket, path: "/tickets", emoji: null },
+  { title: "List Team", icon: Users, path: "/teams", emoji: null },
+  { title: "List FAT", icon: MapPin, path: "/fat", emoji: null },
+  { title: "List OLT", icon: null, path: "/olt", emoji: "🖥️" },
+  { title: "List UPE", icon: null, path: "/upe", emoji: "🔗" },
+  { title: "List BNG", icon: Network, path: "/bng", emoji: null },
+  { title: "Report", icon: FileText, path: "/report", emoji: null },
+  { title: "Settings", icon: Settings, path: "/settings", emoji: null },
 ];
 
 export function AppSidebar() {
@@ -66,7 +66,11 @@ export function AppSidebar() {
                           : "hover:bg-sidebar-accent/50"
                       }
                     >
-                      <item.icon className="h-4 w-4" />
+                      {item.emoji ? (
+                        <span className="text-base">{item.emoji}</span>
+                      ) : item.icon ? (
+                        <item.icon className="h-4 w-4" />
+                      ) : null}
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
