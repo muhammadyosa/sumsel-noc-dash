@@ -109,7 +109,7 @@ export default function Dashboard() {
               Dashboard Overview
             </h1>
             <p className="text-muted-foreground text-sm">
-              Monitoring incident NOC RITEL SBU SUMBAGSEL
+              Monitoring incident NOC RITEL
             </p>
           </div>
         </div>
