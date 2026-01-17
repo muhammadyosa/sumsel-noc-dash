@@ -21,9 +21,39 @@ import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useTickets } from "@/hooks/useTickets";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from "recharts";
+import { useState } from "react";
+
+const chartConfig = {
+  total: {
+    label: "Total",
+    color: "hsl(var(--primary))",
+  },
+  resolved: {
+    label: "Resolved",
+    color: "hsl(var(--success))",
+  },
+  pending: {
+    label: "Pending",
+    color: "hsl(var(--warning))",
+  },
+  critical: {
+    label: "Critical",
+    color: "hsl(var(--destructive))",
+  },
+} satisfies ChartConfig;
 
 export default function Teams() {
   const { tickets } = useTickets();
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
   const teamStats = tickets.reduce((acc, ticket) => {
     if (!ticket.serpo) return acc;
@@ -45,66 +75,144 @@ export default function Teams() {
     return acc;
   }, {} as Record<string, { total: number; resolved: number; pending: number; critical: number; tickets: any[] }>);
 
+  const chartData = Object.entries(teamStats).map(([team, stats]) => ({
+    team,
+    total: stats.total,
+    resolved: stats.resolved,
+    pending: stats.pending,
+    critical: stats.critical,
+    tickets: stats.tickets,
+  }));
+
+  const selectedTeamData = selectedTeam ? teamStats[selectedTeam] : null;
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">👥 List Team</h1>
-        <p className="text-muted-foreground">Daftar tim dan statistik ticket</p>
+        <p className="text-muted-foreground">Statistik ticket per tim dalam bentuk grafik batang</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {Object.keys(teamStats).length === 0 ? (
-          <Card className="shadow-card col-span-full">
-            <CardContent className="pt-6">
-              <div className="text-center text-muted-foreground py-8">
-                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Belum ada data tim. Buat tiket untuk melihat statistik tim.</p>
-              </div>
+      {Object.keys(teamStats).length === 0 ? (
+        <Card className="shadow-card">
+          <CardContent className="pt-6">
+            <div className="text-center text-muted-foreground py-8">
+              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>Belum ada data tim. Buat tiket untuk melihat statistik tim.</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Bar Chart */}
+          <Card className="shadow-card lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Statistik Ticket per Tim
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                  onClick={(data) => {
+                    if (data?.activePayload?.[0]?.payload?.team) {
+                      setSelectedTeam(data.activePayload[0].payload.team);
+                    }
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="team" 
+                    angle={-45} 
+                    textAnchor="end" 
+                    interval={0}
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    height={80}
+                  />
+                  <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        labelFormatter={(value) => `Tim: ${value}`}
+                      />
+                    }
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar 
+                    dataKey="total" 
+                    fill="hsl(var(--primary))" 
+                    radius={[4, 4, 0, 0]}
+                    cursor="pointer"
+                  />
+                  <Bar 
+                    dataKey="resolved" 
+                    fill="hsl(var(--success))" 
+                    radius={[4, 4, 0, 0]}
+                    cursor="pointer"
+                  />
+                  <Bar 
+                    dataKey="pending" 
+                    fill="hsl(var(--warning))" 
+                    radius={[4, 4, 0, 0]}
+                    cursor="pointer"
+                  />
+                  <Bar 
+                    dataKey="critical" 
+                    fill="hsl(var(--destructive))" 
+                    radius={[4, 4, 0, 0]}
+                    cursor="pointer"
+                  />
+                </BarChart>
+              </ChartContainer>
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Klik pada bar untuk melihat detail tickets tim
+              </p>
             </CardContent>
           </Card>
-        ) : (
-          Object.entries(teamStats).map(([team, stats]) => (
-            <Card key={team} className="shadow-card hover:shadow-elevated transition-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  {team}
-                  {stats.pending > 0 && (
-                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30 ml-auto">
-                      {stats.pending} Pending
-                    </Badge>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Total Tickets:</span>
-                    <span className="font-bold">{stats.total}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-success">Resolved:</span>
-                    <span className="font-medium text-success">{stats.resolved}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-warning">In Progress/Pending:</span>
-                    <span className="font-medium text-warning">{stats.pending}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-destructive">Critical:</span>
-                    <span className="font-medium text-destructive">{stats.critical}</span>
-                  </div>
-                  <div className="mt-4 pt-4 border-t">
-                    <div className="flex justify-between text-sm font-medium">
-                      <span>Resolution Rate:</span>
-                      <span className="text-primary">
-                        {stats.total > 0
-                          ? Math.round((stats.resolved / stats.total) * 100)
-                          : 0}
-                        %
-                      </span>
+
+          {/* Detail Panel */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                {selectedTeam ? `Detail: ${selectedTeam}` : "Detail Tim"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {selectedTeamData ? (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Total Tickets:</span>
+                      <span className="font-bold">{selectedTeamData.total}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-success">Resolved:</span>
+                      <span className="font-medium text-success">{selectedTeamData.resolved}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-warning">In Progress/Pending:</span>
+                      <span className="font-medium text-warning">{selectedTeamData.pending}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-destructive">Critical:</span>
+                      <span className="font-medium text-destructive">{selectedTeamData.critical}</span>
+                    </div>
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex justify-between text-sm font-medium">
+                        <span>Resolution Rate:</span>
+                        <span className="text-primary">
+                          {selectedTeamData.total > 0
+                            ? Math.round((selectedTeamData.resolved / selectedTeamData.total) * 100)
+                            : 0}%
+                        </span>
+                      </div>
                     </div>
                   </div>
+
                   <Sheet>
                     <SheetTrigger asChild>
                       <Button variant="outline" size="sm" className="w-full mt-4">
@@ -114,14 +222,14 @@ export default function Teams() {
                     </SheetTrigger>
                     <SheetContent side="right" className="w-full sm:max-w-2xl">
                       <SheetHeader>
-                        <SheetTitle>Detail Tickets - {team}</SheetTitle>
+                        <SheetTitle>Detail Tickets - {selectedTeam}</SheetTitle>
                         <SheetDescription>
-                          Daftar semua tickets yang ditangani oleh tim {team}
+                          Daftar semua tickets yang ditangani oleh tim {selectedTeam}
                         </SheetDescription>
                       </SheetHeader>
                       <ScrollArea className="h-[calc(100vh-120px)] mt-6">
                         <div className="space-y-4 pr-4">
-                          {stats.tickets.map((ticket) => (
+                          {selectedTeamData.tickets.map((ticket) => (
                             <Card key={ticket.id} className="shadow-sm">
                               <CardContent className="pt-4">
                                 <div className="space-y-3">
@@ -198,11 +306,16 @@ export default function Teams() {
                     </SheetContent>
                   </Sheet>
                 </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-sm">Klik pada grafik untuk melihat detail tim</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
