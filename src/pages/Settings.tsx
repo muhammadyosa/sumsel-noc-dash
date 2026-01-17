@@ -148,6 +148,8 @@ export default function Settings() {
     switch (type) {
       case "user":
         return { label: "List User", color: "bg-blue-500" };
+      case "olt":
+        return { label: "List OLT", color: "bg-cyan-500" };
       case "fat":
         return { label: "List FAT", color: "bg-green-500" };
       case "upe":
@@ -326,6 +328,7 @@ export default function Settings() {
                               </TableCell>
                               <TableCell className="text-muted-foreground">
                                 {sheet.type === "user" && "→ Ticket Management"}
+                                {sheet.type === "olt" && "→ List OLT"}
                                 {sheet.type === "fat" && "→ List FAT"}
                                 {sheet.type === "upe" && "→ List UPE"}
                                 {sheet.type === "bng" && "→ List BNG"}
@@ -378,13 +381,17 @@ export default function Settings() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg text-center">
                     <div className="text-2xl font-bold text-blue-600">{importResult.summary.user.toLocaleString()}</div>
-                    <div className="text-sm text-muted-foreground">List User → Ticket Management</div>
+                    <div className="text-sm text-muted-foreground">List User → Ticket</div>
+                  </div>
+                  <div className="bg-cyan-50 dark:bg-cyan-950 p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold text-cyan-600">{importResult.summary.olt.toLocaleString()}</div>
+                    <div className="text-sm text-muted-foreground">List OLT → Data OLT</div>
                   </div>
                   <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg text-center">
-                    <div className="text-2xl font-bold text-green-600">{importResult.summary.olt.toLocaleString()}</div>
+                    <div className="text-2xl font-bold text-green-600">{importResult.summary.fat.toLocaleString()}</div>
                     <div className="text-sm text-muted-foreground">List FAT → Data FAT</div>
                   </div>
                   <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg text-center">
@@ -403,7 +410,8 @@ export default function Settings() {
                   </p>
                   <ul className="mt-2 text-sm text-green-700 dark:text-green-300 space-y-1">
                     {importResult.summary.user > 0 && <li>• Ticket Management - {importResult.summary.user.toLocaleString()} data user siap digunakan</li>}
-                    {importResult.summary.olt > 0 && <li>• List FAT - {importResult.summary.olt.toLocaleString()} data FAT siap digunakan</li>}
+                    {importResult.summary.olt > 0 && <li>• List OLT - {importResult.summary.olt.toLocaleString()} data OLT siap digunakan</li>}
+                    {importResult.summary.fat > 0 && <li>• List FAT - {importResult.summary.fat.toLocaleString()} data FAT siap digunakan</li>}
                     {importResult.summary.upe > 0 && <li>• List UPE - {importResult.summary.upe.toLocaleString()} data UPE siap digunakan</li>}
                     {importResult.summary.bng > 0 && <li>• List BNG - {importResult.summary.bng.toLocaleString()} data BNG siap digunakan</li>}
                   </ul>
