@@ -10,7 +10,8 @@ import iconnetLogo from "@/assets/iconnet-logo.png";
 import Dashboard from "./pages/Dashboard";
 import TicketManagement from "./pages/TicketManagement";
 import Teams from "./pages/Teams";
-import OLTList from "./pages/OLTList";
+import FATList from "./pages/FATList";
+import OLTDeviceList from "./pages/OLTDeviceList";
 import UPEList from "./pages/UPEList";
 import BNGList from "./pages/BNGList";
 import Report from "./pages/Report";
@@ -46,7 +47,8 @@ const App = () => {
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/tickets" element={<TicketManagement />} />
                       <Route path="/teams" element={<Teams />} />
-                      <Route path="/olt" element={<OLTList />} />
+                      <Route path="/fat" element={<FATList />} />
+                      <Route path="/olt" element={<OLTDeviceList />} />
                       <Route path="/upe" element={<UPEList />} />
                       <Route path="/bng" element={<BNGList />} />
                       <Route path="/report" element={<Report />} />
