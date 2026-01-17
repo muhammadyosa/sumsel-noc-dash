@@ -35,17 +35,17 @@ export function AppSidebar() {
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
       <SidebarContent>
         <div className="p-4 border-b border-sidebar-border">
-          {!collapsed ? (
+        {!collapsed ? (
             <div className="flex items-center gap-3">
-              <img src={iconnetLogo} alt="Iconnet" className="h-10 w-10" />
+              <img src={iconnetLogo} alt="Iconnet" className="h-12 w-auto" />
               <div className="space-y-0.5">
-                <h2 className="text-lg font-bold text-sidebar-foreground">NOC RITEL</h2>
+                <p className="text-sm font-semibold text-sidebar-foreground">NOC RITEL</p>
                 <p className="text-xs text-sidebar-foreground/70">Iconnet</p>
               </div>
             </div>
           ) : (
             <div className="flex justify-center">
-              <img src={iconnetLogo} alt="Iconnet" className="h-8 w-8" />
+              <img src={iconnetLogo} alt="Iconnet" className="h-8 w-auto" />
             </div>
           )}
         </div>
