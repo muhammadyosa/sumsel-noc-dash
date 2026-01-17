@@ -244,7 +244,7 @@ export default function Dashboard() {
                 };
 
                 return (
-                  <ChartContainer config={chartConfig} className="h-[200px] sm:h-[240px] md:h-[280px] w-full">
+                  <ChartContainer config={chartConfig} className="h-[200px] sm:h-[240px] md:h-[280px] w-full transition-all duration-500 ease-out">
                     <BarChart
                       data={statusData}
                       margin={{ top: 10, right: 10, left: 0, bottom: 30 }}
@@ -316,7 +316,7 @@ export default function Dashboard() {
                 };
 
                 return (
-                  <ChartContainer config={chartConfig} className="h-[200px] sm:h-[240px] md:h-[280px] w-full">
+                  <ChartContainer config={chartConfig} className="h-[200px] sm:h-[240px] md:h-[280px] w-full transition-all duration-500 ease-out">
                     <BarChart
                       data={categoryData}
                       margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
