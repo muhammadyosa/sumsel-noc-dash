@@ -473,6 +473,18 @@ export default function Settings() {
                   </ul>
                 </div>
                 <div>
+                  <h4 className="font-medium mb-2">📟 List OLT (untuk Data OLT)</h4>
+                  <p className="text-sm text-muted-foreground mb-2">Kolom yang didukung:</p>
+                  <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                    <li>PROVINSI</li>
+                    <li>ID OLT</li>
+                    <li>HOSTNAME OLT</li>
+                    <li>HOSTNAME UPE</li>
+                    <li>IP NMS OLT</li>
+                    <li>TIKOR OLT</li>
+                  </ul>
+                </div>
+                <div>
                   <h4 className="font-medium mb-2">🔗 List UPE (untuk Data UPE)</h4>
                   <p className="text-sm text-muted-foreground mb-2">Kolom yang didukung:</p>
                   <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
