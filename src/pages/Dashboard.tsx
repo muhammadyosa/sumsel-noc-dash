@@ -98,7 +98,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen space-y-6 p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6 lg:p-8 w-full max-w-full overflow-x-hidden">
       {/* Header Section */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
@@ -119,7 +119,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* KPI Cards Section */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4 w-full">
         {[
           { 
             title: "Total Incident", 
@@ -199,14 +199,14 @@ export default function Dashboard() {
             <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
             
             {/* Content */}
-            <div className="relative p-6">
-              <div className="flex items-start justify-between mb-4">
-                <span className="text-3xl drop-shadow-lg">{card.emoji}</span>
+            <div className="relative p-3 sm:p-4 md:p-6">
+              <div className="flex items-start justify-between mb-2 sm:mb-4">
+                <span className="text-2xl sm:text-3xl drop-shadow-lg">{card.emoji}</span>
               </div>
               
               <div>
-                <p className="text-sm text-muted-foreground font-medium mb-1">{card.title}</p>
-                <p className="text-4xl font-bold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
+                <p className="text-xs sm:text-sm text-muted-foreground font-medium mb-1 truncate">{card.title}</p>
+                <p className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
                   {card.value}
                 </p>
               </div>
@@ -216,7 +216,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts Section - Bar Charts */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-2 w-full">
         {/* Status Distribution Bar Chart */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -230,7 +230,7 @@ export default function Dashboard() {
                 Status Distribution
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="p-3 sm:p-4 md:pt-6">
               {(() => {
                 const statusData = [
                   { name: "⚙️ On Progress", value: tickets.filter((t) => t.status === "On Progress").length, fill: "hsl(217, 91%, 60%)", status: "On Progress" },
@@ -244,10 +244,10 @@ export default function Dashboard() {
                 };
 
                 return (
-                  <ChartContainer config={chartConfig} className="h-[280px] w-full">
+                  <ChartContainer config={chartConfig} className="h-[200px] sm:h-[240px] md:h-[280px] w-full">
                     <BarChart
                       data={statusData}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+                      margin={{ top: 10, right: 10, left: 0, bottom: 30 }}
                       onClick={(data) => {
                         if (data?.activePayload?.[0]?.payload?.status) {
                           const status = data.activePayload[0].payload.status;
@@ -263,9 +263,11 @@ export default function Dashboard() {
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                       <XAxis 
                         dataKey="name" 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                        tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                        interval={0}
+                        height={40}
                       />
-                      <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} width={30} />
                       <ChartTooltip
                         content={<ChartTooltipContent />}
                         cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }}
@@ -299,7 +301,7 @@ export default function Dashboard() {
                 Category Distribution
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="p-3 sm:p-4 md:pt-6">
               {(() => {
                 const ritelCount = tickets.filter((t) => t.category === "RITEL").length;
                 const feederCount = tickets.filter((t) => t.category === "FEEDER").length;
@@ -314,10 +316,10 @@ export default function Dashboard() {
                 };
 
                 return (
-                  <ChartContainer config={chartConfig} className="h-[280px] w-full">
+                  <ChartContainer config={chartConfig} className="h-[200px] sm:h-[240px] md:h-[280px] w-full">
                     <BarChart
                       data={categoryData}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                      margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
                       onClick={(data) => {
                         if (data?.activePayload?.[0]?.payload?.category) {
                           const category = data.activePayload[0].payload.category;
@@ -333,9 +335,10 @@ export default function Dashboard() {
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                       <XAxis 
                         dataKey="name" 
-                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        interval={0}
                       />
-                      <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} width={30} />
                       <ChartTooltip
                         content={<ChartTooltipContent />}
                         cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }}
