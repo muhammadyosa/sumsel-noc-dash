@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Download, Info, Server } from "lucide-react";
+import { Download, Server, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,22 +23,20 @@ import * as XLSX from "xlsx";
 import { loadOLTData } from "@/lib/indexedDB";
 import { sanitizeForCSV } from "@/lib/validation";
 import { Link } from "react-router-dom";
-
-interface OLTDevice {
-  id: string;
-  hostname: string;
-  provinsi: string;
-  createdAt: string;
-}
+import { OLT } from "@/types/olt";
 
 const OLT_FIELDS = [
   { value: "all", label: "Semua Field" },
-  { value: "hostname", label: "Hostname OLT" },
-  { value: "provinsi", label: "Nama Provinsi" },
+  { value: "provinsi", label: "PROVINSI" },
+  { value: "idOlt", label: "ID OLT" },
+  { value: "hostnameOlt", label: "HOSTNAME OLT" },
+  { value: "hostnameUpe", label: "HOSTNAME UPE" },
+  { value: "ipNmsOlt", label: "IP NMS OLT" },
+  { value: "tikorOlt", label: "TIKOR OLT" },
 ];
 
 const OLTDeviceList = () => {
-  const [oltDevices, setOltDevices] = useState<OLTDevice[]>([]);
+  const [oltData, setOltData] = useState<OLT[]>([]);
   const [searchField, setSearchField] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -46,27 +44,10 @@ const OLTDeviceList = () => {
   useEffect(() => {
     loadOLTData()
       .then((data) => {
-        // Extract unique OLT hostnames from FAT data
-        const uniqueOLTs = new Map<string, OLTDevice>();
-        data.forEach((item) => {
-          if (item.hostname && !uniqueOLTs.has(item.hostname)) {
-            uniqueOLTs.set(item.hostname, {
-              id: item.hostname,
-              hostname: item.hostname,
-              provinsi: item.provinsi || "",
-              createdAt: item.createdAt,
-            });
-          }
-        });
-        setOltDevices(Array.from(uniqueOLTs.values()));
+        setOltData(data);
         setIsLoading(false);
       })
-      .catch((error) => {
-        if (import.meta.env.DEV) {
-          console.error("Error loading OLT data:", error);
-        }
-        setIsLoading(false);
-      });
+      .catch(() => setIsLoading(false));
   }, []);
 
   const handleExport = () => {
@@ -79,10 +60,14 @@ const OLTDeviceList = () => {
       return;
     }
 
-    const exportData = filteredData.map((olt, index) => ({
-      "No": index + 1,
-      "Hostname OLT": sanitizeForCSV(olt.hostname),
-      "Nama Provinsi": sanitizeForCSV(olt.provinsi),
+    const exportData = filteredData.map((olt) => ({
+      "PROVINSI": sanitizeForCSV(olt.provinsi),
+      "ID OLT": sanitizeForCSV(olt.idOlt),
+      "HOSTNAME OLT": sanitizeForCSV(olt.hostnameOlt),
+      "HOSTNAME UPE": sanitizeForCSV(olt.hostnameUpe),
+      "IP NMS OLT": sanitizeForCSV(olt.ipNmsOlt),
+      "TIKOR OLT": sanitizeForCSV(olt.tikorOlt),
+      "Tanggal Import": sanitizeForCSV(new Date(olt.createdAt).toLocaleString("id-ID")),
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);
@@ -96,19 +81,23 @@ const OLTDeviceList = () => {
     });
   };
 
-  const filteredData = oltDevices.filter((olt) => {
+  const filteredData = oltData.filter((olt) => {
     if (!searchQuery) return true;
     
     const query = searchQuery.toLowerCase();
     
     if (searchField === "all") {
       return (
-        String(olt.hostname || "").toLowerCase().includes(query) ||
-        String(olt.provinsi || "").toLowerCase().includes(query)
+        String(olt.provinsi || "").toLowerCase().includes(query) ||
+        String(olt.idOlt || "").toLowerCase().includes(query) ||
+        String(olt.hostnameOlt || "").toLowerCase().includes(query) ||
+        String(olt.hostnameUpe || "").toLowerCase().includes(query) ||
+        String(olt.ipNmsOlt || "").toLowerCase().includes(query) ||
+        String(olt.tikorOlt || "").toLowerCase().includes(query)
       );
     }
     
-    const fieldValue = String(olt[searchField as keyof OLTDevice] || "").toLowerCase();
+    const fieldValue = String(olt[searchField as keyof OLT] || "").toLowerCase();
     return fieldValue.includes(query);
   });
 
@@ -117,7 +106,7 @@ const OLTDeviceList = () => {
       <div>
         <h1 className="text-3xl font-bold">📟 List OLT</h1>
         <p className="text-muted-foreground">
-          Data OLT diambil dari data FAT yang diimport melalui{" "}
+          Data OLT diimport melalui{" "}
           <Link to="/settings" className="text-primary underline hover:no-underline">
             Settings
           </Link>
@@ -127,23 +116,26 @@ const OLTDeviceList = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <span>Data OLT</span>
-              <p className="text-xs text-muted-foreground font-normal mt-1">
-                {isLoading ? (
-                  "Memuat data OLT..."
-                ) : oltDevices.length > 0 ? (
-                  `✓ ${oltDevices.length} perangkat OLT unik ditemukan`
-                ) : (
-                  <span className="flex items-center gap-1">
-                    <Info className="h-3 w-3" />
-                    Belum ada data. Import data FAT melalui{" "}
-                    <Link to="/settings" className="text-primary underline hover:no-underline">
-                      Settings
-                    </Link>
-                  </span>
-                )}
-              </p>
+            <div className="flex items-center gap-2">
+              <Server className="h-5 w-5" />
+              <div>
+                <span>Data OLT</span>
+                <p className="text-xs text-muted-foreground font-normal mt-1">
+                  {isLoading ? (
+                    "Memuat data OLT..."
+                  ) : oltData.length > 0 ? (
+                    `✓ ${oltData.length} data tersimpan dari Import Master Data`
+                  ) : (
+                    <span className="flex items-center gap-1">
+                      <Info className="h-3 w-3" />
+                      Belum ada data. Import melalui{" "}
+                      <Link to="/settings" className="text-primary underline hover:no-underline">
+                        Settings
+                      </Link>
+                    </span>
+                  )}
+                </p>
+              </div>
             </div>
             <Button
               variant="outline"
@@ -156,14 +148,14 @@ const OLTDeviceList = () => {
             </Button>
           </CardTitle>
           <CardDescription>
-            Daftar perangkat OLT unik berdasarkan Hostname
+            Kolom: PROVINSI, ID OLT, HOSTNAME OLT, HOSTNAME UPE, IP NMS OLT, TIKOR OLT
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search & Filter */}
+          {/* Simplified Search & Filter */}
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <div className="flex items-center gap-2">
-              <Server className="h-4 w-4 text-muted-foreground" />
+              <FileText className="h-4 w-4 text-muted-foreground" />
               <Select value={searchField} onValueChange={setSearchField}>
                 <SelectTrigger className="w-[180px] h-9 bg-background">
                   <SelectValue placeholder="Pilih Field" />
@@ -191,23 +183,27 @@ const OLTDeviceList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-16">No</TableHead>
-                  <TableHead>Hostname OLT</TableHead>
-                  <TableHead>Nama Provinsi</TableHead>
+                  <TableHead className="w-12">No</TableHead>
+                  <TableHead>PROVINSI</TableHead>
+                  <TableHead>ID OLT</TableHead>
+                  <TableHead>HOSTNAME OLT</TableHead>
+                  <TableHead>HOSTNAME UPE</TableHead>
+                  <TableHead>IP NMS OLT</TableHead>
+                  <TableHead>TIKOR OLT</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground">
                       Memuat data OLT...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center text-muted-foreground">
-                      {oltDevices.length === 0
-                        ? "Belum ada data OLT. Silakan import data FAT terlebih dahulu."
+                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                      {oltData.length === 0
+                        ? "Belum ada data OLT. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
                     </TableCell>
                   </TableRow>
@@ -215,8 +211,12 @@ const OLTDeviceList = () => {
                   filteredData.slice(0, 100).map((olt, index) => (
                     <TableRow key={olt.id}>
                       <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell className="font-mono text-sm">{olt.hostname}</TableCell>
                       <TableCell>{olt.provinsi}</TableCell>
+                      <TableCell className="font-mono text-xs">{olt.idOlt}</TableCell>
+                      <TableCell className="font-mono text-xs">{olt.hostnameOlt}</TableCell>
+                      <TableCell className="font-mono text-xs">{olt.hostnameUpe}</TableCell>
+                      <TableCell className="font-mono text-xs">{olt.ipNmsOlt}</TableCell>
+                      <TableCell className="font-mono text-xs">{olt.tikorOlt}</TableCell>
                     </TableRow>
                   ))
                 )}
@@ -226,9 +226,9 @@ const OLTDeviceList = () => {
 
           <div className="text-sm text-muted-foreground">
             {filteredData.length > 100 ? (
-              <>Menampilkan 100 dari {filteredData.length} hasil pencarian (Total: {oltDevices.length} perangkat OLT)</>
+              <>Menampilkan 100 dari {filteredData.length} hasil pencarian (Total: {oltData.length} data OLT)</>
             ) : (
-              <>Total: {filteredData.length} dari {oltDevices.length} perangkat OLT</>
+              <>Total: {filteredData.length} dari {oltData.length} data OLT</>
             )}
           </div>
         </CardContent>

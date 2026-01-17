@@ -1,7 +1,8 @@
 import * as XLSX from "xlsx";
 import { ExcelRecord } from "@/types/ticket";
 import { OLT } from "@/types/olt";
-import { saveExcelData, saveOLTData } from "./indexedDB";
+import { FAT } from "@/types/fat";
+import { saveExcelData, saveOLTData, saveFATData } from "./indexedDB";
 
 // Types for each data category
 export interface UPERecord {
@@ -29,11 +30,13 @@ export interface BNGRecord {
 export interface ImportResult {
   userRecords: ExcelRecord[];
   oltRecords: OLT[];
+  fatRecords: FAT[];
   upeRecords: UPERecord[];
   bngRecords: BNGRecord[];
   summary: {
     user: number;
     olt: number;
+    fat: number;
     upe: number;
     bng: number;
     totalSheets: number;
@@ -45,7 +48,8 @@ export interface ImportResult {
 // Sheet detection patterns - exact sheet name matching
 const SHEET_PATTERNS = {
   user: ["list user", "user", "pelanggan", "customer", "data user"],
-  fat: ["list olt", "list fat", "fat", "olt", "data fat", "data olt"],
+  olt: ["list olt", "data olt"],
+  fat: ["list fat", "fat", "data fat"],
   upe: ["sheet list upe", "list upe", "upe", "data upe"],
   bng: ["sheet list bng", "list bng", "bng", "data bng"],
 };
@@ -58,6 +62,14 @@ const COLUMN_MAPPINGS = {
     hostname: ["Hostname OLT", "hostname", "hostname_olt", "olt"],
     fat: ["ID FAT", "fat", "fat_id", "id_fat"],
     sn: ["SN ONT", "sn", "sn_ont", "ont"],
+  },
+  olt: {
+    provinsi: ["PROVINSI", "Provinsi", "provinsi", "province", "nama provinsi", "NAMA PROVINSI"],
+    idOlt: ["ID OLT", "id olt", "ID_OLT", "OLT ID", "olt id", "OLT_ID", "idolt", "IDOLT"],
+    hostnameOlt: ["HOSTNAME OLT", "Hostname OLT", "hostname olt", "hostname_olt", "HOSTNAME_OLT", "hostnameolt"],
+    hostnameUpe: ["HOSTNAME UPE", "Hostname UPE", "hostname upe", "hostname_upe", "HOSTNAME_UPE", "hostnameupe"],
+    ipNmsOlt: ["IP NMS OLT", "ip nms olt", "IP_NMS_OLT", "ip_nms_olt", "IPNMSOLT", "ipnmsolt", "IP NMS", "ip nms"],
+    tikorOlt: ["TIKOR OLT", "Tikor OLT", "tikor olt", "TIKOR_OLT", "tikor_olt", "tikorolt", "TIKOR", "Tikor", "tikor", "koordinat"],
   },
   fat: {
     provinsi: ["Provinsi", "provinsi", "province", "nama provinsi", "PROVINSI", "Nama Provinsi", "NAMA PROVINSI"],
@@ -167,11 +179,27 @@ function processUserSheet(data: any[]): ExcelRecord[] {
     .filter((r) => r.customer || r.service || r.hostname || r.fat || r.sn);
 }
 
-// Process FAT/OLT sheet
-function processFATSheet(data: any[]): OLT[] {
+// Process OLT sheet
+function processOLTSheet(data: any[]): OLT[] {
   return data
     .map((row, index) => ({
       id: `olt-${Date.now()}-${index}`,
+      provinsi: getColumnValue(row, COLUMN_MAPPINGS.olt.provinsi),
+      idOlt: getColumnValue(row, COLUMN_MAPPINGS.olt.idOlt),
+      hostnameOlt: getColumnValue(row, COLUMN_MAPPINGS.olt.hostnameOlt),
+      hostnameUpe: getColumnValue(row, COLUMN_MAPPINGS.olt.hostnameUpe),
+      ipNmsOlt: getColumnValue(row, COLUMN_MAPPINGS.olt.ipNmsOlt),
+      tikorOlt: getColumnValue(row, COLUMN_MAPPINGS.olt.tikorOlt),
+      createdAt: new Date().toISOString(),
+    }))
+    .filter((r) => r.provinsi || r.idOlt || r.hostnameOlt || r.hostnameUpe || r.ipNmsOlt || r.tikorOlt);
+}
+
+// Process FAT sheet
+function processFATSheet(data: any[]): FAT[] {
+  return data
+    .map((row, index) => ({
+      id: `fat-${Date.now()}-${index}`,
       provinsi: getColumnValue(row, COLUMN_MAPPINGS.fat.provinsi),
       fatId: getColumnValue(row, COLUMN_MAPPINGS.fat.fatId),
       hostname: getColumnValue(row, COLUMN_MAPPINGS.fat.hostname),
@@ -226,11 +254,13 @@ export async function importMultiSheetExcel(file: File): Promise<ImportResult> {
         const result: ImportResult = {
           userRecords: [],
           oltRecords: [],
+          fatRecords: [],
           upeRecords: [],
           bngRecords: [],
           summary: {
             user: 0,
             olt: 0,
+            fat: 0,
             upe: 0,
             bng: 0,
             totalSheets: workbook.SheetNames.length,
@@ -263,10 +293,16 @@ export async function importMultiSheetExcel(file: File): Promise<ImportResult> {
               result.summary.processedSheets.push(`${sheetName} → User (${result.userRecords.length})`);
               break;
               
-            case "fat":
-              result.oltRecords = processFATSheet(jsonData);
+            case "olt":
+              result.oltRecords = processOLTSheet(jsonData);
               result.summary.olt = result.oltRecords.length;
               result.summary.processedSheets.push(`${sheetName} → OLT (${result.oltRecords.length})`);
+              break;
+              
+            case "fat":
+              result.fatRecords = processFATSheet(jsonData);
+              result.summary.fat = result.fatRecords.length;
+              result.summary.processedSheets.push(`${sheetName} → FAT (${result.fatRecords.length})`);
               break;
               
             case "upe":

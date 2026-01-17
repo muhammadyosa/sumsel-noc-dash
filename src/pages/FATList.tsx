@@ -20,12 +20,12 @@ import {
 } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import * as XLSX from "xlsx";
-import { OLT } from "@/types/olt";
-import { loadOLTData } from "@/lib/indexedDB";
+import { FAT } from "@/types/fat";
+import { loadFATData } from "@/lib/indexedDB";
 import { sanitizeForCSV } from "@/lib/validation";
 import { Link } from "react-router-dom";
 
-const OLT_FIELDS = [
+const FAT_FIELDS = [
   { value: "all", label: "Semua Field" },
   { value: "provinsi", label: "Nama Provinsi" },
   { value: "fatId", label: "ID FAT" },
@@ -33,21 +33,21 @@ const OLT_FIELDS = [
   { value: "tikor", label: "Tikor FAT" },
 ];
 
-const OLTList = () => {
-  const [oltData, setOltData] = useState<OLT[]>([]);
+const FATList = () => {
+  const [fatData, setFatData] = useState<FAT[]>([]);
   const [searchField, setSearchField] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadOLTData()
+    loadFATData()
       .then((data) => {
-        setOltData(data);
+        setFatData(data);
         setIsLoading(false);
       })
       .catch((error) => {
         if (import.meta.env.DEV) {
-          console.error("Error loading OLT data:", error);
+          console.error("Error loading FAT data:", error);
         }
         setIsLoading(false);
       });
@@ -63,41 +63,40 @@ const OLTList = () => {
       return;
     }
 
-    const exportData = filteredData.map((olt) => ({
-      "Nama Provinsi": sanitizeForCSV(olt.provinsi),
-      "ID FAT": sanitizeForCSV(olt.fatId),
-      "Hostname OLT": sanitizeForCSV(olt.hostname),
-      "Tikor OLT": sanitizeForCSV(olt.tikor),
-      "Tanggal Import": sanitizeForCSV(new Date(olt.createdAt).toLocaleString("id-ID")),
+    const exportData = filteredData.map((fat) => ({
+      "Nama Provinsi": sanitizeForCSV(fat.provinsi),
+      "ID FAT": sanitizeForCSV(fat.fatId),
+      "Hostname OLT": sanitizeForCSV(fat.hostname),
+      "Tikor FAT": sanitizeForCSV(fat.tikor),
+      "Tanggal Import": sanitizeForCSV(new Date(fat.createdAt).toLocaleString("id-ID")),
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "List OLT");
-    XLSX.writeFile(wb, `List_OLT_${new Date().toISOString().split("T")[0]}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, "List FAT");
+    XLSX.writeFile(wb, `List_FAT_${new Date().toISOString().split("T")[0]}.xlsx`);
 
     toast({
       title: "Export berhasil",
-      description: "Data OLT berhasil diekspor ke Excel.",
+      description: "Data FAT berhasil diekspor ke Excel.",
     });
   };
 
-
-  const filteredData = oltData.filter((olt) => {
+  const filteredData = fatData.filter((fat) => {
     if (!searchQuery) return true;
     
     const query = searchQuery.toLowerCase();
     
     if (searchField === "all") {
       return (
-        String(olt.provinsi || "").toLowerCase().includes(query) ||
-        String(olt.fatId || "").toLowerCase().includes(query) ||
-        String(olt.hostname || "").toLowerCase().includes(query) ||
-        String(olt.tikor || "").toLowerCase().includes(query)
+        String(fat.provinsi || "").toLowerCase().includes(query) ||
+        String(fat.fatId || "").toLowerCase().includes(query) ||
+        String(fat.hostname || "").toLowerCase().includes(query) ||
+        String(fat.tikor || "").toLowerCase().includes(query)
       );
     }
     
-    const fieldValue = String(olt[searchField as keyof OLT] || "").toLowerCase();
+    const fieldValue = String(fat[searchField as keyof FAT] || "").toLowerCase();
     return fieldValue.includes(query);
   });
 
@@ -106,7 +105,7 @@ const OLTList = () => {
       <div>
         <h1 className="text-3xl font-bold">📍 List FAT</h1>
         <p className="text-muted-foreground">
-          Data FAT diimport melalui <Link to="/import" className="text-primary underline hover:no-underline">Import Master Data</Link>
+          Data FAT diimport melalui <Link to="/settings" className="text-primary underline hover:no-underline">Settings</Link>
         </p>
       </div>
 
@@ -118,14 +117,14 @@ const OLTList = () => {
               <p className="text-xs text-muted-foreground font-normal mt-1">
                 {isLoading ? (
                   "Memuat data FAT..."
-                ) : oltData.length > 0 ? (
-                  `✓ ${oltData.length} data tersimpan dari Import Master Data`
+                ) : fatData.length > 0 ? (
+                  `✓ ${fatData.length} data tersimpan dari Import Master Data`
                 ) : (
                   <span className="flex items-center gap-1">
                     <Info className="h-3 w-3" />
                     Belum ada data. Import melalui{" "}
-                    <Link to="/import" className="text-primary underline hover:no-underline">
-                      Import Master Data
+                    <Link to="/settings" className="text-primary underline hover:no-underline">
+                      Settings
                     </Link>
                   </span>
                 )}
@@ -155,7 +154,7 @@ const OLTList = () => {
                   <SelectValue placeholder="Pilih Field" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border shadow-lg z-50">
-                  {OLT_FIELDS.map((field) => (
+                  {FAT_FIELDS.map((field) => (
                     <SelectItem key={field.value} value={field.value}>
                       {field.label}
                     </SelectItem>
@@ -165,7 +164,7 @@ const OLTList = () => {
             </div>
             <div className="flex-1 w-full sm:max-w-md">
               <Input
-                placeholder={`Cari ${OLT_FIELDS.find(f => f.value === searchField)?.label || "data"}...`}
+                placeholder={`Cari ${FAT_FIELDS.find(f => f.value === searchField)?.label || "data"}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-9"
@@ -188,25 +187,25 @@ const OLTList = () => {
                 {isLoading ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center text-muted-foreground">
-                      Memuat data OLT...
+                      Memuat data FAT...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center text-muted-foreground">
-                      {oltData.length === 0
-                        ? "Belum ada data OLT. Silakan import file Excel/CSV."
+                      {fatData.length === 0
+                        ? "Belum ada data FAT. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
                     </TableCell>
                   </TableRow>
                  ) : (
-                  filteredData.slice(0, 100).map((olt, index) => (
-                    <TableRow key={olt.id}>
+                  filteredData.slice(0, 100).map((fat, index) => (
+                    <TableRow key={fat.id}>
                       <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell className="font-medium">{olt.provinsi}</TableCell>
-                      <TableCell className="font-mono text-xs">{olt.fatId}</TableCell>
-                      <TableCell className="font-mono text-xs">{olt.hostname}</TableCell>
-                      <TableCell>{olt.tikor}</TableCell>
+                      <TableCell className="font-medium">{fat.provinsi}</TableCell>
+                      <TableCell className="font-mono text-xs">{fat.fatId}</TableCell>
+                      <TableCell className="font-mono text-xs">{fat.hostname}</TableCell>
+                      <TableCell>{fat.tikor}</TableCell>
                     </TableRow>
                   ))
                 )}
@@ -216,9 +215,9 @@ const OLTList = () => {
 
           <div className="text-sm text-muted-foreground">
             {filteredData.length > 100 ? (
-              <>Menampilkan 100 dari {filteredData.length} hasil pencarian (Total: {oltData.length} data OLT)</>
+              <>Menampilkan 100 dari {filteredData.length} hasil pencarian (Total: {fatData.length} data FAT)</>
             ) : (
-              <>Total: {filteredData.length} dari {oltData.length} data OLT</>
+              <>Total: {filteredData.length} dari {fatData.length} data FAT</>
             )}
           </div>
         </CardContent>
@@ -227,4 +226,4 @@ const OLTList = () => {
   );
 };
 
-export default OLTList;
+export default FATList;

@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { importMultiSheetExcel, getExcelSheets, ImportResult } from "@/lib/multiSheetImport";
-import { saveExcelData, saveOLTData, openDB, clearAllData } from "@/lib/indexedDB";
+import { saveExcelData, saveOLTData, saveFATData, openDB, clearAllData } from "@/lib/indexedDB";
 
 const UPE_STORE_NAME = "upe_data";
 const BNG_STORE_NAME = "bng_data";
@@ -111,6 +111,11 @@ export default function Settings() {
 
       if (result.oltRecords.length > 0) {
         await saveOLTData(result.oltRecords);
+        setImportProgress(55);
+      }
+
+      if (result.fatRecords.length > 0) {
+        await saveFATData(result.fatRecords);
         setImportProgress(65);
       }
 
@@ -127,7 +132,7 @@ export default function Settings() {
       setImportProgress(100);
       setImportResult(result);
 
-      const totalRecords = result.summary.user + result.summary.olt + result.summary.upe + result.summary.bng;
+      const totalRecords = result.summary.user + result.summary.olt + result.summary.fat + result.summary.upe + result.summary.bng;
       toast.success(`Berhasil import ${totalRecords.toLocaleString()} data dari ${result.summary.processedSheets.length} sheet`);
     } catch (error) {
       toast.error("Gagal mengimport data");
