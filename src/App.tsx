@@ -2,10 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { PageTransition } from "@/components/PageTransition";
+import { AnimatePresence } from "framer-motion";
 import iconnetLogo from "@/assets/iconnet-logo.png";
 import Dashboard from "./pages/Dashboard";
 import TicketManagement from "./pages/TicketManagement";
@@ -20,6 +22,28 @@ import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
+        <Route path="/tickets" element={<PageTransition><TicketManagement /></PageTransition>} />
+        <Route path="/teams" element={<PageTransition><Teams /></PageTransition>} />
+        <Route path="/fat" element={<PageTransition><FATList /></PageTransition>} />
+        <Route path="/olt" element={<PageTransition><OLTDeviceList /></PageTransition>} />
+        <Route path="/upe" element={<PageTransition><UPEList /></PageTransition>} />
+        <Route path="/bng" element={<PageTransition><BNGList /></PageTransition>} />
+        <Route path="/report" element={<PageTransition><Report /></PageTransition>} />
+        <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
+        <Route path="/install" element={<PageTransition><Install /></PageTransition>} />
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
 const App = () => {
   return (
@@ -42,20 +66,8 @@ const App = () => {
                       </div>
                     </div>
                   </header>
-                  <main className="flex-1 p-6">
-                    <Routes>
-                      <Route path="/" element={<Dashboard />} />
-                      <Route path="/tickets" element={<TicketManagement />} />
-                      <Route path="/teams" element={<Teams />} />
-                      <Route path="/fat" element={<FATList />} />
-                      <Route path="/olt" element={<OLTDeviceList />} />
-                      <Route path="/upe" element={<UPEList />} />
-                      <Route path="/bng" element={<BNGList />} />
-                      <Route path="/report" element={<Report />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/install" element={<Install />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
+                  <main className="flex-1 p-6 overflow-hidden">
+                    <AnimatedRoutes />
                   </main>
                 </div>
               </div>
