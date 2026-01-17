@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Zap } from "lucide-react";
+import iconnetLogo from "@/assets/iconnet-logo.png";
 import Dashboard from "./pages/Dashboard";
 import TicketManagement from "./pages/TicketManagement";
 import Teams from "./pages/Teams";
@@ -36,7 +36,7 @@ const App = () => {
                     <div className="flex h-14 items-center px-4 gap-3">
                       <SidebarTrigger />
                       <div className="flex items-center gap-2">
-                        <Zap className="h-5 w-5 text-primary" />
+                        <img src={iconnetLogo} alt="Iconnet" className="h-8 w-auto" />
                         <span className="font-semibold text-lg">NOC RITEL</span>
                       </div>
                     </div>
