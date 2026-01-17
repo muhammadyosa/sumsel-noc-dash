@@ -124,7 +124,7 @@ export default function Dashboard() {
           { 
             title: "Total Incident", 
             value: totalIncidents, 
-            icon: Activity, 
+            emoji: "🗃️", 
             metric: "total",
             gradient: "from-blue-500 to-blue-700",
             glowColor: "shadow-blue-500/50"
@@ -132,26 +132,26 @@ export default function Dashboard() {
           { 
             title: "Over SLA (>24h)", 
             value: overSLA, 
-            icon: AlertTriangle, 
+            emoji: "⚠️", 
             metric: "overSLA",
             gradient: "from-red-500 to-red-700",
             glowColor: "shadow-red-500/50"
           },
           { 
-            title: "Impact Feeder", 
-            value: feederImpact, 
-            icon: Zap, 
-            metric: "feeder",
-            gradient: "from-amber-500 to-orange-600",
-            glowColor: "shadow-amber-500/50"
-          },
-          { 
             title: "Impact OLT", 
             value: totalOLT, 
-            icon: Server, 
+            emoji: "📟", 
             metric: "olt",
             gradient: "from-green-500 to-emerald-700",
             glowColor: "shadow-green-500/50"
+          },
+          { 
+            title: "Impact Feeder", 
+            value: feederImpact, 
+            emoji: "⛓️‍💥", 
+            metric: "feeder",
+            gradient: "from-amber-500 to-orange-600",
+            glowColor: "shadow-amber-500/50"
           }
         ].map((card, index) => (
           <motion.div
@@ -201,8 +201,8 @@ export default function Dashboard() {
             {/* Content */}
             <div className="relative p-6">
               <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl bg-gradient-to-br ${card.gradient} shadow-lg`}>
-                  <card.icon className="h-6 w-6 text-white" />
+                <div className={`p-3 rounded-xl bg-gradient-to-br ${card.gradient} shadow-lg flex items-center justify-center`}>
+                  <span className="text-2xl">{card.emoji}</span>
                 </div>
                 <TrendingUp className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
