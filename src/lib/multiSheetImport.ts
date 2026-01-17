@@ -48,7 +48,7 @@ export interface ImportResult {
 // Sheet detection patterns - exact sheet name matching
 const SHEET_PATTERNS = {
   user: ["list user", "user", "pelanggan", "customer", "data user"],
-  olt: ["list olt", "data olt"],
+  olt: ["list olt", "data olt", "olt", "sheet list olt", "daftar olt", "master olt", "inventory olt"],
   fat: ["list fat", "fat", "data fat"],
   upe: ["sheet list upe", "list upe", "upe", "data upe"],
   bng: ["sheet list bng", "list bng", "bng", "data bng"],
@@ -141,18 +141,46 @@ function detectSheetType(sheetName: string, sampleData: any[]): keyof typeof SHE
   if (sampleData.length > 0) {
     const headers = Object.keys(sampleData[0]).map(h => h.toLowerCase());
     
-    // Check for UPE-specific columns
-    if (headers.some(h => h.includes("upe")) && headers.some(h => h.includes("olt"))) {
-      // Check if it looks like BNG data (has more columns)
-      if (headers.some(h => h.includes("bng") || h.includes("vlan") || h.includes("port"))) {
-        return "bng";
-      }
+    // Check for BNG-specific columns first (most specific)
+    if (headers.some(h => h.includes("bng") || h.includes("vlan") || h.includes("port upe") || h.includes("radius"))) {
+      return "bng";
+    }
+    
+    // Check for OLT-specific columns (has ID OLT, IP NMS OLT, TIKOR OLT)
+    const hasIdOlt = headers.some(h => h.includes("id olt") || h.includes("id_olt") || h.includes("idolt"));
+    const hasIpNmsOlt = headers.some(h => h.includes("ip nms") || h.includes("ip_nms") || h.includes("ipnms"));
+    const hasTikorOlt = headers.some(h => 
+      (h.includes("tikor") && h.includes("olt")) || 
+      h === "tikor olt" || 
+      h === "tikor_olt"
+    );
+    const hasHostnameOlt = headers.some(h => h.includes("hostname olt") || h.includes("hostname_olt"));
+    const hasHostnameUpe = headers.some(h => h.includes("hostname upe") || h.includes("hostname_upe"));
+    const hasProvinsi = headers.some(h => h.includes("provinsi"));
+    
+    // OLT sheet: has provinsi, id olt, hostname olt, hostname upe, ip nms, tikor olt
+    if (hasProvinsi && hasIdOlt && hasHostnameOlt && (hasIpNmsOlt || hasTikorOlt || hasHostnameUpe)) {
+      return "olt";
+    }
+    
+    // Alternative OLT detection: has at least 3 OLT-specific columns
+    const oltColumnCount = [hasIdOlt, hasIpNmsOlt, hasTikorOlt, hasHostnameOlt && hasHostnameUpe].filter(Boolean).length;
+    if (oltColumnCount >= 2 && hasHostnameOlt) {
+      return "olt";
+    }
+    
+    // Check for UPE-specific columns (simpler - just hostname olt + hostname upe)
+    if (hasHostnameOlt && hasHostnameUpe && !hasIdOlt && !hasIpNmsOlt && !hasTikorOlt) {
       return "upe";
     }
     
-    // Check for FAT/OLT data
-    if (headers.some(h => h.includes("provinsi")) && 
-        headers.some(h => h.includes("fat") || h.includes("tikor"))) {
+    // Check for FAT data (has ID FAT or Tikor FAT)
+    const hasFatId = headers.some(h => h.includes("id fat") || h.includes("id_fat") || h.includes("fat id"));
+    const hasTikorFat = headers.some(h => 
+      (h.includes("tikor") && h.includes("fat")) || 
+      (h === "tikor" && !h.includes("olt"))
+    );
+    if (hasProvinsi && (hasFatId || hasTikorFat)) {
       return "fat";
     }
     
