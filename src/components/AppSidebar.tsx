@@ -1,4 +1,3 @@
-import { Moon, Sun } from "lucide-react";
 import iconnetLogo from "@/assets/iconnet-logo.png";
 import { NavLink } from "react-router-dom";
 import {
@@ -88,12 +87,8 @@ export function AppSidebar() {
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
             >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-              {!collapsed && <span className="ml-2">Dark Mode</span>}
+              <span className="text-base">{theme === "dark" ? "☀️" : "🌙"}</span>
+              {!collapsed && <span className="ml-2">{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
             </Button>
           </div>
           {!collapsed && (
