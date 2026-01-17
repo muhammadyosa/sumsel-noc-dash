@@ -1,4 +1,4 @@
-import { LayoutDashboard, Ticket, Users, Moon, Sun, Network, FileText, Settings, MapPin } from "lucide-react";
+import { LayoutDashboard, Ticket, Users, Moon, Sun, FileText, Settings } from "lucide-react";
 import iconnetLogo from "@/assets/iconnet-logo.png";
 import { NavLink } from "react-router-dom";
 import {
@@ -19,10 +19,10 @@ const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/", emoji: null },
   { title: "Ticket Management", icon: Ticket, path: "/tickets", emoji: null },
   { title: "List Team", icon: Users, path: "/teams", emoji: null },
-  { title: "List FAT", icon: MapPin, path: "/fat", emoji: null },
+  { title: "List FAT", icon: null, path: "/fat", emoji: "📍" },
   { title: "List OLT", icon: null, path: "/olt", emoji: "🖥️" },
   { title: "List UPE", icon: null, path: "/upe", emoji: "🔗" },
-  { title: "List BNG", icon: Network, path: "/bng", emoji: null },
+  { title: "List BNG", icon: null, path: "/bng", emoji: "🌐" },
   { title: "Report", icon: FileText, path: "/report", emoji: null },
   { title: "Settings", icon: Settings, path: "/settings", emoji: null },
 ];
