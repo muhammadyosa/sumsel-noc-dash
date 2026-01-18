@@ -113,33 +113,33 @@ export default function Teams() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={chartConfig} className="h-[400px] w-full transition-all duration-500 ease-out">
+              <ChartContainer config={chartConfig} className="h-[500px] w-full transition-all duration-500 ease-out">
                 <BarChart
                   data={chartData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                  barCategoryGap="20%"
-                  barGap={2}
+                  layout="vertical"
+                  margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
+                  barCategoryGap="25%"
+                  barGap={1}
                   onClick={(data) => {
                     if (data?.activePayload?.[0]?.payload?.team) {
                       setSelectedTeam(data.activePayload[0].payload.team);
                     }
                   }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
                   <XAxis 
-                    dataKey="team" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    interval={0}
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
-                    height={70}
-                    axisLine={{ stroke: "hsl(var(--border))" }}
+                    type="number"
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    axisLine={false}
                     tickLine={false}
                   />
                   <YAxis 
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
+                    type="category"
+                    dataKey="team"
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                     axisLine={false}
                     tickLine={false}
+                    width={75}
                   />
                   <ChartTooltip
                     content={
@@ -153,33 +153,33 @@ export default function Teams() {
                     dataKey="total" 
                     name="Total"
                     fill="hsl(var(--primary))" 
-                    radius={[3, 3, 0, 0]}
+                    radius={[0, 3, 3, 0]}
                     cursor="pointer"
-                    maxBarSize={24}
+                    maxBarSize={16}
                   />
                   <Bar 
                     dataKey="resolved" 
                     name="Resolved"
                     fill="hsl(var(--success))" 
-                    radius={[3, 3, 0, 0]}
+                    radius={[0, 3, 3, 0]}
                     cursor="pointer"
-                    maxBarSize={24}
+                    maxBarSize={16}
                   />
                   <Bar 
                     dataKey="pending" 
                     name="Pending"
                     fill="hsl(var(--warning))" 
-                    radius={[3, 3, 0, 0]}
+                    radius={[0, 3, 3, 0]}
                     cursor="pointer"
-                    maxBarSize={24}
+                    maxBarSize={16}
                   />
                   <Bar 
                     dataKey="critical" 
                     name="Critical"
                     fill="hsl(var(--destructive))" 
-                    radius={[3, 3, 0, 0]}
+                    radius={[0, 3, 3, 0]}
                     cursor="pointer"
-                    maxBarSize={24}
+                    maxBarSize={16}
                   />
                 </BarChart>
               </ChartContainer>
