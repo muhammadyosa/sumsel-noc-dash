@@ -15,7 +15,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   };
 
   return (
-    <Badge className={variants[status] || variants["Pending"]}>
+    <Badge className={`${variants[status] || variants["Pending"]} text-[8px] px-1.5 py-0 h-4 font-medium`}>
       {status}
     </Badge>
   );
