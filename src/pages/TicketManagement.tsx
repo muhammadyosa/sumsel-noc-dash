@@ -750,19 +750,21 @@ export default function TicketManagement() {
                     <TableRow key={ticket.id}>
                       <TableCell className="font-medium">{ticket.id}</TableCell>
                       <TableCell>
-                        <div className="flex flex-col items-center justify-center gap-0.5">
-                          <Badge
-                            className={`text-[10px] px-1.5 py-0 ${
-                              ticket.category === "FEEDER"
-                                ? "bg-warning text-warning-foreground"
-                                : "bg-primary text-primary-foreground"
-                            }`}
-                          >
-                            {ticket.category}
-                          </Badge>
-                          <span className="text-[10px] text-muted-foreground whitespace-nowrap font-medium">
+                        <div className="text-xs">
+                          <div className="font-medium">
+                            <Badge
+                              className={`text-[10px] px-1.5 py-0 ${
+                                ticket.category === "FEEDER"
+                                  ? "bg-warning text-warning-foreground"
+                                  : "bg-primary text-primary-foreground"
+                              }`}
+                            >
+                              {ticket.category}
+                            </Badge>
+                          </div>
+                          <div className="text-muted-foreground mt-1">
                             {ticket.constraint}
-                          </span>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -786,11 +788,13 @@ export default function TicketManagement() {
                       <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
                       <TableCell className="text-xs">{ticket.serpo}</TableCell>
                       <TableCell>
-                        <div className="flex flex-col items-center justify-center gap-0.5">
-                          <StatusBadge status={ticket.status} />
-                          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                        <div className="text-xs">
+                          <div className="font-medium">
+                            <StatusBadge status={ticket.status} />
+                          </div>
+                          <div className="text-muted-foreground mt-1">
                             {ticket.createdAt}
-                          </span>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
