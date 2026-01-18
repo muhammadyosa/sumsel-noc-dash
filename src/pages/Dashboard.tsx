@@ -507,27 +507,27 @@ export default function Dashboard() {
                 <div className="rounded-md border overflow-auto max-h-80">
                   <Table>
                     <TableHeader>
-                      <TableRow className="h-6">
-                        <TableHead className="px-1 py-0.5 text-[10px]">Ticket ID</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[10px]">Type</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[10px]">Customer/Type</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[10px]">Service ID</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[10px]">Serpo</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[10px]">Status</TableHead>
+                      <TableRow className="h-7">
+                        <TableHead className="px-2 py-1 text-[11px]">Ticket ID</TableHead>
+                        <TableHead className="px-2 py-1 text-[11px]">Type</TableHead>
+                        <TableHead className="px-2 py-1 text-[11px]">Customer/Type</TableHead>
+                        <TableHead className="px-2 py-1 text-[11px]">Service ID</TableHead>
+                        <TableHead className="px-2 py-1 text-[11px]">Serpo</TableHead>
+                        <TableHead className="px-2 py-1 text-[11px]">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {recentTickets.map((ticket) => (
                         <TableRow 
                           key={ticket.id}
-                          className="cursor-pointer hover:bg-muted/50 transition-colors h-8"
+                          className="cursor-pointer hover:bg-muted/50 transition-colors h-9"
                           onClick={() => setSelectedTicket(ticket)}
                         >
-                          <TableCell className="px-1 py-0.5 text-[10px] font-medium">{ticket.id}</TableCell>
-                          <TableCell className="px-1 py-0.5">
+                          <TableCell className="px-2 py-1 text-[11px] font-medium">{ticket.id}</TableCell>
+                          <TableCell className="px-2 py-1">
                             <div>
                               <span
-                                className={`text-[8px] px-1 py-0 rounded font-semibold ${
+                                className={`text-[9px] px-1.5 py-0.5 rounded font-semibold ${
                                   ticket.category === "FEEDER"
                                     ? "bg-warning text-warning-foreground"
                                     : "bg-primary text-primary-foreground"
@@ -535,40 +535,40 @@ export default function Dashboard() {
                               >
                                 {ticket.category}
                               </span>
-                              <div className="text-[8px] text-muted-foreground">
+                              <div className="text-[9px] text-muted-foreground mt-0.5">
                                 {ticket.constraint}
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="px-1 py-0.5">
+                          <TableCell className="px-2 py-1">
                             {ticket.category === "FEEDER" ? (
                               ticket.constraint === "OLT DOWN" ? (
-                                <span className="text-[10px] font-medium">{ticket.hostname}</span>
+                                <span className="text-[11px] font-medium">{ticket.hostname}</span>
                               ) :
                               ticket.constraint === "PORT DOWN" ? (
-                                <div className="text-[10px]">
+                                <div className="text-[11px]">
                                   <div className="font-medium">{ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT INFO"}</div>
-                                  <div className="text-muted-foreground text-[8px]">{ticket.hostname}</div>
+                                  <div className="text-muted-foreground text-[9px]">{ticket.hostname}</div>
                                 </div>
                               ) :
                               ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? (
-                                <div className="text-[10px]">
+                                <div className="text-[11px]">
                                   <div className="font-medium">{ticket.fatId}</div>
-                                  <div className="text-muted-foreground text-[8px]">{ticket.hostname}</div>
+                                  <div className="text-muted-foreground text-[9px]">{ticket.hostname}</div>
                                 </div>
                               ) : (
-                                <span className="text-[10px] font-medium">{ticket.constraint}</span>
+                                <span className="text-[11px] font-medium">{ticket.constraint}</span>
                               )
                             ) : (
-                              <span className="text-[10px] font-medium">{ticket.customerName || "-"}</span>
+                              <span className="text-[11px] font-medium">{ticket.customerName || "-"}</span>
                             )}
                           </TableCell>
-                          <TableCell className="px-1 py-0.5 font-mono text-[10px]">{ticket.serviceId}</TableCell>
-                          <TableCell className="px-1 py-0.5 text-[10px]">{ticket.serpo}</TableCell>
-                          <TableCell className="px-1 py-0.5">
+                          <TableCell className="px-2 py-1 font-mono text-[11px]">{ticket.serviceId}</TableCell>
+                          <TableCell className="px-2 py-1 text-[11px]">{ticket.serpo}</TableCell>
+                          <TableCell className="px-2 py-1">
                             <div>
                               <StatusBadge status={ticket.status} />
-                              <div className="text-[8px] text-muted-foreground">
+                              <div className="text-[9px] text-muted-foreground mt-0.5">
                                 {new Date(ticket.createdISO).toLocaleString("id-ID", {
                                   day: "numeric",
                                   month: "numeric",
