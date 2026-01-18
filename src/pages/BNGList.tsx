@@ -222,31 +222,31 @@ const BNGList = () => {
           </div>
 
           <div className="rounded-md border overflow-auto max-h-96">
-            <Table>
+            <Table className="text-[10px]">
               <TableHeader>
                 <TableRow>
-                  <TableHead>IP RADIUS</TableHead>
-                  <TableHead>HOSTNAME RADIUS</TableHead>
-                  <TableHead>IP BNG</TableHead>
-                  <TableHead>HOSTNAME BNG</TableHead>
-                  <TableHead>NPE</TableHead>
-                  <TableHead>VLAN</TableHead>
-                  <TableHead>HOSTNAME OLT</TableHead>
-                  <TableHead>UPE</TableHead>
-                  <TableHead>PORT UPE</TableHead>
-                  <TableHead>KOTA/KABUPATEN</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">IP RADIUS</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">HOST RADIUS</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">IP BNG</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">HOST BNG</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">NPE</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">VLAN</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">HOST OLT</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">UPE</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">PORT UPE</TableHead>
+                  <TableHead className="px-1 py-1 whitespace-nowrap">KOTA/KAB</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center text-muted-foreground">
+                    <TableCell colSpan={10} className="text-center text-muted-foreground px-1 py-1">
                       Memuat data BNG...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center text-muted-foreground">
+                    <TableCell colSpan={10} className="text-center text-muted-foreground px-1 py-1">
                       {bngData.length === 0
                         ? "Belum ada data BNG. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
@@ -255,16 +255,16 @@ const BNGList = () => {
                 ) : (
                   filteredData.slice(0, 100).map((bng) => (
                     <TableRow key={bng.id}>
-                      <TableCell className="font-mono text-xs">{bng.ipRadius}</TableCell>
-                      <TableCell className="font-mono text-xs">{bng.hostnameRadius}</TableCell>
-                      <TableCell className="font-mono text-xs">{bng.ipBng}</TableCell>
-                      <TableCell className="font-mono text-xs">{bng.hostnameBng}</TableCell>
-                      <TableCell className="font-mono text-xs">{bng.npe}</TableCell>
-                      <TableCell className="font-mono text-xs">{bng.vlan}</TableCell>
-                      <TableCell className="font-mono text-xs">{bng.hostnameOlt}</TableCell>
-                      <TableCell className="font-mono text-xs">{bng.upe}</TableCell>
-                      <TableCell className="font-mono text-xs">{bng.portUpe}</TableCell>
-                      <TableCell>{bng.kotaKabupaten}</TableCell>
+                      <TableCell className="font-mono px-1 py-0.5">{bng.ipRadius}</TableCell>
+                      <TableCell className="font-mono px-1 py-0.5">{bng.hostnameRadius}</TableCell>
+                      <TableCell className="font-mono px-1 py-0.5">{bng.ipBng}</TableCell>
+                      <TableCell className="font-mono px-1 py-0.5">{bng.hostnameBng}</TableCell>
+                      <TableCell className="font-mono px-1 py-0.5">{bng.npe}</TableCell>
+                      <TableCell className="font-mono px-1 py-0.5">{bng.vlan}</TableCell>
+                      <TableCell className="font-mono px-1 py-0.5">{bng.hostnameOlt}</TableCell>
+                      <TableCell className="font-mono px-1 py-0.5">{bng.upe}</TableCell>
+                      <TableCell className="font-mono px-1 py-0.5">{bng.portUpe}</TableCell>
+                      <TableCell className="px-1 py-0.5">{bng.kotaKabupaten}</TableCell>
                     </TableRow>
                   ))
                 )}
