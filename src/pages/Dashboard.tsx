@@ -743,19 +743,33 @@ export default function Dashboard() {
                       Tidak ada data OLT
                     </p>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="space-y-2">
                       {uniqueOlts.map(([hostname, count], index) => (
                         <div 
                           key={hostname} 
-                          className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                          className="p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
                         >
-                          <div className="flex items-center gap-3 min-w-0">
-                            <span className="text-xs text-muted-foreground w-6">{index + 1}.</span>
-                            <span className="font-mono text-sm font-medium truncate">{hostname}</span>
+                          {/* Row 1: No, Hostname, Count */}
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-xs text-muted-foreground flex-shrink-0">{index + 1}.</span>
+                              <span className="font-mono font-semibold text-primary text-sm truncate">{hostname}</span>
+                            </div>
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              <span className="text-lg font-bold text-primary">{count}</span>
+                              <span className="text-xs text-muted-foreground">tiket</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-1 flex-shrink-0">
-                            <span className="text-lg font-bold text-primary">{count}</span>
-                            <span className="text-xs text-muted-foreground">tiket</span>
+                          
+                          {/* Row 2: Additional Info */}
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                            <div className="flex items-center gap-1">
+                              <span className="text-muted-foreground">Status:</span>
+                              <span className="font-medium text-success">Active</span>
+                            </div>
+                            <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-warning/20 text-warning">
+                              OLT
+                            </span>
                           </div>
                         </div>
                       ))}
