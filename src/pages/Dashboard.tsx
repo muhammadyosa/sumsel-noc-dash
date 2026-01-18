@@ -516,8 +516,7 @@ export default function Dashboard() {
                         <TableHead className="px-1 py-0.5 text-[9px]">Host</TableHead>
                         <TableHead className="px-1 py-0.5 text-[9px]">FAT</TableHead>
                         <TableHead className="px-1 py-0.5 text-[9px]">ONT</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px]">Constraint</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px]">Cat</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px] text-center">Type</TableHead>
                         <TableHead className="px-1 py-0.5 text-[9px] text-center">Status</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -549,20 +548,20 @@ export default function Dashboard() {
                             <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.fatId}</TableCell>
                             <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.snOnt}</TableCell>
                             <TableCell className="px-1 py-0.5">
-                              <span className="text-[8px] px-1 py-0.5 rounded bg-accent/10 text-accent font-medium whitespace-nowrap">
-                                {ticket.constraint}
-                              </span>
-                            </TableCell>
-                            <TableCell className="px-1 py-0.5">
-                              <span
-                                className={`text-[8px] px-1 py-0.5 rounded font-medium whitespace-nowrap ${
-                                  ticket.category === "FEEDER"
-                                    ? "bg-warning/20 text-warning"
-                                    : "bg-primary/20 text-primary"
-                                }`}
-                              >
-                                {ticket.category}
-                              </span>
+                              <div className="flex flex-col items-center justify-center gap-0.5">
+                                <span
+                                  className={`text-[8px] px-1 py-0.5 rounded font-medium whitespace-nowrap ${
+                                    ticket.category === "FEEDER"
+                                      ? "bg-warning/20 text-warning"
+                                      : "bg-primary/20 text-primary"
+                                  }`}
+                                >
+                                  {ticket.category}
+                                </span>
+                                <span className="text-[7px] text-muted-foreground/80 whitespace-nowrap font-medium">
+                                  {ticket.constraint}
+                                </span>
+                              </div>
                             </TableCell>
                             <TableCell className="px-1 py-0.5">
                               <div className="flex flex-col items-center justify-center gap-0.5">
