@@ -32,7 +32,7 @@ export const RITEL_CONSTRAINTS = [
   "GANGGUAN BERULANG",
   "PENGECEKAN BERSAMA",
   "CABLE PROBLEM",
-  "INTERMITTEN",
+  "INTERMITTENT",
 ];
 
 // FEEDER Constraints - masuk bucket FEEDER (PROACTIVE NOC RETAIL)
@@ -78,6 +78,11 @@ export function generateTicketFormat(
   
   if (constraint === "CABLE PROBLEM (FEEDER)") {
     return `[PROACTIVE NOC RETAIL] CABLE PROBLEM UNDER - ${serpo}`;
+  }
+  
+  // INTERMITTENT - lowercase in format
+  if (constraint === "INTERMITTENT") {
+    return `${customerName} // intermittent - ${serpo} // ${fatId} // ${hostname} // ${snOnt} //`;
   }
   
   // RITEL Format (default) - includes CABLE PROBLEM
