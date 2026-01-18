@@ -180,27 +180,27 @@ const OLTDeviceList = () => {
           </div>
 
           <div className="rounded-md border overflow-auto max-h-96">
-            <Table>
+            <Table className="text-xs">
               <TableHeader>
                 <TableRow>
-                  <TableHead>PROVINSI</TableHead>
-                  <TableHead>ID OLT</TableHead>
-                  <TableHead>HOSTNAME OLT</TableHead>
-                  <TableHead>HOSTNAME UPE</TableHead>
-                  <TableHead>IP NMS OLT</TableHead>
-                  <TableHead>TIKOR OLT</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">PROVINSI</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">ID OLT</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">HOSTNAME OLT</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">HOSTNAME UPE</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">IP NMS</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">TIKOR</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground px-2 py-1.5">
                       Memuat data OLT...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground px-2 py-1.5">
                       {oltData.length === 0
                         ? "Belum ada data OLT. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
@@ -209,12 +209,12 @@ const OLTDeviceList = () => {
                 ) : (
                   filteredData.slice(0, 100).map((olt) => (
                     <TableRow key={olt.id}>
-                      <TableCell>{olt.provinsi}</TableCell>
-                      <TableCell className="font-mono text-xs">{olt.idOlt}</TableCell>
-                      <TableCell className="font-mono text-xs">{olt.hostnameOlt}</TableCell>
-                      <TableCell className="font-mono text-xs">{olt.hostnameUpe}</TableCell>
-                      <TableCell className="font-mono text-xs">{olt.ipNmsOlt}</TableCell>
-                      <TableCell className="font-mono text-xs">{olt.tikorOlt}</TableCell>
+                      <TableCell className="px-2 py-1.5">{olt.provinsi}</TableCell>
+                      <TableCell className="font-mono px-2 py-1.5">{olt.idOlt}</TableCell>
+                      <TableCell className="font-mono px-2 py-1.5">{olt.hostnameOlt}</TableCell>
+                      <TableCell className="font-mono px-2 py-1.5">{olt.hostnameUpe}</TableCell>
+                      <TableCell className="font-mono px-2 py-1.5">{olt.ipNmsOlt}</TableCell>
+                      <TableCell className="font-mono px-2 py-1.5">{olt.tikorOlt}</TableCell>
                     </TableRow>
                   ))
                 )}

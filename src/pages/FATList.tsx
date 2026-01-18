@@ -173,25 +173,25 @@ const FATList = () => {
           </div>
 
           <div className="rounded-md border overflow-auto max-h-96">
-            <Table>
+            <Table className="text-xs">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nama Provinsi</TableHead>
-                  <TableHead>ID FAT</TableHead>
-                  <TableHead>Hostname OLT</TableHead>
-                  <TableHead>Tikor FAT</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">Provinsi</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">ID FAT</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">Hostname OLT</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">Tikor</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    <TableCell colSpan={4} className="text-center text-muted-foreground px-2 py-1.5">
                       Memuat data FAT...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    <TableCell colSpan={4} className="text-center text-muted-foreground px-2 py-1.5">
                       {fatData.length === 0
                         ? "Belum ada data FAT. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
@@ -200,10 +200,10 @@ const FATList = () => {
                  ) : (
                   filteredData.slice(0, 100).map((fat) => (
                     <TableRow key={fat.id}>
-                      <TableCell className="font-medium">{fat.provinsi}</TableCell>
-                      <TableCell className="font-mono text-xs">{fat.fatId}</TableCell>
-                      <TableCell className="font-mono text-xs">{fat.hostname}</TableCell>
-                      <TableCell>{fat.tikor}</TableCell>
+                      <TableCell className="px-2 py-1.5">{fat.provinsi}</TableCell>
+                      <TableCell className="font-mono px-2 py-1.5">{fat.fatId}</TableCell>
+                      <TableCell className="font-mono px-2 py-1.5">{fat.hostname}</TableCell>
+                      <TableCell className="px-2 py-1.5">{fat.tikor}</TableCell>
                     </TableRow>
                   ))
                 )}

@@ -190,23 +190,23 @@ const UPEList = () => {
           </div>
 
           <div className="rounded-md border overflow-auto max-h-96">
-            <Table>
+            <Table className="text-xs">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Hostname UPE</TableHead>
-                  <TableHead>Hostname OLT</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">Hostname UPE</TableHead>
+                  <TableHead className="px-2 py-1.5 whitespace-nowrap">Hostname OLT</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={2} className="text-center text-muted-foreground">
+                    <TableCell colSpan={2} className="text-center text-muted-foreground px-2 py-1.5">
                       Memuat data UPE...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={2} className="text-center text-muted-foreground">
+                    <TableCell colSpan={2} className="text-center text-muted-foreground px-2 py-1.5">
                       {upeData.length === 0
                         ? "Belum ada data UPE. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
@@ -215,8 +215,8 @@ const UPEList = () => {
                 ) : (
                   filteredData.slice(0, 100).map((upe) => (
                     <TableRow key={upe.id}>
-                      <TableCell className="font-mono text-xs">{upe.hostnameUPE}</TableCell>
-                      <TableCell className="font-mono text-xs">{upe.hostnameOLT}</TableCell>
+                      <TableCell className="font-mono px-2 py-1.5">{upe.hostnameUPE}</TableCell>
+                      <TableCell className="font-mono px-2 py-1.5">{upe.hostnameOLT}</TableCell>
                     </TableRow>
                   ))
                 )}
