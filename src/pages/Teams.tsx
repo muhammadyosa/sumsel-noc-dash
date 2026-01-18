@@ -113,26 +113,34 @@ export default function Teams() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={chartConfig} className="h-[400px] w-full">
+              <ChartContainer config={chartConfig} className="h-[400px] w-full transition-all duration-500 ease-out">
                 <BarChart
                   data={chartData}
                   margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                  barCategoryGap="20%"
+                  barGap={2}
                   onClick={(data) => {
                     if (data?.activePayload?.[0]?.payload?.team) {
                       setSelectedTeam(data.activePayload[0].payload.team);
                     }
                   }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
                   <XAxis 
                     dataKey="team" 
                     angle={-45} 
                     textAnchor="end" 
                     interval={0}
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                    height={80}
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                    height={70}
+                    axisLine={{ stroke: "hsl(var(--border))" }}
+                    tickLine={false}
                   />
-                  <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis 
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} 
+                    axisLine={false}
+                    tickLine={false}
+                  />
                   <ChartTooltip
                     content={
                       <ChartTooltipContent
@@ -140,30 +148,38 @@ export default function Teams() {
                       />
                     }
                   />
-                  <ChartLegend content={<ChartLegendContent />} />
+                  <ChartLegend content={<ChartLegendContent />} verticalAlign="top" />
                   <Bar 
                     dataKey="total" 
+                    name="Total"
                     fill="hsl(var(--primary))" 
-                    radius={[4, 4, 0, 0]}
+                    radius={[3, 3, 0, 0]}
                     cursor="pointer"
+                    maxBarSize={24}
                   />
                   <Bar 
                     dataKey="resolved" 
+                    name="Resolved"
                     fill="hsl(var(--success))" 
-                    radius={[4, 4, 0, 0]}
+                    radius={[3, 3, 0, 0]}
                     cursor="pointer"
+                    maxBarSize={24}
                   />
                   <Bar 
                     dataKey="pending" 
+                    name="Pending"
                     fill="hsl(var(--warning))" 
-                    radius={[4, 4, 0, 0]}
+                    radius={[3, 3, 0, 0]}
                     cursor="pointer"
+                    maxBarSize={24}
                   />
                   <Bar 
                     dataKey="critical" 
+                    name="Critical"
                     fill="hsl(var(--destructive))" 
-                    radius={[4, 4, 0, 0]}
+                    radius={[3, 3, 0, 0]}
                     cursor="pointer"
+                    maxBarSize={24}
                   />
                 </BarChart>
               </ChartContainer>
