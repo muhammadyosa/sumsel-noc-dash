@@ -507,74 +507,72 @@ export default function Dashboard() {
                 <div className="rounded-md border overflow-auto max-h-80">
                   <Table>
                     <TableHeader>
-                      <TableRow className="h-7">
-                        <TableHead className="px-1 py-0.5 text-[9px]">Tiket</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px]">SID</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px]">Info</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px]">SERPO</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px]">Host</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px]">FAT</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px]">ONT</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px] text-center">Type</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px] text-center">Status</TableHead>
+                      <TableRow className="h-8">
+                        <TableHead className="px-2 py-1 text-xs">Ticket ID</TableHead>
+                        <TableHead className="px-2 py-1 text-xs text-center">Type</TableHead>
+                        <TableHead className="px-2 py-1 text-xs">Customer/Type</TableHead>
+                        <TableHead className="px-2 py-1 text-xs">Service ID</TableHead>
+                        <TableHead className="px-2 py-1 text-xs">Serpo</TableHead>
+                        <TableHead className="px-2 py-1 text-xs text-center">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {recentTickets.map((ticket, index) => (
+                      {recentTickets.map((ticket) => (
                         <TableRow 
                           key={ticket.id}
-                          className="cursor-pointer hover:bg-muted/50 transition-colors h-6"
+                          className="cursor-pointer hover:bg-muted/50 transition-colors"
                           onClick={() => setSelectedTicket(ticket)}
                         >
-                            <TableCell className="px-1 py-0.5 text-[9px] font-semibold text-primary">{ticket.id}</TableCell>
-                            <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.serviceId}</TableCell>
-                            <TableCell className="px-1 py-0.5 text-[9px] max-w-[100px] truncate">
-                              {ticket.category === "FEEDER" 
-                                ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
-                                    ? `${ticket.fatId}`
-                                    : ticket.constraint === "PORT DOWN"
-                                      ? (() => {
-                                          const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
-                                          return match ? match[1] : "PORT";
-                                        })()
+                          <TableCell className="px-2 py-2 text-sm font-medium">{ticket.id}</TableCell>
+                          <TableCell className="px-2 py-2">
+                            <div className="flex flex-col items-center justify-center gap-1">
+                              <span
+                                className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
+                                  ticket.category === "FEEDER"
+                                    ? "bg-warning text-warning-foreground"
+                                    : "bg-primary text-primary-foreground"
+                                }`}
+                              >
+                                {ticket.category}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                {ticket.constraint}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-2 py-2 text-sm font-medium">
+                            {ticket.category === "FEEDER" 
+                              ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
+                                  ? `${ticket.fatId}\n${ticket.hostname}`
+                                  : ticket.constraint === "PORT DOWN"
+                                    ? (() => {
+                                        const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
+                                        return match ? match[1] : "PORT";
+                                      })()
+                                    : ticket.constraint === "OLT DOWN"
+                                      ? ticket.hostname
                                       : ticket.customerName || "-")
-                                : (ticket.customerName || "-")
-                              }
-                            </TableCell>
-                            <TableCell className="px-1 py-0.5 text-[9px] font-medium">{ticket.serpo}</TableCell>
-                            <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.hostname}</TableCell>
-                            <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.fatId}</TableCell>
-                            <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.snOnt}</TableCell>
-                            <TableCell className="px-1 py-0.5">
-                              <div className="flex flex-col items-center justify-center gap-0.5">
-                                <span
-                                  className={`text-[8px] px-1 py-0.5 rounded font-medium whitespace-nowrap ${
-                                    ticket.category === "FEEDER"
-                                      ? "bg-warning/20 text-warning"
-                                      : "bg-primary/20 text-primary"
-                                  }`}
-                                >
-                                  {ticket.category}
-                                </span>
-                                <span className="text-[7px] text-muted-foreground/80 whitespace-nowrap font-medium">
-                                  {ticket.constraint}
-                                </span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="px-1 py-0.5">
-                              <div className="flex flex-col items-center justify-center gap-0.5">
-                                <StatusBadge status={ticket.status} />
-                                <span className="text-[7px] text-muted-foreground/80 whitespace-nowrap font-medium">
-                                  {new Date(ticket.createdISO).toLocaleString("id-ID", {
-                                    day: "2-digit",
-                                    month: "short",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}
-                                </span>
-                              </div>
-                            </TableCell>
-                          </TableRow>
+                              : (ticket.customerName || "-")
+                            }
+                          </TableCell>
+                          <TableCell className="px-2 py-2 font-mono text-sm">{ticket.serviceId}</TableCell>
+                          <TableCell className="px-2 py-2 text-sm">{ticket.serpo}</TableCell>
+                          <TableCell className="px-2 py-2">
+                            <div className="flex flex-col items-center justify-center gap-1">
+                              <StatusBadge status={ticket.status} />
+                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                {new Date(ticket.createdISO).toLocaleString("id-ID", {
+                                  day: "numeric",
+                                  month: "numeric",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  second: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
                       ))}
                     </TableBody>
                   </Table>
