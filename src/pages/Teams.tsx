@@ -136,11 +136,10 @@ export default function Teams() {
                   <YAxis 
                     type="category"
                     dataKey="team"
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
                     axisLine={false}
                     tickLine={false}
-                    width={70}
-                    tickFormatter={(value) => value.length > 10 ? `${value.slice(0, 10)}...` : value}
+                    width={100}
                   />
                   <ChartTooltip
                     content={
