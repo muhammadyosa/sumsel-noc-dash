@@ -540,20 +540,28 @@ export default function Dashboard() {
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell className="px-2 py-2 text-sm font-medium">
-                            {ticket.category === "FEEDER" 
-                              ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
-                                  ? `${ticket.fatId}\n${ticket.hostname}`
-                                  : ticket.constraint === "PORT DOWN"
-                                    ? (() => {
-                                        const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
-                                        return match ? match[1] : "PORT";
-                                      })()
-                                    : ticket.constraint === "OLT DOWN"
-                                      ? ticket.hostname
-                                      : ticket.customerName || "-")
-                              : (ticket.customerName || "-")
-                            }
+                          <TableCell className="px-2 py-2">
+                            {ticket.category === "FEEDER" ? (
+                              ticket.constraint === "OLT DOWN" ? (
+                                <span className="text-sm font-medium">{ticket.hostname}</span>
+                              ) :
+                              ticket.constraint === "PORT DOWN" ? (
+                                <div className="text-xs">
+                                  <div className="font-medium">{ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT INFO"}</div>
+                                  <div className="text-muted-foreground">{ticket.hostname}</div>
+                                </div>
+                              ) :
+                              ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? (
+                                <div className="text-xs">
+                                  <div className="font-medium">{ticket.fatId}</div>
+                                  <div className="text-muted-foreground">{ticket.hostname}</div>
+                                </div>
+                              ) : (
+                                <span className="text-sm font-medium">{ticket.constraint}</span>
+                              )
+                            ) : (
+                              <span className="text-sm font-medium">{ticket.customerName || "-"}</span>
+                            )}
                           </TableCell>
                           <TableCell className="px-2 py-2 font-mono text-sm">{ticket.serviceId}</TableCell>
                           <TableCell className="px-2 py-2 text-sm">{ticket.serpo}</TableCell>
