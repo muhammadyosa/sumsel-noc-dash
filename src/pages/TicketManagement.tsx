@@ -730,10 +730,9 @@ export default function TicketManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Ticket ID</TableHead>
-                  <TableHead>Category</TableHead>
+                  <TableHead className="text-center">Type</TableHead>
                   <TableHead>Customer/Type</TableHead>
                   <TableHead>Service ID</TableHead>
-                  <TableHead>Constraint</TableHead>
                   <TableHead>Serpo</TableHead>
                   <TableHead className="text-center">Status</TableHead>
                   <TableHead>Action</TableHead>
@@ -742,7 +741,7 @@ export default function TicketManagement() {
               <TableBody>
                 {tickets.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground">
                       Belum ada tiket
                     </TableCell>
                   </TableRow>
@@ -751,15 +750,20 @@ export default function TicketManagement() {
                     <TableRow key={ticket.id}>
                       <TableCell className="font-medium">{ticket.id}</TableCell>
                       <TableCell>
-                        <Badge
-                          className={
-                            ticket.category === "FEEDER"
-                              ? "bg-warning text-warning-foreground"
-                              : "bg-primary text-primary-foreground"
-                          }
-                        >
-                          {ticket.category}
-                        </Badge>
+                        <div className="flex flex-col items-center justify-center gap-0.5">
+                          <Badge
+                            className={`text-[10px] px-1.5 py-0 ${
+                              ticket.category === "FEEDER"
+                                ? "bg-warning text-warning-foreground"
+                                : "bg-primary text-primary-foreground"
+                            }`}
+                          >
+                            {ticket.category}
+                          </Badge>
+                          <span className="text-[10px] text-muted-foreground whitespace-nowrap font-medium">
+                            {ticket.constraint}
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell>
                         {ticket.category === "FEEDER" ? (
@@ -780,7 +784,6 @@ export default function TicketManagement() {
                         ) : ticket.customerName}
                       </TableCell>
                       <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
-                      <TableCell className="text-xs">{ticket.constraint}</TableCell>
                       <TableCell className="text-xs">{ticket.serpo}</TableCell>
                       <TableCell>
                         <div className="flex flex-col items-center justify-center gap-0.5">
