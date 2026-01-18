@@ -504,60 +504,59 @@ export default function Dashboard() {
                   Belum ada tiket
                 </p>
               ) : (
-                <div className="rounded-md border overflow-auto max-h-96">
+                <div className="rounded-md border overflow-auto max-h-80">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-12">No</TableHead>
-                        <TableHead>Tiket ID</TableHead>
-                        <TableHead>Service ID</TableHead>
-                        <TableHead>Customer / Info</TableHead>
-                        <TableHead>SERPO</TableHead>
-                        <TableHead>Hostname</TableHead>
-                        <TableHead>FAT ID</TableHead>
-                        <TableHead>SN ONT</TableHead>
-                        <TableHead>Constraint</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Created</TableHead>
+                      <TableRow className="h-8">
+                        <TableHead className="w-8 px-2 py-1 text-[10px]">No</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">Tiket ID</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">Service ID</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">Info</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">SERPO</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">Hostname</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">FAT</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">ONT</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">Constraint</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">Cat</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">Status</TableHead>
+                        <TableHead className="px-2 py-1 text-[10px]">Time</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {recentTickets.map((ticket, index) => (
                         <TableRow 
                           key={ticket.id}
-                          className="cursor-pointer hover:bg-muted/50 transition-colors"
+                          className="cursor-pointer hover:bg-muted/50 transition-colors h-7"
                           onClick={() => setSelectedTicket(ticket)}
                         >
-                            <TableCell className="font-medium">{index + 1}</TableCell>
-                            <TableCell className="font-semibold text-primary">{ticket.id}</TableCell>
-                            <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
-                            <TableCell className="max-w-[200px] truncate">
+                            <TableCell className="px-2 py-1 text-[10px] font-medium">{index + 1}</TableCell>
+                            <TableCell className="px-2 py-1 text-[10px] font-semibold text-primary">{ticket.id}</TableCell>
+                            <TableCell className="px-2 py-1 font-mono text-[10px]">{ticket.serviceId}</TableCell>
+                            <TableCell className="px-2 py-1 text-[10px] max-w-[120px] truncate">
                               {ticket.category === "FEEDER" 
                                 ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
-                                    ? `${ticket.fatId} - ${ticket.hostname}`
+                                    ? `${ticket.fatId}`
                                     : ticket.constraint === "PORT DOWN"
                                       ? (() => {
                                           const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
-                                          const portInfo = match ? match[1] : "PORT";
-                                          return `${portInfo} - ${ticket.hostname}`;
+                                          return match ? match[1] : "PORT";
                                         })()
                                       : ticket.customerName || "-")
                                 : (ticket.customerName || "-")
                               }
                             </TableCell>
-                            <TableCell className="font-medium text-xs">{ticket.serpo}</TableCell>
-                            <TableCell className="font-mono text-xs">{ticket.hostname}</TableCell>
-                            <TableCell className="font-mono text-xs">{ticket.fatId}</TableCell>
-                            <TableCell className="font-mono text-xs">{ticket.snOnt}</TableCell>
-                            <TableCell>
-                              <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
+                            <TableCell className="px-2 py-1 text-[10px] font-medium">{ticket.serpo}</TableCell>
+                            <TableCell className="px-2 py-1 font-mono text-[10px]">{ticket.hostname}</TableCell>
+                            <TableCell className="px-2 py-1 font-mono text-[10px]">{ticket.fatId}</TableCell>
+                            <TableCell className="px-2 py-1 font-mono text-[10px]">{ticket.snOnt}</TableCell>
+                            <TableCell className="px-2 py-1">
+                              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
                                 {ticket.constraint}
                               </span>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="px-2 py-1">
                               <span
-                                className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
+                                className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${
                                   ticket.category === "FEEDER"
                                     ? "bg-warning/20 text-warning"
                                     : "bg-primary/20 text-primary"
@@ -566,10 +565,10 @@ export default function Dashboard() {
                                 {ticket.category}
                               </span>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="px-2 py-1">
                               <StatusBadge status={ticket.status} />
                             </TableCell>
-                            <TableCell className="text-xs whitespace-nowrap">
+                            <TableCell className="px-2 py-1 text-[10px] whitespace-nowrap">
                               {new Date(ticket.createdISO).toLocaleString("id-ID", {
                                 day: "2-digit",
                                 month: "short",
