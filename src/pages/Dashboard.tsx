@@ -509,11 +509,11 @@ export default function Dashboard() {
                     <TableHeader>
                       <TableRow className="h-8">
                         <TableHead className="px-2 py-1 text-xs">Ticket ID</TableHead>
-                        <TableHead className="px-2 py-1 text-xs text-center">Type</TableHead>
+                        <TableHead className="px-2 py-1 text-xs">Type</TableHead>
                         <TableHead className="px-2 py-1 text-xs">Customer/Type</TableHead>
                         <TableHead className="px-2 py-1 text-xs">Service ID</TableHead>
                         <TableHead className="px-2 py-1 text-xs">Serpo</TableHead>
-                        <TableHead className="px-2 py-1 text-xs text-center">Status</TableHead>
+                        <TableHead className="px-2 py-1 text-xs">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -525,19 +525,17 @@ export default function Dashboard() {
                         >
                           <TableCell className="px-2 py-2 text-sm font-medium">{ticket.id}</TableCell>
                           <TableCell className="px-2 py-2">
-                            <div className="text-xs">
-                              <div className="font-medium">
-                                <span
-                                  className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
-                                    ticket.category === "FEEDER"
-                                      ? "bg-warning text-warning-foreground"
-                                      : "bg-primary text-primary-foreground"
-                                  }`}
-                                >
-                                  {ticket.category}
-                                </span>
-                              </div>
-                              <div className="text-muted-foreground mt-1">
+                            <div>
+                              <span
+                                className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
+                                  ticket.category === "FEEDER"
+                                    ? "bg-warning text-warning-foreground"
+                                    : "bg-primary text-primary-foreground"
+                                }`}
+                              >
+                                {ticket.category}
+                              </span>
+                              <div className="text-[10px] text-muted-foreground mt-0.5">
                                 {ticket.constraint}
                               </div>
                             </div>
@@ -568,11 +566,9 @@ export default function Dashboard() {
                           <TableCell className="px-2 py-2 font-mono text-sm">{ticket.serviceId}</TableCell>
                           <TableCell className="px-2 py-2 text-sm">{ticket.serpo}</TableCell>
                           <TableCell className="px-2 py-2">
-                            <div className="text-xs">
-                              <div className="font-medium">
-                                <StatusBadge status={ticket.status} />
-                              </div>
-                              <div className="text-muted-foreground mt-1">
+                            <div>
+                              <StatusBadge status={ticket.status} />
+                              <div className="text-[10px] text-muted-foreground mt-0.5">
                                 {new Date(ticket.createdISO).toLocaleString("id-ID", {
                                   day: "numeric",
                                   month: "numeric",
