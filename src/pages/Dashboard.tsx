@@ -699,241 +699,150 @@ export default function Dashboard() {
 
       {/* Filter Dialog - Shows tickets by Status or Category or OLT List */}
       <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
-        <DialogContent className="max-w-[95vw] w-full lg:max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="w-[95vw] max-w-4xl max-h-[85vh] overflow-hidden flex flex-col p-4 sm:p-6">
           <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="flex items-center gap-2 text-xl">
+            <DialogTitle className="flex items-center gap-2 text-lg">
               <BarChart3 className="h-5 w-5 text-primary" />
               {filterDialogTitle}
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="mt-4 flex-1 overflow-auto min-h-0">
-            {showOltList ? (
-              /* OLT List View */
-              <div className="rounded-md border overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12 whitespace-nowrap">No</TableHead>
-                      <TableHead className="whitespace-nowrap">Hostname OLT</TableHead>
-                      <TableHead className="whitespace-nowrap">Jumlah Tiket</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {(() => {
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                ({showOltList 
+                  ? (() => {
                       const oltMap = new Map<string, number>();
                       tickets.forEach(ticket => {
                         if (ticket.hostname) {
                           oltMap.set(ticket.hostname, (oltMap.get(ticket.hostname) || 0) + 1);
                         }
                       });
-                      
-                      const uniqueOlts = Array.from(oltMap.entries())
-                        .sort((a, b) => a[0].localeCompare(b[0]));
-                      
-                      return uniqueOlts.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                            Tidak ada data OLT
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        uniqueOlts.map(([hostname, count], index) => (
-                          <TableRow key={hostname} className="hover:bg-muted/50">
-                            <TableCell className="font-medium">{index + 1}</TableCell>
-                            <TableCell className="font-semibold font-mono">{hostname}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg font-bold text-primary">{count}</span>
-                                <span className="text-xs text-muted-foreground">tiket</span>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      );
-                    })()}
-                  </TableBody>
-                </Table>
+                      return oltMap.size;
+                    })()
+                  : filterDialogTickets.length
+                } item)
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="mt-3 flex-1 overflow-auto min-h-0">
+            {showOltList ? (
+              /* OLT List View - Compact Cards */
+              <div className="space-y-2">
+                {(() => {
+                  const oltMap = new Map<string, number>();
+                  tickets.forEach(ticket => {
+                    if (ticket.hostname) {
+                      oltMap.set(ticket.hostname, (oltMap.get(ticket.hostname) || 0) + 1);
+                    }
+                  });
+                  
+                  const uniqueOlts = Array.from(oltMap.entries())
+                    .sort((a, b) => b[1] - a[1]); // Sort by count descending
+                  
+                  return uniqueOlts.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">
+                      Tidak ada data OLT
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {uniqueOlts.map(([hostname, count], index) => (
+                        <div 
+                          key={hostname} 
+                          className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="text-xs text-muted-foreground w-6">{index + 1}.</span>
+                            <span className="font-mono text-sm font-medium truncate">{hostname}</span>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <span className="text-lg font-bold text-primary">{count}</span>
+                            <span className="text-xs text-muted-foreground">tiket</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             ) : (
-              /* Ticket List View - Card Layout for mobile, Table for desktop */
+              /* Ticket List View - Compact Cards */
               filterDialogTickets.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
                   Tidak ada tiket dalam kategori ini
                 </p>
               ) : (
-                <>
-                  {/* Mobile Card View */}
-                  <div className="block lg:hidden space-y-3">
-                    {filterDialogTickets.map((ticket, index) => (
-                      <div 
-                        key={ticket.id}
-                        className="p-4 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors"
-                        onClick={() => {
-                          setFilterDialogOpen(false);
-                          setSelectedTicket(ticket);
-                        }}
-                      >
-                        <div className="flex items-start justify-between gap-2 mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">#{index + 1}</span>
-                            <span className="font-semibold text-primary">{ticket.id}</span>
-                          </div>
-                          <StatusBadge status={ticket.status} />
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                          <div>
-                            <span className="text-xs text-muted-foreground block">Customer</span>
-                            <span className="font-medium truncate block">
-                              {ticket.category === "FEEDER" 
-                                ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
-                                    ? `${ticket.fatId} - ${ticket.hostname}`
-                                    : ticket.constraint === "PORT DOWN"
-                                      ? (() => {
-                                          const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
-                                          const portInfo = match ? match[1] : "PORT";
-                                          return `${portInfo} - ${ticket.hostname}`;
-                                        })()
-                                      : ticket.customerName || "-")
-                                : (ticket.customerName || "-")
-                              }
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-xs text-muted-foreground block">Service ID</span>
-                            <span className="font-mono text-xs truncate block">{ticket.serviceId}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                          <div>
-                            <span className="text-xs text-muted-foreground block">Hostname</span>
-                            <span className="font-mono text-xs truncate block">{ticket.hostname}</span>
-                          </div>
-                          <div>
-                            <span className="text-xs text-muted-foreground block">SERPO</span>
-                            <span className="font-medium text-xs">{ticket.serpo}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-medium">
+                <div className="space-y-2">
+                  {filterDialogTickets.map((ticket, index) => (
+                    <div 
+                      key={ticket.id}
+                      className="p-3 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors"
+                      onClick={() => {
+                        setFilterDialogOpen(false);
+                        setSelectedTicket(ticket);
+                      }}
+                    >
+                      {/* Row 1: No, Ticket ID, Status */}
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xs text-muted-foreground flex-shrink-0">{index + 1}.</span>
+                          <span className="font-semibold text-primary text-sm truncate">{ticket.id}</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-accent/10 text-accent font-medium flex-shrink-0">
                             {ticket.constraint}
                           </span>
-                          <span
-                            className={`text-xs px-2 py-1 rounded-full font-medium ${
-                              ticket.category === "FEEDER"
-                                ? "bg-warning/20 text-warning"
-                                : "bg-primary/20 text-primary"
-                            }`}
-                          >
-                            {ticket.category}
-                          </span>
-                          <span className="text-xs text-muted-foreground ml-auto">
-                            {new Date(ticket.createdISO).toLocaleString("id-ID", {
-                              day: "2-digit",
-                              month: "short",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                        </div>
+                        <StatusBadge status={ticket.status} />
+                      </div>
+                      
+                      {/* Row 2: Customer, SERPO, Hostname */}
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                        <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">Customer:</span>
+                          <span className="font-medium truncate max-w-[150px]">
+                            {ticket.category === "FEEDER" 
+                              ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
+                                  ? `${ticket.fatId}`
+                                  : ticket.constraint === "PORT DOWN"
+                                    ? (() => {
+                                        const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
+                                        return match ? match[1] : "PORT";
+                                      })()
+                                    : ticket.customerName || "-")
+                              : (ticket.customerName || "-")
+                            }
                           </span>
                         </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">SERPO:</span>
+                          <span className="font-medium">{ticket.serpo}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">OLT:</span>
+                          <span className="font-mono truncate max-w-[120px]">{ticket.hostname}</span>
+                        </div>
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+                            ticket.category === "FEEDER"
+                              ? "bg-warning/20 text-warning"
+                              : "bg-primary/20 text-primary"
+                          }`}
+                        >
+                          {ticket.category}
+                        </span>
+                        <span className="text-muted-foreground ml-auto flex-shrink-0">
+                          {new Date(ticket.createdISO).toLocaleString("id-ID", {
+                            day: "2-digit",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                  
-                  {/* Desktop Table View */}
-                  <div className="hidden lg:block rounded-md border overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-12 whitespace-nowrap">No</TableHead>
-                          <TableHead className="whitespace-nowrap">Tiket ID</TableHead>
-                          <TableHead className="whitespace-nowrap">Service ID</TableHead>
-                          <TableHead className="whitespace-nowrap min-w-[150px]">Customer / Info</TableHead>
-                          <TableHead className="whitespace-nowrap">SERPO</TableHead>
-                          <TableHead className="whitespace-nowrap">Hostname</TableHead>
-                          <TableHead className="whitespace-nowrap">FAT ID</TableHead>
-                          <TableHead className="whitespace-nowrap">SN ONT</TableHead>
-                          <TableHead className="whitespace-nowrap">Constraint</TableHead>
-                          <TableHead className="whitespace-nowrap">Category</TableHead>
-                          <TableHead className="whitespace-nowrap">Status</TableHead>
-                          <TableHead className="whitespace-nowrap">Created</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filterDialogTickets.map((ticket, index) => (
-                          <TableRow 
-                            key={ticket.id}
-                            className="cursor-pointer hover:bg-muted/50 transition-colors"
-                            onClick={() => {
-                              setFilterDialogOpen(false);
-                              setSelectedTicket(ticket);
-                            }}
-                          >
-                            <TableCell className="font-medium">{index + 1}</TableCell>
-                            <TableCell className="font-semibold text-primary whitespace-nowrap">{ticket.id}</TableCell>
-                            <TableCell className="font-mono text-xs whitespace-nowrap">{ticket.serviceId}</TableCell>
-                            <TableCell className="max-w-[200px]">
-                              <span className="block truncate">
-                                {ticket.category === "FEEDER" 
-                                  ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
-                                      ? `${ticket.fatId} - ${ticket.hostname}`
-                                      : ticket.constraint === "PORT DOWN"
-                                        ? (() => {
-                                            const match = ticket.ticketResult.match(/PORT - (.+?) - DOWN/);
-                                            const portInfo = match ? match[1] : "PORT";
-                                            return `${portInfo} - ${ticket.hostname}`;
-                                          })()
-                                        : ticket.customerName || "-")
-                                  : (ticket.customerName || "-")
-                                }
-                              </span>
-                            </TableCell>
-                            <TableCell className="font-medium text-xs whitespace-nowrap">{ticket.serpo}</TableCell>
-                            <TableCell className="font-mono text-xs whitespace-nowrap">{ticket.hostname}</TableCell>
-                            <TableCell className="font-mono text-xs whitespace-nowrap">{ticket.fatId}</TableCell>
-                            <TableCell className="font-mono text-xs whitespace-nowrap">{ticket.snOnt}</TableCell>
-                            <TableCell>
-                              <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
-                                {ticket.constraint}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <span
-                                className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
-                                  ticket.category === "FEEDER"
-                                    ? "bg-warning/20 text-warning"
-                                    : "bg-primary/20 text-primary"
-                                }`}
-                              >
-                                {ticket.category}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <StatusBadge status={ticket.status} />
-                            </TableCell>
-                            <TableCell className="text-xs whitespace-nowrap">
-                              {new Date(ticket.createdISO).toLocaleString("id-ID", {
-                                day: "2-digit",
-                                month: "short",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </TableCell>
-                          </TableRow>
-                         ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </>
+                    </div>
+                  ))}
+                </div>
               )
             )}
           </div>
           
-          <div className="flex justify-end pt-4 border-t mt-4 flex-shrink-0">
-            <Button variant="outline" onClick={() => setFilterDialogOpen(false)}>
+          <div className="flex justify-end pt-3 border-t mt-3 flex-shrink-0">
+            <Button variant="outline" size="sm" onClick={() => setFilterDialogOpen(false)}>
               Tutup
             </Button>
           </div>
