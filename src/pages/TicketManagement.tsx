@@ -728,31 +728,31 @@ export default function TicketManagement() {
           <div className="rounded-md border overflow-auto max-h-96">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Ticket ID</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Customer/Type</TableHead>
-                  <TableHead>Service ID</TableHead>
-                  <TableHead>Serpo</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Action</TableHead>
+                <TableRow className="h-6">
+                  <TableHead className="px-1 py-0.5 text-[10px]">Ticket ID</TableHead>
+                  <TableHead className="px-1 py-0.5 text-[10px]">Type</TableHead>
+                  <TableHead className="px-1 py-0.5 text-[10px]">Customer/Type</TableHead>
+                  <TableHead className="px-1 py-0.5 text-[10px]">Service ID</TableHead>
+                  <TableHead className="px-1 py-0.5 text-[10px]">Serpo</TableHead>
+                  <TableHead className="px-1 py-0.5 text-[10px]">Status</TableHead>
+                  <TableHead className="px-1 py-0.5 text-[10px]">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {tickets.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground text-xs">
                       Belum ada tiket
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredTickets.map((ticket) => (
-                    <TableRow key={ticket.id}>
-                      <TableCell className="font-medium">{ticket.id}</TableCell>
-                      <TableCell>
+                    <TableRow key={ticket.id} className="h-8">
+                      <TableCell className="px-1 py-0.5 text-[10px] font-medium">{ticket.id}</TableCell>
+                      <TableCell className="px-1 py-0.5">
                         <div>
                           <Badge
-                            className={`text-[10px] px-1.5 py-0 ${
+                            className={`text-[8px] px-1 py-0 ${
                               ticket.category === "FEEDER"
                                 ? "bg-warning text-warning-foreground"
                                 : "bg-primary text-primary-foreground"
@@ -760,35 +760,36 @@ export default function TicketManagement() {
                           >
                             {ticket.category}
                           </Badge>
-                          <div className="text-[10px] text-muted-foreground mt-0.5">
+                          <div className="text-[8px] text-muted-foreground">
                             {ticket.constraint}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-1 py-0.5 text-[10px]">
                         {ticket.category === "FEEDER" ? (
-                          ticket.constraint === "OLT DOWN" ? ticket.hostname :
+                          ticket.constraint === "OLT DOWN" ? (
+                            <span className="font-medium">{ticket.hostname}</span>
+                          ) :
                           ticket.constraint === "PORT DOWN" ? (
-                            <div className="text-xs">
+                            <div>
                               <div className="font-medium">{ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT INFO"}</div>
-                              <div className="text-muted-foreground">{ticket.hostname}</div>
+                              <div className="text-muted-foreground text-[8px]">{ticket.hostname}</div>
                             </div>
                           ) :
                           ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX" ? (
-                            <div className="text-xs">
+                            <div>
                               <div className="font-medium">{ticket.fatId}</div>
-                              <div className="text-muted-foreground">{ticket.hostname}</div>
+                              <div className="text-muted-foreground text-[8px]">{ticket.hostname}</div>
                             </div>
-                          ) :
-                          ticket.constraint
+                          ) : ticket.constraint
                         ) : ticket.customerName}
                       </TableCell>
-                      <TableCell className="font-mono text-xs">{ticket.serviceId}</TableCell>
-                      <TableCell className="text-xs">{ticket.serpo}</TableCell>
-                      <TableCell>
+                      <TableCell className="px-1 py-0.5 font-mono text-[10px]">{ticket.serviceId}</TableCell>
+                      <TableCell className="px-1 py-0.5 text-[10px]">{ticket.serpo}</TableCell>
+                      <TableCell className="px-1 py-0.5">
                         <div>
                           <StatusBadge status={ticket.status} />
-                          <div className="text-[10px] text-muted-foreground mt-0.5">
+                          <div className="text-[8px] text-muted-foreground">
                             {ticket.createdAt}
                           </div>
                         </div>
