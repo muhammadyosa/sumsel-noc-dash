@@ -31,6 +31,7 @@ export const RITEL_CONSTRAINTS = [
   "GANGGUAN ICONPLAY",
   "GANGGUAN BERULANG",
   "PENGECEKAN BERSAMA",
+  "CABLE PROBLEM",
 ];
 
 // FEEDER Constraints - masuk bucket FEEDER (PROACTIVE NOC RETAIL)
@@ -39,7 +40,7 @@ export const FEEDER_CONSTRAINTS = [
   "FAT LOSS",
   "PORT DOWN",
   "OLT DOWN",
-  "CABLE PROBLEM",
+  "CABLE PROBLEM (FEEDER)",
 ];
 
 export const ALL_CONSTRAINTS = [...RITEL_CONSTRAINTS, ...FEEDER_CONSTRAINTS];
@@ -74,10 +75,10 @@ export function generateTicketFormat(
     return `[PROACTIVE NOC RETAIL] OLT DOWN UNDER - ${hostname} - ${serpo}`;
   }
   
-  if (constraint === "CABLE PROBLEM") {
+  if (constraint === "CABLE PROBLEM (FEEDER)") {
     return `[PROACTIVE NOC RETAIL] CABLE PROBLEM UNDER - ${serpo}`;
   }
   
-  // RITEL Format (default)
+  // RITEL Format (default) - includes CABLE PROBLEM
   return `${customerName} // ${constraint} - ${serpo} // ${fatId} // ${hostname} // ${snOnt} //`;
 }
