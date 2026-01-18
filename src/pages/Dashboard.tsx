@@ -548,15 +548,15 @@ export default function Dashboard() {
                             <TableCell className="px-1 py-0.5">
                               <div className="flex flex-col items-center justify-center gap-0.5">
                                 <span
-                                  className={`text-[8px] px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap ${
+                                  className={`text-[8px] px-1 py-0.5 rounded font-medium whitespace-nowrap ${
                                     ticket.category === "FEEDER"
-                                      ? "bg-gradient-to-r from-warning/25 to-warning/10 text-warning border border-warning/30"
-                                      : "bg-gradient-to-r from-primary/25 to-primary/10 text-primary border border-primary/30"
+                                      ? "bg-warning/20 text-warning"
+                                      : "bg-primary/20 text-primary"
                                   }`}
                                 >
-                                  {ticket.category === "FEEDER" ? "🏬" : "🏠"} {ticket.category}
+                                  {ticket.category}
                                 </span>
-                                <span className={`text-[7px] px-1.5 py-0.5 rounded-full whitespace-nowrap font-medium bg-accent/10 text-accent-foreground/70 border border-accent/20`}>
+                                <span className="text-[7px] text-muted-foreground/80 whitespace-nowrap font-medium">
                                   {ticket.constraint}
                                 </span>
                               </div>
