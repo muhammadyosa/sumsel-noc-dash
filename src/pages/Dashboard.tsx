@@ -525,19 +525,21 @@ export default function Dashboard() {
                         >
                           <TableCell className="px-2 py-2 text-sm font-medium">{ticket.id}</TableCell>
                           <TableCell className="px-2 py-2">
-                            <div className="flex flex-col items-center justify-center gap-1">
-                              <span
-                                className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
-                                  ticket.category === "FEEDER"
-                                    ? "bg-warning text-warning-foreground"
-                                    : "bg-primary text-primary-foreground"
-                                }`}
-                              >
-                                {ticket.category}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                            <div className="text-xs">
+                              <div className="font-medium">
+                                <span
+                                  className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
+                                    ticket.category === "FEEDER"
+                                      ? "bg-warning text-warning-foreground"
+                                      : "bg-primary text-primary-foreground"
+                                  }`}
+                                >
+                                  {ticket.category}
+                                </span>
+                              </div>
+                              <div className="text-muted-foreground mt-1">
                                 {ticket.constraint}
-                              </span>
+                              </div>
                             </div>
                           </TableCell>
                           <TableCell className="px-2 py-2">
@@ -566,18 +568,19 @@ export default function Dashboard() {
                           <TableCell className="px-2 py-2 font-mono text-sm">{ticket.serviceId}</TableCell>
                           <TableCell className="px-2 py-2 text-sm">{ticket.serpo}</TableCell>
                           <TableCell className="px-2 py-2">
-                            <div className="flex flex-col items-center justify-center gap-1">
-                              <StatusBadge status={ticket.status} />
-                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                            <div className="text-xs">
+                              <div className="font-medium">
+                                <StatusBadge status={ticket.status} />
+                              </div>
+                              <div className="text-muted-foreground mt-1">
                                 {new Date(ticket.createdISO).toLocaleString("id-ID", {
                                   day: "numeric",
                                   month: "numeric",
                                   year: "numeric",
                                   hour: "2-digit",
                                   minute: "2-digit",
-                                  second: "2-digit",
                                 })}
-                              </span>
+                              </div>
                             </div>
                           </TableCell>
                         </TableRow>
