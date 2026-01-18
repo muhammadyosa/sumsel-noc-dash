@@ -592,105 +592,88 @@ export default function Dashboard() {
 
       {/* Ticket Detail Dialog */}
       <Dialog open={!!selectedTicket} onOpenChange={() => setSelectedTicket(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <Activity className="h-5 w-5 text-primary" />
+        <DialogContent className="max-w-2xl p-4">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <Activity className="h-4 w-4 text-primary" />
               Detail Tiket
             </DialogTitle>
           </DialogHeader>
           
           {selectedTicket && (
-            <div className="space-y-6 mt-4">
-              {/* Status Badge */}
-              <div className="flex items-center justify-between pb-4 border-b">
+            <div className="space-y-3">
+              {/* Header: ID, Date, Status */}
+              <div className="flex items-center justify-between pb-2 border-b">
                 <div>
-                  <h3 className="text-2xl font-bold">{selectedTicket.id}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Dibuat pada {new Date(selectedTicket.createdISO).toLocaleString("id-ID", {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
+                  <h3 className="text-lg font-bold">{selectedTicket.id}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(selectedTicket.createdISO).toLocaleString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </p>
                 </div>
                 <StatusBadge status={selectedTicket.status} />
               </div>
 
-              {/* Category & Constraint */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-muted/30 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-1">Category</p>
-                  <span
-                    className={`inline-block text-sm px-3 py-1 rounded-full font-semibold ${
-                      selectedTicket.category === "FEEDER"
-                        ? "bg-warning/20 text-warning"
-                        : "bg-primary/20 text-primary"
-                    }`}
-                  >
-                    {selectedTicket.category}
-                  </span>
+              {/* Category & Constraint - Inline */}
+              <div className="flex gap-2 flex-wrap">
+                <span
+                  className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                    selectedTicket.category === "FEEDER"
+                      ? "bg-warning/20 text-warning"
+                      : "bg-primary/20 text-primary"
+                  }`}
+                >
+                  {selectedTicket.category}
+                </span>
+                <span className="text-xs px-2 py-1 rounded-full font-semibold bg-accent/20 text-accent">
+                  {selectedTicket.constraint}
+                </span>
+              </div>
+
+              {/* Combined Info Grid */}
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="p-2 bg-muted/30 rounded">
+                  <p className="text-muted-foreground mb-0.5">Service ID</p>
+                  <p className="font-mono font-medium truncate">{selectedTicket.serviceId}</p>
                 </div>
-                <div className="p-4 bg-muted/30 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-1">Constraint</p>
-                  <span className="text-sm font-semibold text-accent">
-                    {selectedTicket.constraint}
-                  </span>
+                <div className="p-2 bg-muted/30 rounded">
+                  <p className="text-muted-foreground mb-0.5">Customer</p>
+                  <p className="font-medium truncate">{selectedTicket.customerName || "-"}</p>
+                </div>
+                <div className="p-2 bg-muted/30 rounded">
+                  <p className="text-muted-foreground mb-0.5">SERPO</p>
+                  <p className="font-medium truncate">{selectedTicket.serpo}</p>
+                </div>
+                <div className="p-2 bg-muted/30 rounded">
+                  <p className="text-muted-foreground mb-0.5">Hostname</p>
+                  <p className="font-mono font-medium truncate">{selectedTicket.hostname}</p>
+                </div>
+                <div className="p-2 bg-muted/30 rounded">
+                  <p className="text-muted-foreground mb-0.5">FAT ID</p>
+                  <p className="font-mono font-medium truncate">{selectedTicket.fatId}</p>
+                </div>
+                <div className="p-2 bg-muted/30 rounded">
+                  <p className="text-muted-foreground mb-0.5">SN ONT</p>
+                  <p className="font-mono font-medium truncate">{selectedTicket.snOnt}</p>
                 </div>
               </div>
 
-              {/* Customer Information */}
-              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                <h4 className="font-semibold mb-3 text-primary">Customer Information</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Service ID</p>
-                    <p className="text-sm font-mono">{selectedTicket.serviceId}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Customer Name</p>
-                    <p className="text-sm">{selectedTicket.customerName || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">SERPO</p>
-                    <p className="text-sm font-semibold">{selectedTicket.serpo}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Technical Details */}
-              <div className="p-4 bg-accent/5 rounded-lg border border-accent/20">
-                <h4 className="font-semibold mb-3 text-accent">Technical Details</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Hostname</p>
-                    <p className="text-sm font-mono">{selectedTicket.hostname}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">FAT ID</p>
-                    <p className="text-sm font-mono">{selectedTicket.fatId}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">SN ONT</p>
-                    <p className="text-sm font-mono">{selectedTicket.snOnt}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Ticket Result */}
-              <div className="p-4 bg-success/5 rounded-lg border border-success/20">
-                <h4 className="font-semibold mb-2 text-success">Ticket Result</h4>
-                <pre className="text-sm whitespace-pre-wrap font-mono bg-background p-3 rounded border">
+              {/* Ticket Result - Compact */}
+              <div className="p-2 bg-success/5 rounded border border-success/20">
+                <p className="text-xs font-semibold text-success mb-1">Ticket Result</p>
+                <pre className="text-[10px] whitespace-pre-wrap font-mono bg-background p-2 rounded border max-h-24 overflow-auto">
                   {selectedTicket.ticketResult}
                 </pre>
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end pt-4 border-t">
-                <Button variant="outline" onClick={() => setSelectedTicket(null)}>
+              <div className="flex justify-end pt-2 border-t">
+                <Button variant="outline" size="sm" onClick={() => setSelectedTicket(null)}>
                   Tutup
                 </Button>
               </div>
