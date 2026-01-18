@@ -183,7 +183,6 @@ const OLTDeviceList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">No</TableHead>
                   <TableHead>PROVINSI</TableHead>
                   <TableHead>ID OLT</TableHead>
                   <TableHead>HOSTNAME OLT</TableHead>
@@ -195,22 +194,21 @@ const OLTDeviceList = () => {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
                       Memuat data OLT...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
                       {oltData.length === 0
                         ? "Belum ada data OLT. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredData.slice(0, 100).map((olt, index) => (
+                  filteredData.slice(0, 100).map((olt) => (
                     <TableRow key={olt.id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell>{olt.provinsi}</TableCell>
                       <TableCell className="font-mono text-xs">{olt.idOlt}</TableCell>
                       <TableCell className="font-mono text-xs">{olt.hostnameOlt}</TableCell>
