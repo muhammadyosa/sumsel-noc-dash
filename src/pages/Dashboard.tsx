@@ -747,7 +747,13 @@ export default function Dashboard() {
                       {uniqueOlts.map(([hostname, count], index) => (
                         <div 
                           key={hostname} 
-                          className="p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                          className="p-3 rounded-lg border bg-card hover:bg-muted/50 cursor-pointer transition-colors"
+                          onClick={() => {
+                            const oltTickets = tickets.filter(t => t.hostname === hostname);
+                            setShowOltList(false);
+                            setFilterDialogTickets(oltTickets);
+                            setFilterDialogTitle(`Tiket OLT: ${hostname}`);
+                          }}
                         >
                           {/* Row 1: No, Hostname, Count */}
                           <div className="flex items-center justify-between gap-2 mb-2">
@@ -764,8 +770,7 @@ export default function Dashboard() {
                           {/* Row 2: Additional Info */}
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                             <div className="flex items-center gap-1">
-                              <span className="text-muted-foreground">Status:</span>
-                              <span className="font-medium text-success">Active</span>
+                              <span className="text-muted-foreground">Klik untuk lihat tiket</span>
                             </div>
                             <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-warning/20 text-warning">
                               OLT
