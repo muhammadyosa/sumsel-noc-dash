@@ -508,7 +508,6 @@ export default function Dashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow className="h-7">
-                        <TableHead className="w-6 px-1 py-0.5 text-[9px]">#</TableHead>
                         <TableHead className="px-1 py-0.5 text-[9px]">Tiket</TableHead>
                         <TableHead className="px-1 py-0.5 text-[9px]">SID</TableHead>
                         <TableHead className="px-1 py-0.5 text-[9px]">Info</TableHead>
@@ -527,7 +526,6 @@ export default function Dashboard() {
                           className="cursor-pointer hover:bg-muted/50 transition-colors h-6"
                           onClick={() => setSelectedTicket(ticket)}
                         >
-                            <TableCell className="px-1 py-0.5 text-[9px] font-medium">{index + 1}</TableCell>
                             <TableCell className="px-1 py-0.5 text-[9px] font-semibold text-primary">{ticket.id}</TableCell>
                             <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.serviceId}</TableCell>
                             <TableCell className="px-1 py-0.5 text-[9px] max-w-[100px] truncate">
