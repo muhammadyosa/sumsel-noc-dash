@@ -507,32 +507,31 @@ export default function Dashboard() {
                 <div className="rounded-md border overflow-auto max-h-80">
                   <Table>
                     <TableHeader>
-                      <TableRow className="h-8">
-                        <TableHead className="w-8 px-2 py-1 text-[10px]">No</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">Tiket ID</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">Service ID</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">Info</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">SERPO</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">Hostname</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">FAT</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">ONT</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">Constraint</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">Cat</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">Status</TableHead>
-                        <TableHead className="px-2 py-1 text-[10px]">Time</TableHead>
+                      <TableRow className="h-7">
+                        <TableHead className="w-6 px-1 py-0.5 text-[9px]">#</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">Tiket</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">SID</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">Info</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">SERPO</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">Host</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">FAT</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">ONT</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">Constraint</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">Cat</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px]">Status/Time</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {recentTickets.map((ticket, index) => (
                         <TableRow 
                           key={ticket.id}
-                          className="cursor-pointer hover:bg-muted/50 transition-colors h-7"
+                          className="cursor-pointer hover:bg-muted/50 transition-colors h-6"
                           onClick={() => setSelectedTicket(ticket)}
                         >
-                            <TableCell className="px-2 py-1 text-[10px] font-medium">{index + 1}</TableCell>
-                            <TableCell className="px-2 py-1 text-[10px] font-semibold text-primary">{ticket.id}</TableCell>
-                            <TableCell className="px-2 py-1 font-mono text-[10px]">{ticket.serviceId}</TableCell>
-                            <TableCell className="px-2 py-1 text-[10px] max-w-[120px] truncate">
+                            <TableCell className="px-1 py-0.5 text-[9px] font-medium">{index + 1}</TableCell>
+                            <TableCell className="px-1 py-0.5 text-[9px] font-semibold text-primary">{ticket.id}</TableCell>
+                            <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.serviceId}</TableCell>
+                            <TableCell className="px-1 py-0.5 text-[9px] max-w-[100px] truncate">
                               {ticket.category === "FEEDER" 
                                 ? (ticket.constraint === "FAT LOSS" || ticket.constraint === "FAT LOW RX"
                                     ? `${ticket.fatId}`
@@ -545,18 +544,18 @@ export default function Dashboard() {
                                 : (ticket.customerName || "-")
                               }
                             </TableCell>
-                            <TableCell className="px-2 py-1 text-[10px] font-medium">{ticket.serpo}</TableCell>
-                            <TableCell className="px-2 py-1 font-mono text-[10px]">{ticket.hostname}</TableCell>
-                            <TableCell className="px-2 py-1 font-mono text-[10px]">{ticket.fatId}</TableCell>
-                            <TableCell className="px-2 py-1 font-mono text-[10px]">{ticket.snOnt}</TableCell>
-                            <TableCell className="px-2 py-1">
-                              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-accent/10 text-accent font-medium whitespace-nowrap">
+                            <TableCell className="px-1 py-0.5 text-[9px] font-medium">{ticket.serpo}</TableCell>
+                            <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.hostname}</TableCell>
+                            <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.fatId}</TableCell>
+                            <TableCell className="px-1 py-0.5 font-mono text-[9px]">{ticket.snOnt}</TableCell>
+                            <TableCell className="px-1 py-0.5">
+                              <span className="text-[8px] px-1 py-0.5 rounded bg-accent/10 text-accent font-medium whitespace-nowrap">
                                 {ticket.constraint}
                               </span>
                             </TableCell>
-                            <TableCell className="px-2 py-1">
+                            <TableCell className="px-1 py-0.5">
                               <span
-                                className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap ${
+                                className={`text-[8px] px-1 py-0.5 rounded font-medium whitespace-nowrap ${
                                   ticket.category === "FEEDER"
                                     ? "bg-warning/20 text-warning"
                                     : "bg-primary/20 text-primary"
@@ -565,16 +564,18 @@ export default function Dashboard() {
                                 {ticket.category}
                               </span>
                             </TableCell>
-                            <TableCell className="px-2 py-1">
-                              <StatusBadge status={ticket.status} />
-                            </TableCell>
-                            <TableCell className="px-2 py-1 text-[10px] whitespace-nowrap">
-                              {new Date(ticket.createdISO).toLocaleString("id-ID", {
-                                day: "2-digit",
-                                month: "short",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
+                            <TableCell className="px-1 py-0.5">
+                              <div className="flex flex-col items-start gap-0.5">
+                                <StatusBadge status={ticket.status} />
+                                <span className="text-[8px] text-muted-foreground whitespace-nowrap">
+                                  {new Date(ticket.createdISO).toLocaleString("id-ID", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
+                              </div>
                             </TableCell>
                           </TableRow>
                       ))}
