@@ -518,7 +518,7 @@ export default function Dashboard() {
                         <TableHead className="px-1 py-0.5 text-[9px]">ONT</TableHead>
                         <TableHead className="px-1 py-0.5 text-[9px]">Constraint</TableHead>
                         <TableHead className="px-1 py-0.5 text-[9px]">Cat</TableHead>
-                        <TableHead className="px-1 py-0.5 text-[9px]">Status/Time</TableHead>
+                        <TableHead className="px-1 py-0.5 text-[9px] text-center">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -565,9 +565,9 @@ export default function Dashboard() {
                               </span>
                             </TableCell>
                             <TableCell className="px-1 py-0.5">
-                              <div className="flex items-center gap-1.5">
+                              <div className="flex flex-col items-center justify-center gap-0.5">
                                 <StatusBadge status={ticket.status} />
-                                <span className="text-[8px] text-muted-foreground whitespace-nowrap">
+                                <span className="text-[7px] text-muted-foreground/80 whitespace-nowrap font-medium">
                                   {new Date(ticket.createdISO).toLocaleString("id-ID", {
                                     day: "2-digit",
                                     month: "short",
