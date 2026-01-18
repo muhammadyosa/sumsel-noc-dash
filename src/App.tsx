@@ -54,19 +54,19 @@ const App = () => {
           <Sonner position="top-right" />
           <BrowserRouter>
             <SidebarProvider>
-              <div className="flex min-h-screen w-full">
+              <div className="flex min-h-screen w-full overflow-x-hidden">
                 <AppSidebar />
-                <div className="flex-1 flex flex-col">
-                  <header className="sticky top-0 z-10 h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                    <div className="flex h-14 items-center px-4 gap-3">
+                <div className="flex-1 flex flex-col min-w-0">
+                  <header className="sticky top-0 z-10 h-12 sm:h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <div className="flex h-12 sm:h-14 items-center px-2 sm:px-4 gap-2 sm:gap-3">
                       <SidebarTrigger />
-                      <div className="flex items-center gap-2">
-                        <img src={iconnetLogo} alt="Iconnet" className="h-8 w-auto" />
-                        <span className="font-semibold text-lg">NOC RITEL</span>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <img src={iconnetLogo} alt="Iconnet" className="h-6 sm:h-8 w-auto flex-shrink-0" />
+                        <span className="font-semibold text-sm sm:text-lg truncate">NOC RITEL</span>
                       </div>
                     </div>
                   </header>
-                  <main className="flex-1 p-6 overflow-hidden">
+                  <main className="flex-1 p-2 sm:p-4 md:p-6 overflow-x-hidden overflow-y-auto">
                     <AnimatedRoutes />
                   </main>
                 </div>
