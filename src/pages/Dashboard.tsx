@@ -307,8 +307,8 @@ export default function Dashboard() {
                 const feederCount = tickets.filter((t) => t.category === "FEEDER").length;
 
                 const categoryData = [
-                  { name: "🔖 RITEL", value: ritelCount, fill: "hsl(217, 91%, 60%)", category: "RITEL" },
-                  { name: "🛰️ FEEDER", value: feederCount, fill: "hsl(38, 92%, 50%)", category: "FEEDER" },
+                  { name: "🏠 RITEL", value: ritelCount, fill: "hsl(217, 91%, 60%)", category: "RITEL" },
+                  { name: "🏬 FEEDER", value: feederCount, fill: "hsl(38, 92%, 50%)", category: "FEEDER" },
                 ];
 
                 const chartConfig: ChartConfig = {
