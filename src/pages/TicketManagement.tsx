@@ -735,15 +735,14 @@ export default function TicketManagement() {
                   <TableHead>Service ID</TableHead>
                   <TableHead>Constraint</TableHead>
                   <TableHead>Serpo</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
                   <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {tickets.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
                       Belum ada tiket
                     </TableCell>
                   </TableRow>
@@ -784,9 +783,13 @@ export default function TicketManagement() {
                       <TableCell className="text-xs">{ticket.constraint}</TableCell>
                       <TableCell className="text-xs">{ticket.serpo}</TableCell>
                       <TableCell>
-                        <StatusBadge status={ticket.status} />
+                        <div className="flex flex-col items-center justify-center gap-0.5">
+                          <StatusBadge status={ticket.status} />
+                          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                            {ticket.createdAt}
+                          </span>
+                        </div>
                       </TableCell>
-                      <TableCell className="text-xs">{ticket.createdAt}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Dialog>
