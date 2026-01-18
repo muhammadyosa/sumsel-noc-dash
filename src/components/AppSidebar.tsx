@@ -32,20 +32,20 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
+    <Sidebar className={collapsed ? "w-12 sm:w-14" : "w-56 sm:w-64"} collapsible="icon">
       <SidebarContent>
-        <div className="p-4 border-b border-sidebar-border">
+        <div className="p-2 sm:p-4 border-b border-sidebar-border">
         {!collapsed ? (
-            <div className="flex items-center gap-3">
-              <img src={iconnetLogo} alt="Iconnet" className="h-12 w-auto" />
-              <div className="space-y-0.5">
-                <p className="text-sm font-semibold text-sidebar-foreground">NOC RITEL</p>
-                <p className="text-xs text-sidebar-foreground/70">Iconnet</p>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <img src={iconnetLogo} alt="Iconnet" className="h-8 sm:h-12 w-auto" />
+              <div className="space-y-0.5 min-w-0">
+                <p className="text-xs sm:text-sm font-semibold text-sidebar-foreground truncate">NOC RITEL</p>
+                <p className="text-[10px] sm:text-xs text-sidebar-foreground/70">Iconnet</p>
               </div>
             </div>
           ) : (
             <div className="flex justify-center items-center">
-              <img src={iconnetLogo} alt="Iconnet" className="h-6 w-6 object-contain" />
+              <img src={iconnetLogo} alt="Iconnet" className="h-5 w-5 sm:h-6 sm:w-6 object-contain" />
             </div>
           )}
         </div>
@@ -68,11 +68,11 @@ export function AppSidebar() {
                       }
                     >
                       {item.emoji ? (
-                        <span className="text-base transition-transform duration-200 group-hover:scale-110">{item.emoji}</span>
+                        <span className="text-sm sm:text-base transition-transform duration-200 group-hover:scale-110">{item.emoji}</span>
                       ) : item.icon ? (
-                        <item.icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                        <item.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-200 group-hover:scale-110" />
                       ) : null}
-                      {!collapsed && <span>{item.title}</span>}
+                      {!collapsed && <span className="text-xs sm:text-sm truncate">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -82,20 +82,20 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <div className="mt-auto border-t border-sidebar-border">
-          <div className="p-4">
+          <div className="p-2 sm:p-4">
             <Button
               variant="ghost"
               size={collapsed ? "icon" : "default"}
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent text-xs sm:text-sm"
             >
-              <span className="text-base">{theme === "dark" ? "☀️" : "🌙"}</span>
-              {!collapsed && <span className="ml-2">{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
+              <span className="text-sm sm:text-base">{theme === "dark" ? "☀️" : "🌙"}</span>
+              {!collapsed && <span className="ml-1 sm:ml-2 truncate">{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
             </Button>
           </div>
           {!collapsed && (
-            <div className="px-4 pb-4 text-center">
-              <p className="text-xs text-sidebar-foreground/50">
+            <div className="px-2 sm:px-4 pb-2 sm:pb-4 text-center">
+              <p className="text-[10px] sm:text-xs text-sidebar-foreground/50">
                 © RZ Corp. All Rights Reserved
               </p>
             </div>

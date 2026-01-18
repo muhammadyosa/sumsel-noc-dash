@@ -87,37 +87,37 @@ export default function Teams() {
   const selectedTeamData = selectedTeam ? teamStats[selectedTeam] : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       <div>
-        <h1 className="text-3xl font-bold">👥 List Team</h1>
-        <p className="text-muted-foreground">Statistik ticket per tim dalam bentuk grafik batang</p>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">👥 List Team</h1>
+        <p className="text-muted-foreground text-xs sm:text-sm">Statistik ticket per tim dalam bentuk grafik batang</p>
       </div>
 
       {Object.keys(teamStats).length === 0 ? (
         <Card className="shadow-card">
           <CardContent className="pt-6">
             <div className="text-center text-muted-foreground py-8">
-              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Belum ada data tim. Buat tiket untuk melihat statistik tim.</p>
+              <Users className="h-10 sm:h-12 w-10 sm:w-12 mx-auto mb-4 opacity-50" />
+              <p className="text-sm">Belum ada data tim. Buat tiket untuk melihat statistik tim.</p>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
           {/* Bar Chart */}
-          <Card className="shadow-card lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+          <Card className="shadow-card lg:col-span-2 overflow-hidden">
+            <CardHeader className="p-3 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5" />
                 Statistik Ticket per Tim
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[500px] w-full transition-all duration-500 ease-out">
+            <CardContent className="p-2 sm:p-6 pt-0">
+              <ChartContainer config={chartConfig} className="h-[300px] sm:h-[400px] md:h-[500px] w-full transition-all duration-500 ease-out">
                 <BarChart
                   data={chartData}
                   layout="vertical"
-                  margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
+                  margin={{ top: 10, right: 20, left: 50, bottom: 10 }}
                   barCategoryGap="25%"
                   barGap={1}
                   onClick={(data) => {
@@ -129,17 +129,17 @@ export default function Teams() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
                   <XAxis 
                     type="number"
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis 
                     type="category"
                     dataKey="team"
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 8, fill: "hsl(var(--muted-foreground))" }}
                     axisLine={false}
                     tickLine={false}
-                    width={75}
+                    width={45}
                   />
                   <ChartTooltip
                     content={
@@ -183,7 +183,7 @@ export default function Teams() {
                   />
                 </BarChart>
               </ChartContainer>
-              <p className="text-xs text-muted-foreground text-center mt-2">
+              <p className="text-[10px] sm:text-xs text-muted-foreground text-center mt-2">
                 Klik pada bar untuk melihat detail tickets tim
               </p>
             </CardContent>
@@ -191,34 +191,34 @@ export default function Teams() {
 
           {/* Detail Panel */}
           <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Eye className="h-5 w-5" />
-                {selectedTeam ? `Detail: ${selectedTeam}` : "Detail Tim"}
+            <CardHeader className="p-3 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="truncate">{selectedTeam ? `Detail: ${selectedTeam}` : "Detail Tim"}</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 sm:p-6 pt-0">
               {selectedTeamData ? (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-muted-foreground">Total Tickets:</span>
                       <span className="font-bold">{selectedTeamData.total}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-success">Resolved:</span>
                       <span className="font-medium text-success">{selectedTeamData.resolved}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-warning">In Progress/Pending:</span>
                       <span className="font-medium text-warning">{selectedTeamData.pending}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-destructive">Critical:</span>
                       <span className="font-medium text-destructive">{selectedTeamData.critical}</span>
                     </div>
-                    <div className="mt-4 pt-4 border-t">
-                      <div className="flex justify-between text-sm font-medium">
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
+                      <div className="flex justify-between text-xs sm:text-sm font-medium">
                         <span>Resolution Rate:</span>
                         <span className="text-primary">
                           {selectedTeamData.total > 0
@@ -231,50 +231,50 @@ export default function Teams() {
 
                   <Sheet>
                     <SheetTrigger asChild>
-                      <Button variant="outline" size="sm" className="w-full mt-4">
-                        <Eye className="h-4 w-4 mr-2" />
+                      <Button variant="outline" size="sm" className="w-full mt-3 sm:mt-4 text-xs sm:text-sm">
+                        <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Lihat Detail Tickets
                       </Button>
                     </SheetTrigger>
-                    <SheetContent side="right" className="w-full sm:max-w-2xl">
+                    <SheetContent side="right" className="w-full sm:max-w-lg md:max-w-2xl p-3 sm:p-6">
                       <SheetHeader>
-                        <SheetTitle>Detail Tickets - {selectedTeam}</SheetTitle>
-                        <SheetDescription>
+                        <SheetTitle className="text-base sm:text-lg">Detail Tickets - {selectedTeam}</SheetTitle>
+                        <SheetDescription className="text-xs sm:text-sm">
                           Daftar semua tickets yang ditangani oleh tim {selectedTeam}
                         </SheetDescription>
                       </SheetHeader>
-                      <ScrollArea className="h-[calc(100vh-120px)] mt-6">
-                        <div className="space-y-4 pr-4">
+                      <ScrollArea className="h-[calc(100vh-150px)] sm:h-[calc(100vh-120px)] mt-4 sm:mt-6">
+                        <div className="space-y-3 sm:space-y-4 pr-2 sm:pr-4">
                           {selectedTeamData.tickets.map((ticket) => (
                             <Card key={ticket.id} className="shadow-sm">
-                              <CardContent className="pt-4">
-                                <div className="space-y-3">
+                              <CardContent className="p-3 sm:pt-4">
+                                <div className="space-y-2 sm:space-y-3">
                                   <div className="flex items-start justify-between gap-2">
-                                    <div>
-                                      <p className="font-bold text-sm">{ticket.id}</p>
-                                      <p className="text-xs text-muted-foreground mt-1">
+                                    <div className="min-w-0 flex-1">
+                                      <p className="font-bold text-xs sm:text-sm truncate">{ticket.id}</p>
+                                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                                         {ticket.createdAt}
                                       </p>
                                     </div>
-                                    <div className="flex flex-col gap-1">
+                                    <div className="flex flex-col gap-1 flex-shrink-0">
                                       <StatusBadge status={ticket.status} />
                                       <Badge
                                         variant="outline"
-                                        className={
+                                        className={`text-[10px] sm:text-xs ${
                                           ticket.category === "FEEDER"
                                             ? "bg-warning/10 text-warning border-warning/20"
                                             : "bg-primary/10 text-primary border-primary/20"
-                                        }
+                                        }`}
                                       >
                                         {ticket.category}
                                       </Badge>
                                     </div>
                                   </div>
                                   
-                                  <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <div>
+                                  <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
+                                    <div className="min-w-0">
                                       <span className="text-muted-foreground">Customer/Type:</span>
-                                      <p className="font-medium">
+                                      <p className="font-medium truncate">
                                         {ticket.category === "FEEDER" ? (
                                           ticket.constraint === "OLT DOWN" ? ticket.hostname :
                                           ticket.constraint === "PORT DOWN" ? (ticket.ticketResult.match(/PORT - (.*?) - DOWN/)?.[1] || "PORT INFO") :
@@ -283,33 +283,33 @@ export default function Teams() {
                                         ) : ticket.customerName}
                                       </p>
                                     </div>
-                                    <div>
+                                    <div className="min-w-0">
                                       <span className="text-muted-foreground">Service ID:</span>
-                                      <p className="font-medium font-mono">{ticket.serviceId}</p>
+                                      <p className="font-medium font-mono truncate">{ticket.serviceId}</p>
                                     </div>
-                                    <div>
+                                    <div className="min-w-0">
                                       <span className="text-muted-foreground">Constraint:</span>
-                                      <p className="font-medium">{ticket.constraint}</p>
+                                      <p className="font-medium truncate">{ticket.constraint}</p>
                                     </div>
-                                    <div>
+                                    <div className="min-w-0">
                                       <span className="text-muted-foreground">Hostname:</span>
-                                      <p className="font-medium font-mono text-[10px]">
+                                      <p className="font-medium font-mono text-[9px] sm:text-[10px] truncate">
                                         {ticket.hostname}
                                       </p>
                                     </div>
-                                    <div>
+                                    <div className="min-w-0">
                                       <span className="text-muted-foreground">FAT ID:</span>
-                                      <p className="font-medium font-mono">{ticket.fatId}</p>
+                                      <p className="font-medium font-mono truncate">{ticket.fatId}</p>
                                     </div>
-                                    <div>
+                                    <div className="min-w-0">
                                       <span className="text-muted-foreground">SN ONT:</span>
-                                      <p className="font-medium font-mono">{ticket.snOnt}</p>
+                                      <p className="font-medium font-mono truncate">{ticket.snOnt}</p>
                                     </div>
                                   </div>
                                   
                                   <div className="pt-2 border-t">
-                                    <span className="text-xs text-muted-foreground">Ticket Result:</span>
-                                    <p className="text-xs font-mono mt-1 p-2 bg-muted/50 rounded">
+                                    <span className="text-[10px] sm:text-xs text-muted-foreground">Ticket Result:</span>
+                                    <p className="text-[10px] sm:text-xs font-mono mt-1 p-1.5 sm:p-2 bg-muted/50 rounded break-all">
                                       {ticket.ticketResult}
                                     </p>
                                   </div>
@@ -323,9 +323,9 @@ export default function Teams() {
                   </Sheet>
                 </div>
               ) : (
-                <div className="text-center text-muted-foreground py-8">
-                  <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-sm">Klik pada grafik untuk melihat detail tim</p>
+                <div className="text-center text-muted-foreground py-6 sm:py-8">
+                  <Users className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 opacity-50" />
+                  <p className="text-xs sm:text-sm">Klik pada grafik untuk melihat detail tim</p>
                 </div>
               )}
             </CardContent>
