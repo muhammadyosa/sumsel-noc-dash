@@ -565,7 +565,7 @@ export default function Dashboard() {
                               </span>
                             </TableCell>
                             <TableCell className="px-1 py-0.5">
-                              <div className="flex flex-col items-start gap-0.5">
+                              <div className="flex items-center gap-1.5">
                                 <StatusBadge status={ticket.status} />
                                 <span className="text-[8px] text-muted-foreground whitespace-nowrap">
                                   {new Date(ticket.createdISO).toLocaleString("id-ID", {
