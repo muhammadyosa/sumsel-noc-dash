@@ -225,7 +225,6 @@ const BNGList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">No</TableHead>
                   <TableHead>IP RADIUS</TableHead>
                   <TableHead>HOSTNAME RADIUS</TableHead>
                   <TableHead>IP BNG</TableHead>
@@ -241,22 +240,21 @@ const BNGList = () => {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center text-muted-foreground">
+                    <TableCell colSpan={10} className="text-center text-muted-foreground">
                       Memuat data BNG...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center text-muted-foreground">
+                    <TableCell colSpan={10} className="text-center text-muted-foreground">
                       {bngData.length === 0
                         ? "Belum ada data BNG. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredData.slice(0, 100).map((bng, index) => (
+                  filteredData.slice(0, 100).map((bng) => (
                     <TableRow key={bng.id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell className="font-mono text-xs">{bng.ipRadius}</TableCell>
                       <TableCell className="font-mono text-xs">{bng.hostnameRadius}</TableCell>
                       <TableCell className="font-mono text-xs">{bng.ipBng}</TableCell>

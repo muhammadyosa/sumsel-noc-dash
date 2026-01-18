@@ -176,7 +176,6 @@ const FATList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-16">No</TableHead>
                   <TableHead>Nama Provinsi</TableHead>
                   <TableHead>ID FAT</TableHead>
                   <TableHead>Hostname OLT</TableHead>
@@ -186,22 +185,21 @@ const FATList = () => {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
                       Memuat data FAT...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
                       {fatData.length === 0
                         ? "Belum ada data FAT. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
                     </TableCell>
                   </TableRow>
                  ) : (
-                  filteredData.slice(0, 100).map((fat, index) => (
+                  filteredData.slice(0, 100).map((fat) => (
                     <TableRow key={fat.id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell className="font-medium">{fat.provinsi}</TableCell>
                       <TableCell className="font-mono text-xs">{fat.fatId}</TableCell>
                       <TableCell className="font-mono text-xs">{fat.hostname}</TableCell>

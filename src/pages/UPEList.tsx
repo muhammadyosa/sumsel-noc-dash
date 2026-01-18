@@ -193,7 +193,6 @@ const UPEList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-16">No</TableHead>
                   <TableHead>Hostname UPE</TableHead>
                   <TableHead>Hostname OLT</TableHead>
                 </TableRow>
@@ -201,22 +200,21 @@ const UPEList = () => {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center text-muted-foreground">
+                    <TableCell colSpan={2} className="text-center text-muted-foreground">
                       Memuat data UPE...
                     </TableCell>
                   </TableRow>
                 ) : filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center text-muted-foreground">
+                    <TableCell colSpan={2} className="text-center text-muted-foreground">
                       {upeData.length === 0
                         ? "Belum ada data UPE. Silakan import file Excel/CSV."
                         : "Tidak ada data yang sesuai dengan pencarian."}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredData.slice(0, 100).map((upe, index) => (
+                  filteredData.slice(0, 100).map((upe) => (
                     <TableRow key={upe.id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell className="font-mono text-xs">{upe.hostnameUPE}</TableCell>
                       <TableCell className="font-mono text-xs">{upe.hostnameOLT}</TableCell>
                     </TableRow>
