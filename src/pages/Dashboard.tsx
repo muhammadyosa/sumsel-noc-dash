@@ -699,7 +699,7 @@ export default function Dashboard() {
 
       {/* Filter Dialog - Shows tickets by Status or Category or OLT List */}
       <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] w-full lg:max-w-7xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
               <BarChart3 className="h-5 w-5 text-primary" />
