@@ -117,9 +117,9 @@ export default function Teams() {
                 <BarChart
                   data={chartData}
                   layout="vertical"
-                  margin={{ top: 10, right: 20, left: 50, bottom: 10 }}
-                  barCategoryGap="25%"
-                  barGap={1}
+                  margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
+                  barCategoryGap="20%"
+                  barGap={2}
                   onClick={(data) => {
                     if (data?.activePayload?.[0]?.payload?.team) {
                       setSelectedTeam(data.activePayload[0].payload.team);
@@ -129,17 +129,18 @@ export default function Teams() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
                   <XAxis 
                     type="number"
-                    tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis 
                     type="category"
                     dataKey="team"
-                    tick={{ fontSize: 8, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                     axisLine={false}
                     tickLine={false}
-                    width={45}
+                    width={70}
+                    tickFormatter={(value) => value.length > 10 ? `${value.slice(0, 10)}...` : value}
                   />
                   <ChartTooltip
                     content={
